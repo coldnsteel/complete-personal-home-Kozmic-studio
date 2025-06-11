@@ -1,0 +1,2016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎸 Ultimate Cosmic Shredder Studio 🌌</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(45deg, #1a1a2e, #16213e, #0f3460, #e73c7e, #23a6d5);
+            background-size: 400% 400%;
+            color: white;
+            overflow-x: auto;
+            min-height: 100vh;
+            animation: cosmicDance 8s ease-in-out infinite;
+        }
+
+        @keyframes cosmicDance {
+            0% { background-position: 0% 50%; }
+            25% { background-position: 100% 50%; }
+            50% { background-position: 100% 100%; }
+            75% { background-position: 0% 100%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .cosmic-header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(15px);
+            border-bottom: 3px solid #ff6b9d;
+            box-shadow: 0 5px 25px rgba(255, 107, 157, 0.5);
+        }
+
+        .cosmic-header h1 {
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #ff6b9d, #4ecdc4, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(255, 107, 157, 0.8);
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+
+        .cosmic-subtitle {
+            font-size: 1.2em;
+            color: #4ecdc4;
+            margin-top: 10px;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 25px;
+            padding: 25px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .module {
+            background: rgba(44, 44, 78, 0.95);
+            border: 3px solid;
+            border-image: linear-gradient(45deg, #ff6b9d, #4ecdc4, #ffd700) 1;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 0 30px rgba(255, 107, 157, 0.4);
+            transition: all 0.4s ease;
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .module::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #ff6b9d, #4ecdc4, #ffd700);
+            border-radius: 20px;
+            z-index: -1;
+            animation: borderDance 4s linear infinite;
+        }
+
+        @keyframes borderDance {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .module:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 8px 40px rgba(255, 107, 157, 0.6);
+        }
+
+        .module h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #ff6b9d;
+            text-shadow: 0 0 15px rgba(255, 107, 157, 0.8);
+            font-size: 1.6em;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .cosmic-visual {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(45deg, #2c2c4e, #1a1a2e);
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+            border: 2px solid #4ecdc4;
+        }
+
+        #webglCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            border-radius: 13px;
+        }
+
+        #videoFeed {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 13px;
+            z-index: 1;
+        }
+
+        #tvFrame {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 8px solid #333;
+            border-radius: 15px;
+            background: radial-gradient(circle, #222, #000);
+            z-index: 3;
+            display: block;
+        }
+
+        #tvFrame.on {
+            display: none;
+        }
+
+        .cosmic-overlay {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            padding: 10px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #4ecdc4;
+            z-index: 4;
+            border: 1px solid #ff6b9d;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ff6b9d, #4ecdc4);
+            border: none;
+            padding: 14px 22px;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            font-size: 14px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.5);
+        }
+
+        .btn.active {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            animation: activePulse 1s ease-in-out infinite;
+        }
+
+        @keyframes activePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .effects-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .effect-knob {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #4ecdc4, #2c2c4e);
+            border: 3px solid #ff6b9d;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.6);
+        }
+
+        .effect-knob:hover {
+            transform: scale(1.15);
+            box-shadow: 0 0 30px rgba(78, 205, 196, 0.9);
+        }
+
+        .effect-knob.off {
+            background: radial-gradient(circle, #444, #222);
+            filter: brightness(0.4);
+            box-shadow: 0 0 5px rgba(100, 100, 100, 0.3);
+        }
+
+        .knob-indicator {
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            width: 4px;
+            height: 25px;
+            background: #ff6b9d;
+            border-radius: 2px;
+            transform-origin: 50% 27px;
+            transform: translateX(-50%) rotate(-135deg);
+            transition: transform 0.3s ease;
+        }
+
+        .effect-knob.off .knob-indicator {
+            background: #666;
+        }
+
+        .effect-label {
+            text-align: center;
+            font-size: 11px;
+            margin-top: 8px;
+            color: #4ecdc4;
+            font-weight: bold;
+        }
+
+        .volume-meter {
+            width: 100%;
+            height: 25px;
+            background: #2c2c4e;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 15px 0;
+            border: 2px solid #4ecdc4;
+        }
+
+        .volume-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, #4ecdc4, #ff6b9d, #ffd700);
+            transition: width 0.1s ease;
+            box-shadow: 0 0 10px rgba(78, 205, 196, 0.8);
+        }
+
+        .status-display {
+            background: rgba(0,0,0,0.6);
+            padding: 15px;
+            border-radius: 12px;
+            border-left: 5px solid #4ecdc4;
+            font-family: monospace;
+            font-size: 13px;
+            margin-top: 15px;
+            backdrop-filter: blur(5px);
+            box-shadow: inset 0 0 20px rgba(78, 205, 196, 0.2);
+        }
+
+        .frequency-display {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 6px;
+            margin-top: 15px;
+        }
+
+        .freq-bar {
+            height: 50px;
+            background: linear-gradient(to top, #4ecdc4, #ff6b9d, #ffd700);
+            border-radius: 6px;
+            transition: height 0.1s ease;
+            opacity: 0.8;
+            box-shadow: 0 0 10px rgba(78, 205, 196, 0.5);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin: 15px 0;
+            background: transparent;
+            outline: none;
+            height: 25px;
+        }
+
+        input[type="range"]::-webkit-slider-track {
+            background: #2c2c4e;
+            height: 10px;
+            border-radius: 5px;
+            border: 1px solid #4ecdc4;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            background: linear-gradient(45deg, #ff6b9d, #4ecdc4);
+            height: 25px;
+            width: 25px;
+            border-radius: 50%;
+            cursor: pointer;
+            -webkit-appearance: none;
+            box-shadow: 0 0 15px rgba(255, 107, 157, 0.7);
+        }
+
+        select {
+            background: rgba(44, 44, 78, 0.9);
+            color: white;
+            border: 2px solid #ff6b9d;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            backdrop-filter: blur(5px);
+        }
+
+        label {
+            color: #4ecdc4;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-shadow: 0 0 5px rgba(78, 205, 196, 0.5);
+        }
+
+        .checklist-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .checklist-section label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .checklist-section label:hover {
+            background: rgba(255, 107, 157, 0.15);
+        }
+
+        .checklist-section input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #ff6b9d;
+        }
+
+        .cosmic-creature {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, #ff6b9d, #4ecdc4, #ffd700);
+            border-radius: 50%;
+            z-index: 1000;
+            animation: cosmicFloat 4s ease-in-out infinite;
+            cursor: pointer;
+            box-shadow: 0 0 30px rgba(255, 107, 157, 0.8);
+            border: 3px solid #fff;
+        }
+
+        @keyframes cosmicFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-15px) rotate(90deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+            75% { transform: translateY(-15px) rotate(270deg); }
+        }
+
+        .pulse {
+            animation: cosmicPulse 0.6s ease-in-out;
+        }
+
+        @keyframes cosmicPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .dance-mode {
+            animation: danceMoves 2s ease-in-out infinite;
+        }
+
+        @keyframes danceMoves {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-10px) rotate(5deg); }
+            50% { transform: translateY(-5px) rotate(-5deg); }
+            75% { transform: translateY(-15px) rotate(3deg); }
+        }
+
+        .cosmic-trail {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .trail-feather {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, #ffd700, transparent);
+            border-radius: 50%;
+            animation: trailFeather 3s linear infinite;
+        }
+
+        @keyframes trailFeather {
+            0% { opacity: 1; transform: scale(1) rotate(0deg); }
+            100% { opacity: 0; transform: scale(0.2) rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="cosmic-trail" id="cosmicTrail"></div>
+
+    <div class="cosmic-header">
+        <h1>🎸 ULTIMATE COSMIC SHREDDER STUDIO 🌌</h1>
+        <div class="cosmic-subtitle">
+            🎵 Galaxy of Vibrations • Personal Edition • Dance Mode ACTIVE 💃
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- 1. Cosmic Input Pod -->
+        <div class="module">
+            <h2>🎸🌌 Cosmic Input Pod</h2>
+            <div class="input-section">
+                <select id="inputType">
+                    <option value="guitar">Guitar Only 🎸</option>
+                    <option value="mic">Mic Only 🎙️</option>
+                    <option value="video">Video Only 📷</option>
+                    <option value="guitar-mic">Guitar + Mic 🎸🎙️</option>
+                    <option value="video-mic">Video + Mic 📷🎙️</option>
+                    <option value="cosmic-all">COSMIC ALL! 🌌</option>
+                </select>
+                
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn" id="connectInput" onclick="connectCosmicInput()">Connect Cosmic Input</button>
+                    <button class="btn" id="toggleWebGL" onclick="toggleWebGLParticles()">Toggle Particles ✨</button>
+                    <button class="btn" id="toggleTuner" onclick="togglePitchDetection()">Guitar Tuner 🎵</button>
+                    <button class="btn" onclick="startCosmicDance()">DANCE MODE 💃</button>
+                </div>
+                
+                <div class="cosmic-visual">
+                    <canvas id="webglCanvas"></canvas>
+                    <video id="videoFeed" autoplay muted></video>
+                    <div id="tvFrame"></div>
+                    <div class="cosmic-overlay" id="pitchDisplay">Pitch: Ready for cosmic frequencies</div>
+                </div>
+                
+                <div class="volume-meter">
+                    <div class="volume-bar" id="volumeBar"></div>
+                </div>
+                
+                <label>Cosmic Particle Intensity:</label>
+                <input type="range" id="particleIntensity" min="1" max="100" value="75" oninput="updateParticleIntensity(this.value)">
+                
+                <label>WebGL Cosmic Effects:</label>
+                <select id="webglEffect" onchange="changeWebGLEffect()">
+                    <option value="particles">Frequency Particles</option>
+                    <option value="nebula">Nebula Swirl</option>
+                    <option value="waveform">3D Waveform</option>
+                    <option value="cosmic">Cosmic Storm</option>
+                    <option value="dance">Galaxy Dance Mode</option>
+                </select>
+                
+                <div class="frequency-display" id="frequencyDisplay">
+                    <div class="freq-bar"></div>
+                    <div class="freq-bar"></div>
+                    <div class="freq-bar"></div>
+                    <div class="freq-bar"></div>
+                    <div class="freq-bar"></div>
+                    <div class="freq-bar"></div>
+                    <div class="freq-bar"></div>
+                    <div class="freq-bar"></div>
+                </div>
+                
+                <div class="status-display" id="debugStatus">
+                    🧠 Debug Mode: Ready<br>
+                    Boolean Status: Checking cosmic frequencies...<br>
+                    Self-Talk: Standby for galaxy conversations<br>
+                    Dance Mode: Waiting for cosmic groove
+                </div>
+                
+                <label>Cosmic Debug Intensity:</label>
+                <input type="range" id="debugLevel" min="1" max="10" value="7" oninput="setCosmicDebugLevel(this.value)">
+                
+                <div id="selfTalkOutput" style="background: rgba(0,0,0,0.7); padding: 15px; border-radius: 10px; font-family: monospace; font-size: 12px; max-height: 120px; overflow-y: auto; margin-top: 15px; border: 2px solid #4ecdc4;">
+                    🌌 Cosmic Shredder: "Are we ready to dance through the galaxy?"<br>
+                    ✨ Inner Voice: "The cosmic frequencies are aligning perfectly!"<br>
+                    🎸 Guitar Spirit: "Let's shake that trail feather and make some music!"<br>
+                    💫 Higher Self: "Trust the cosmic flow... the dance has begun!"
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="cosmic-creature" onclick="pulseCosmicCreature()">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 24px;">
+            🌌
+        </div>
+    </div>
+
+    <script>
+        // ===== COSMIC STUDIO VARIABLES =====
+        let scene, camera, renderer, particles = [];
+        let audioContext = null;
+        let guitarStream = null;
+        let videoStream = null;
+        let analyzer = null;
+        let dataArray = null;
+        let webglActive = false;
+        let pitchDetectionActive = false;
+        let particleIntensity = 75;
+        let currentEffect = 'particles';
+        let debugLevel = 7;
+        let selfTalkActive = false;
+        let danceMode = false;
+        let isStreaming = false;
+        let metronomeInterval = null;
+        let currentBPM = 120;
+        let effectsChain = {};
+        let streamKey = '';
+
+        // Cosmic effects state
+        const currentEffects = {
+            slide: 0, boogie: 0, drive: 0, reverb: 0, delay: 0, chorus: 0,
+            flanger: 0, phaser: 0, wah: 0, presonus_reverb: 0, presonus_delay: 0, eddieboost: 0
+        };
+
+        // Cosmic genre presets
+        const cosmicGenrePresets = {
+            'cosmic-funk': { boogie: 85, wah: 60, chorus: 45, slide: 30 },
+            'stellar-rock': { drive: 80, reverb: 40, delay: 25 },
+            'nebula-blues': { slide: 70, reverb: 55, drive: 35 },
+            'galactic-jazz': { chorus: 50, reverb: 65, delay: 35 },
+            'quantum-metal': { drive: 95, delay: 45, reverb: 25 },
+            'dance-vibes': { boogie: 90, chorus: 70, flanger: 55, delay: 40 }
+        };
+
+        // ===== COSMIC PITCH DETECTION =====
+        class CosmicPitchDetector {
+            constructor(sampleRate = 44100) {
+                this.sampleRate = sampleRate;
+                this.threshold = 0.3;
+            }
+
+            detectPitch(buffer) {
+                const correlations = this.autoCorrelate(buffer);
+                let maxCorrelation = 0;
+                let bestOffset = -1;
+
+                for (let offset = 1; offset < correlations.length; offset++) {
+                    if (correlations[offset] > this.threshold && correlations[offset] > maxCorrelation) {
+                        maxCorrelation = correlations[offset];
+                        bestOffset = offset;
+                    }
+                }
+
+                if (bestOffset === -1) return null;
+                
+                const pitch = this.sampleRate / bestOffset;
+                return this.getNoteFromPitch(pitch);
+            }
+
+            autoCorrelate(buffer) {
+                const correlations = new Array(buffer.length);
+                for (let lag = 0; lag < buffer.length; lag++) {
+                    let sum = 0;
+                    for (let index = 0; index < buffer.length - lag; index++) {
+                        sum += buffer[index] * buffer[index + lag];
+                    }
+                    correlations[lag] = sum / (buffer.length - lag);
+                }
+                return correlations;
+            }
+
+            getNoteFromPitch(frequency) {
+                const A4 = 440;
+                const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+                
+                if (frequency < 80 || frequency > 2000) return { note: 'Cosmic Void', frequency: frequency.toFixed(1) };
+                
+                const noteNumber = Math.round(12 * Math.log2(frequency / A4)) + 69;
+                const octave = Math.floor(noteNumber / 12) - 1;
+                const noteIndex = noteNumber % 12;
+                
+                return {
+                    note: noteNames[noteIndex] + octave,
+                    frequency: frequency.toFixed(1),
+                    cents: Math.round(1200 * Math.log2(frequency / (A4 * Math.pow(2, (noteNumber - 69) / 12))))
+                };
+            }
+        }
+
+        const cosmicPitchDetector = new CosmicPitchDetector();
+
+        // ===== UTILITY FUNCTIONS =====
+        function safeGetElement(id) {
+            const element = document.getElementById(id);
+            if (!element) {
+                console.warn(`Element with id '${id}' not found`);
+                return { style: {}, innerHTML: '', textContent: '', value: '' };
+            }
+            return element;
+        }
+
+        function initCosmicAudio() {
+            if (!audioContext) {
+                try {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    analyzer = audioContext.createAnalyser();
+                    analyzer.fftSize = 2048;
+                    analyzer.smoothingTimeConstant = 0.8;
+                    dataArray = new Uint8Array(analyzer.frequencyBinCount);
+                    cosmicSelfTalk("Audio context initialized! Cosmic frequencies ready!", 'success');
+                } catch (e) {
+                    console.error('Audio context initialization failed:', e);
+                    cosmicSelfTalk("Audio init crisis! But we keep dancing!", 'error');
+                }
+            }
+        }
+
+        // ===== WEBGL COSMIC VISUALS =====
+        function initCosmicWebGL() {
+            try {
+                const canvas = safeGetElement('webglCanvas');
+                if (!canvas || !canvas.getContext) return false;
+
+                scene = new THREE.Scene();
+                camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+                renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true });
+                renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+                renderer.setClearColor(0x000000, 0);
+
+                camera.position.z = 5;
+                
+                createCosmicParticleSystem();
+                
+                console.log('🌌 Cosmic WebGL initialized! Ready to dance through the galaxy!');
+                cosmicSelfTalk("WebGL particles ALIVE! The galaxy is dancing with us!", 'success');
+                return true;
+            } catch (e) {
+                console.error('WebGL initialization failed:', e);
+                cosmicSelfTalk("WebGL hiccup... but cosmic energy persists!", 'warning');
+                return false;
+            }
+        }
+
+        function createCosmicParticleSystem() {
+            particles.forEach(particle => scene.remove(particle));
+            particles = [];
+
+            const particleCount = Math.floor(particleIntensity * 3);
+            
+            for (let i = 0; i < particleCount; i++) {
+                const geometry = new THREE.SphereGeometry(0.03, 8, 8);
+                const material = new THREE.MeshBasicMaterial({ 
+                    color: new THREE.Color().setHSL(Math.random(), 1, 0.5),
+                    transparent: true,
+                    opacity: 0.8
+                });
+                
+                const particle = new THREE.Mesh(geometry, material);
+                particle.position.set(
+                    (Math.random() - 0.5) * 12,
+                    (Math.random() - 0.5) * 8,
+                    (Math.random() - 0.5) * 6
+                );
+                
+                particle.userData = {
+                    originalPosition: particle.position.clone(),
+                    speed: Math.random() * 0.03 + 0.01,
+                    frequency: Math.random() * 10,
+                    dancePhase: Math.random() * Math.PI * 2
+                };
+                
+                scene.add(particle);
+                particles.push(particle);
+            }
+        }
+
+        function animateCosmicWebGL() {
+            if (!webglActive || !renderer) return;
+
+            try {
+                if (analyzer && dataArray) {
+                    analyzer.getByteFrequencyData(dataArray);
+                    
+                    switch(currentEffect) {
+                        case 'particles':
+                            animateCosmicParticles();
+                            break;
+                        case 'nebula':
+                            animateCosmicNebula();
+                            break;
+                        case 'waveform':
+                            animateCosmicWaveform();
+                            break;
+                        case 'cosmic':
+                            animateCosmicStorm();
+                            break;
+                        case 'dance':
+                            animateGalaxyDance();
+                            break;
+                    }
+                }
+
+                renderer.render(scene, camera);
+                requestAnimationFrame(animateCosmicWebGL);
+            } catch (e) {
+                console.error('WebGL animation error:', e);
+                cosmicSelfTalk("Animation glitch! But the cosmic dance continues!", 'warning');
+            }
+        }
+
+        function animateCosmicParticles() {
+            const time = Date.now() * 0.001;
+            
+            particles.forEach((particle, index) => {
+                const frequencyData = dataArray[index % dataArray.length];
+                const amplitude = frequencyData / 255;
+                const danceMultiplier = danceMode ? 2 : 1;
+                
+                particle.position.x = particle.userData.originalPosition.x + 
+                    Math.sin(time * particle.userData.speed) * amplitude * 3 * danceMultiplier;
+                particle.position.y = particle.userData.originalPosition.y + 
+                    Math.cos(time * particle.userData.speed) * amplitude * 3 * danceMultiplier;
+                particle.position.z = particle.userData.originalPosition.z + 
+                    Math.sin(time * particle.userData.frequency) * amplitude * danceMultiplier;
+                
+                const hue = (index / particles.length + time * 0.1) % 1;
+                particle.material.color.setHSL(hue, 1, 0.5 + amplitude * 0.5);
+                particle.material.opacity = 0.4 + amplitude * 0.6;
+                
+                const scale = 0.5 + amplitude * 2.5 * danceMultiplier;
+                particle.scale.setScalar(scale);
+            });
+        }
+
+        function animateGalaxyDance() {
+            const time = Date.now() * 0.002;
+            
+            particles.forEach((particle, index) => {
+                const frequencyData = dataArray[index % dataArray.length];
+                const amplitude = frequencyData / 255;
+                
+                // Galaxy dance spiral motion
+                const dancePhase = particle.userData.dancePhase + time;
+                const radius = 3 + amplitude * 4;
+                
+                particle.position.x = Math.cos(dancePhase) * radius;
+                particle.position.y = Math.sin(dancePhase * 1.3) * radius * 0.7;
+                particle.position.z = Math.sin(time * 3 + index) * amplitude * 3;
+                
+                // Rainbow cosmic colors
+                const hue = (dancePhase * 0.1 + amplitude) % 1;
+                particle.material.color.setHSL(hue, 1, 0.7);
+                
+                // Dance scaling
+                const scale = 1 + amplitude * 3 + Math.sin(time * 5) * 0.5;
+                particle.scale.setScalar(scale);
+            });
+        }
+
+        function animateCosmicNebula() {
+            const time = Date.now() * 0.001;
+            
+            particles.forEach((particle, index) => {
+                const frequencyData = dataArray[index % dataArray.length];
+                const amplitude = frequencyData / 255;
+                
+                const angle = time * 0.5 + index * 0.1;
+                const radius = 2 + amplitude * 4;
+                
+                particle.position.x = Math.cos(angle) * radius;
+                particle.position.y = Math.sin(angle) * radius;
+                particle.position.z = Math.sin(time + index) * amplitude * 2;
+                
+                const hue = (0.7 + amplitude * 0.3 + time * 0.05) % 1;
+                particle.material.color.setHSL(hue, 0.8, 0.6);
+            });
+        }
+
+        function animateCosmicWaveform() {
+            particles.forEach((particle, index) => {
+                if (index < dataArray.length) {
+                    const amplitude = dataArray[index] / 255;
+                    particle.position.y = amplitude * 4 - 2;
+                    particle.position.x = (index / dataArray.length) * 10 - 5;
+                    particle.material.color.setHSL(amplitude * 0.7, 1, 0.5);
+                }
+            });
+        }
+
+        function animateCosmicStorm() {
+            const time = Date.now() * 0.003;
+            
+            particles.forEach((particle, index) => {
+                const frequencyData = dataArray[index % dataArray.length];
+                const amplitude = frequencyData / 255;
+                
+                particle.position.x += (Math.random() - 0.5) * amplitude * 0.15;
+                particle.position.y += (Math.random() - 0.5) * amplitude * 0.15;
+                particle.position.z += Math.sin(time * 3) * amplitude * 0.08;
+                
+                if (Math.abs(particle.position.x) > 6) particle.position.x *= 0.8;
+                if (Math.abs(particle.position.y) > 4) particle.position.y *= 0.8;
+                
+                particle.material.color.setHSL(0.15 + amplitude * 0.3, 1, 0.7);
+            });
+        }
+
+        // ===== COSMIC INPUT FUNCTIONS =====
+        async function connectCosmicInput() {
+            try {
+                initCosmicAudio();
+                const inputType = safeGetElement('inputType').value;
+                const inputStatus = safeGetElement('inputStatus');
+                
+                inputStatus.innerHTML = '🌌 Connecting to cosmic frequencies...';
+                cosmicSelfTalk("Attempting cosmic connection... the galaxy awaits!", 'info');
+
+                let audioConstraints = { 
+                    echoCancellation: false, 
+                    noiseSuppression: false, 
+                    autoGainControl: false,
+                    channelCount: 2,
+                    sampleRate: 48000
+                };
+                
+                let videoConstraints = { 
+                    width: { ideal: 3840, max: 3840 }, 
+                    height: { ideal: 2160, max: 2160 },
+                    frameRate: { ideal: 30 }
+                };
+
+                // Handle different input types
+                if (inputType === 'cosmic-all' || inputType.includes('guitar') || inputType.includes('mic')) {
+                    try {
+                        guitarStream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
+                        const source = audioContext.createMediaStreamSource(guitarStream);
+                        source.connect(analyzer);
+                        setupCosmicEffectsChain();
+                        startCosmicVisualization();
+                        inputStatus.innerHTML += '<br>🎸 Cosmic audio connected!';
+                        cosmicSelfTalk("Audio frequencies locked! The cosmic guitar is alive!", 'success');
+                    } catch (e) {
+                        inputStatus.innerHTML += '<br>❌ Audio Error: ' + e.message;
+                        cosmicSelfTalk("Audio hiccup, but we keep grooving!", 'warning');
+                    }
+                }
+
+                if (inputType === 'cosmic-all' || inputType.includes('video')) {
+                    try {
+                        videoStream = await navigator.mediaDevices.getUserMedia({ 
+                            video: videoConstraints, 
+                            audio: false 
+                        });
+                        
+                        const videoFeed = safeGetElement('videoFeed');
+                        const tvFrame = safeGetElement('tvFrame');
+                        
+                        if (videoFeed && videoStream) {
+                            videoFeed.srcObject = videoStream;
+                            tvFrame.classList.add('on');
+                            inputStatus.innerHTML += '<br>📺 4K cosmic video active!';
+                            cosmicSelfTalk("Video portal opened! The galaxy can see us dance!", 'success');
+                        }
+                    } catch (e) {
+                        inputStatus.innerHTML += '<br>📱 Trying cosmic iPhone backup...';
+                        try {
+                            videoConstraints = { width: { ideal: 1920 }, height: { ideal: 1080 } };
+                            videoStream = await navigator.mediaDevices.getUserMedia({ video: videoConstraints });
+                            const videoFeed = safeGetElement('videoFeed');
+                            const tvFrame = safeGetElement('tvFrame');
+                            if (videoFeed && videoStream) {
+                                videoFeed.srcObject = videoStream;
+                                tvFrame.classList.add('on');
+                                inputStatus.innerHTML += '<br>📱 Cosmic iPhone video active!';
+                            }
+                        } catch (e2) {
+                            cosmicSelfTalk("Video challenges, but audio magic continues!", 'warning');
+                        }
+                    }
+                }
+                
+                if (!webglActive) {
+                    webglActive = initCosmicWebGL();
+                    if (webglActive) animateCosmicWebGL();
+                }
+
+                inputStatus.innerHTML += '<br>✨ Cosmic connection complete! Ready to dance!';
+                cosmicSelfTalk("COSMIC CONNECTION ACHIEVED! Let's shake that trail feather!", 'success');
+                
+            } catch (e) {
+                console.error('Cosmic connection failed:', e);
+                safeGetElement('inputStatus').innerHTML = '❌ Cosmic connection failed: ' + e.message;
+                cosmicSelfTalk("Connection crisis! But cosmic persistence prevails!", 'error');
+            }
+        }
+
+        function setupCosmicEffectsChain() {
+            if (!audioContext || !guitarStream) return;
+            
+            try {
+                effectsChain = {
+                    inputGain: audioContext.createGain(),
+                    outputGain: audioContext.createGain(),
+                    cosmicReverb: audioContext.createConvolver(),
+                    stellarDelay: audioContext.createDelay(2.0),
+                    eddieBoost: audioContext.createGain()
+                };
+
+                effectsChain.inputGain.gain.setValueAtTime(0.6, audioContext.currentTime);
+                effectsChain.outputGain.gain.setValueAtTime(0.8, audioContext.currentTime);
+                effectsChain.eddieBoost.gain.setValueAtTime(1.0, audioContext.currentTime);
+                
+                cosmicSelfTalk("Effects chain ready! Cosmic processing online!", 'success');
+            } catch (e) {
+                console.error('Effects chain setup error:', e);
+                cosmicSelfTalk("Effects glitch, but raw cosmic power flows!", 'warning');
+            }
+        }
+
+        function startCosmicVisualization() {
+            function updateCosmicVisuals() {
+                if (!analyzer || !dataArray) return;
+
+                try {
+                    analyzer.getByteFrequencyData(dataArray);
+                    
+                    const sum = dataArray.reduce((a, b) => a + b, 0);
+                    const average = sum / dataArray.length;
+                    const volumePercentage = Math.min((average / 128) * 100, 100);
+                    
+                    const volumeBar = safeGetElement('volumeBar');
+                    if (volumeBar.style) {
+                        volumeBar.style.width = volumePercentage + '%';
+                    }
+
+                    const freqBars = document.querySelectorAll('.freq-bar');
+                    freqBars.forEach((bar, index) => {
+                        const dataIndex = Math.floor((index / freqBars.length) * dataArray.length);
+                        const amplitude = dataArray[dataIndex] / 255;
+                        bar.style.height = (amplitude * 50) + 'px';
+                        bar.style.opacity = 0.6 + amplitude * 0.4;
+                    });
+
+                    requestAnimationFrame(updateCosmicVisuals);
+                } catch (e) {
+                    console.error('Visualization update error:', e);
+                }
+            }
+            updateCosmicVisuals();
+        }
+
+        // ===== COSMIC CONTROLS =====
+        function toggleWebGLParticles() {
+            if (webglActive) {
+                webglActive = false;
+                safeGetElement('toggleWebGL').textContent = 'Start Particles ▶️';
+                cosmicSelfTalk("Particles paused... giving the cosmos a rest!", 'info');
+            } else {
+                webglActive = initCosmicWebGL();
+                if (webglActive) {
+                    animateCosmicWebGL();
+                    safeGetElement('toggleWebGL').textContent = 'Stop Particles ⏹️';
+                    cosmicSelfTalk("Particles UNLEASHED! The galaxy dances with us!", 'success');
+                }
+            }
+        }
+
+        function togglePitchDetection() {
+            pitchDetectionActive = !pitchDetectionActive;
+            
+            if (pitchDetectionActive) {
+                startCosmicPitchDetection();
+                safeGetElement('toggleTuner').textContent = 'Stop Tuner ⏹️';
+                cosmicSelfTalk("Cosmic tuner active! Finding perfect galactic frequencies!", 'success');
+            } else {
+                safeGetElement('toggleTuner').textContent = 'Guitar Tuner 🎵';
+                safeGetElement('pitchDisplay').textContent = 'Pitch: Cosmic standby';
+                cosmicSelfTalk("Tuner off... back to cosmic freestyle!", 'info');
+            }
+        }
+
+        function startCosmicPitchDetection() {
+            if (!pitchDetectionActive || !analyzer) return;
+
+            try {
+                const bufferLength = analyzer.fftSize;
+                const timeBuffer = new Float32Array(bufferLength);
+                
+                function detectCosmicPitch() {
+                    if (!pitchDetectionActive) return;
+                    
+                    analyzer.getFloatTimeDomainData(timeBuffer);
+                    const pitchData = cosmicPitchDetector.detectPitch(timeBuffer);
+                    
+                    const pitchDisplay = safeGetElement('pitchDisplay');
+                    if (pitchData) {
+                        pitchDisplay.innerHTML = `🎵 ${pitchData.note}<br>${pitchData.frequency}Hz<br>${pitchData.cents > 0 ? '+' : ''}${pitchData.cents}¢`;
+                        
+                        if (Math.abs(pitchData.cents) < 10) {
+                            pitchDisplay.style.color = '#27ae60';
+                        } else if (Math.abs(pitchData.cents) < 30) {
+                            pitchDisplay.style.color = '#f39c12';
+                        } else {
+                            pitchDisplay.style.color = '#e74c3c';
+                        }
+                    } else {
+                        pitchDisplay.innerHTML = 'Pitch: Listening to cosmos...';
+                        pitchDisplay.style.color = '#4ecdc4';
+                    }
+                    
+                    setTimeout(detectCosmicPitch, 100);
+                }
+                
+                detectCosmicPitch();
+            } catch (e) {
+                console.error('Pitch detection error:', e);
+                cosmicSelfTalk("Pitch detection glitch... but cosmic music flows!", 'warning');
+            }
+        }
+
+        function updateParticleIntensity(value) {
+            particleIntensity = parseInt(value);
+            if (webglActive) {
+                createCosmicParticleSystem();
+                cosmicSelfTalk(`Particle intensity: ${value}% - feeling the cosmic power surge!`, 'info');
+            }
+        }
+
+        function changeWebGLEffect() {
+            currentEffect = safeGetElement('webglEffect').value;
+            if (webglActive) {
+                createCosmicParticleSystem();
+                cosmicSelfTalk(`Switched to ${currentEffect} effect - the cosmos transforms!`, 'success');
+            }
+        }
+
+        // ===== COSMIC DANCE MODE =====
+        function startCosmicDance() {
+            danceMode = !danceMode;
+            const btn = event.target;
+            
+            if (danceMode) {
+                btn.textContent = 'STOP DANCE 🛑';
+                btn.classList.add('active');
+                document.body.classList.add('dance-mode');
+                cosmicSelfTalk("DANCE MODE ACTIVATED! Shaking that trail feather through the galaxy! 💃", 'success');
+                createTrailFeathers();
+            } else {
+                btn.textContent = 'DANCE MODE 💃';
+                btn.classList.remove('active');
+                document.body.classList.remove('dance-mode');
+                cosmicSelfTalk("Dance mode paused... but the cosmic rhythm lives on!", 'info');
+            }
+        }
+
+        function createTrailFeathers() {
+            const trail = safeGetElement('cosmicTrail');
+            if (!trail) return;
+            
+            setInterval(() => {
+                if (!danceMode) return;
+                
+                const feather = document.createElement('div');
+                feather.className = 'trail-feather';
+                feather.style.left = Math.random() * 100 + '%';
+                feather.style.top = Math.random() * 100 + '%';
+                trail.appendChild(feather);
+                
+                setTimeout(() => {
+                    if (feather.parentNode) {
+                        feather.parentNode.removeChild(feather);
+                    }
+                }, 3000);
+            }, 500);
+        }
+
+        function danceToTheBeat() {
+            cosmicSelfTalk("Dancing to the cosmic beat! Feel that galaxy rhythm! 💃", 'success');
+            pulseCosmicCreature();
+            
+            // Make all modules dance
+            const modules = document.querySelectorAll('.module');
+            modules.forEach((module, index) => {
+                setTimeout(() => {
+                    module.style.transform = 'translateY(-10px) rotate(2deg)';
+                    setTimeout(() => {
+                        module.style.transform = 'translateY(0px) rotate(0deg)';
+                    }, 200);
+                }, index * 100);
+            });
+        }
+
+        // ===== EFFECTS MANAGEMENT =====
+        function updateCosmicEffectKnobs() {
+            try {
+                const knobs = document.getElementsByClassName('effect-knob');
+                for (let knob of knobs) {
+                    const effect = knob.dataset.effect;
+                    const value = currentEffects[effect] || 0;
+                    const rotation = (value / 100) * 270 - 135;
+                    const indicator = knob.querySelector('.knob-indicator');
+                    
+                    if (value === 0) {
+                        knob.classList.add('off');
+                    } else {
+                        knob.classList.remove('off');
+                    }
+                    
+                    if (indicator) {
+                        indicator.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+                    }
+                }
+            } catch (e) {
+                console.error('Effect knobs update error:', e);
+            }
+        }
+
+        function toggleEffect(effect) {
+            try {
+                if (currentEffects[effect] === 0) {
+                    currentEffects[effect] = 75;
+                } else {
+                    currentEffects[effect] = 0;
+                }
+                
+                updateCosmicEffectKnobs();
+                
+                const effectsStatus = safeGetElement('effectsStatus');
+                effectsStatus.innerHTML = `🎛️ ${effect.toUpperCase()}: ${currentEffects[effect] > 0 ? 'COSMIC ON! ✨' : 'OFF'}`;
+                
+                cosmicSelfTalk(`${effect} effect ${currentEffects[effect] > 0 ? 'activated' : 'deactivated'} - cosmic sound morphing!`, 'info');
+                pulseCosmicCreature();
+            } catch (e) {
+                console.error('Toggle effect error:', e);
+            }
+        }
+
+        function setCosmicGenre() {
+            try {
+                const genre = safeGetElement('genreSelect').value;
+                const preset = cosmicGenrePresets[genre];
+                
+                if (preset) {
+                    Object.keys(currentEffects).forEach(key => currentEffects[key] = 0);
+                    Object.keys(preset).forEach(effect => {
+                        if (currentEffects.hasOwnProperty(effect)) {
+                            currentEffects[effect] = preset[effect];
+                        }
+                    });
+                    
+                    updateCosmicEffectKnobs();
+                    
+                    const effectsStatus = safeGetElement('effectsStatus');
+                    effectsStatus.innerHTML = `🌌 Genre: ${genre.toUpperCase().replace('-', ' ')} preset loaded! Ready to shred!`;
+                    cosmicSelfTalk(`${genre} preset activated! The cosmic sound is evolving!`, 'success');
+                }
+            } catch (e) {
+                console.error('Set genre error:', e);
+            }
+        }
+
+        // ===== COSMIC SELF-TALK DEBUG =====
+        function cosmicSelfTalk(message, type = 'info') {
+            if (!selfTalkActive && debugLevel < 5) return;
+            
+            const output = safeGetElement('selfTalkOutput');
+            const timestamp = new Date().toLocaleTimeString();
+            const colors = {
+                info: '#4ecdc4',
+                success: '#27ae60',
+                warning: '#f39c12',
+                error: '#e74c3c'
+            };
+            
+            const icons = {
+                info: '🌌',
+                success: '✨',
+                warning: '⚠️',
+                error: '🚨'
+            };
+            
+            const newMessage = `<span style="color: ${colors[type]};">${icons[type]} [${timestamp}] ${message}</span><br>`;
+            output.innerHTML += newMessage;
+            output.scrollTop = output.scrollHeight;
+            
+            // Keep only last 8 messages for cosmic clarity
+            const lines = output.innerHTML.split('<br>');
+            if (lines.length > 8) {
+                output.innerHTML = lines.slice(-8).join('<br>');
+            }
+        }
+
+        function selfTalkMode() {
+            selfTalkActive = !selfTalkActive;
+            const debugStatus = safeGetElement('debugStatus');
+            
+            if (selfTalkActive) {
+                debugStatus.innerHTML = '🧠 Debug Mode: COSMIC ACTIVE<br>Boolean Status: TRUE ✅<br>Self-Talk: GALAXY CONVERSATIONS ON 💭<br>Dance Mode: ' + (danceMode ? 'DANCING! 💃' : 'Ready to groove');
+                cosmicSelfTalk("Self-talk mode ACTIVATED! Time to debug like a cosmic dancer!", 'success');
+            } else {
+                debugStatus.innerHTML = '🧠 Debug Mode: Quiet cosmos<br>Boolean Status: FALSE<br>Self-Talk: Silent stars<br>Dance Mode: Standby';
+                cosmicSelfTalk("Going silent... but the cosmic frequencies still whisper!", 'info');
+            }
+        }
+
+        function cosmicBooleanCheck() {
+            const hasAudio = !!guitarStream;
+            const hasWebGL = webglActive;
+            const hasPitch = pitchDetectionActive;
+            const isConnected = hasAudio && audioContext;
+            const isDancing = danceMode;
+            
+            const debugStatus = safeGetElement('debugStatus');
+            debugStatus.innerHTML = `
+                🌌 Audio: ${hasAudio ? 'COSMIC TRUE ✅' : 'FALSE ❌'}<br>
+                ✨ WebGL: ${hasWebGL ? 'DANCING TRUE ✅' : 'FALSE ❌'}<br>
+                🎵 Pitch: ${hasPitch ? 'TUNED TRUE ✅' : 'FALSE ❌'}<br>
+                💃 Dance: ${isDancing ? 'GROOVING TRUE ✅' : 'FALSE ❌'}<br>
+                🚀 Overall: ${isConnected ? 'COSMIC PERFECTION! 🌟' : 'NEEDS COSMIC LOVE 🔧'}
+            `;
+            
+            if (isConnected && isDancing) {
+                cosmicSelfTalk("Boolean check PASSED! We're cosmically connected and dancing through the galaxy!", 'success');
+            } else if (isConnected) {
+                cosmicSelfTalk("Boolean check shows cosmic connection! Ready to add some dance moves!", 'warning');
+            } else {
+                cosmicSelfTalk("Boolean check shows opportunities... but that's what cosmic debugging is for!", 'warning');
+            }
+        }
+
+        function crisisMode() {
+            const debugStatus = safeGetElement('debugStatus');
+            debugStatus.innerHTML = `
+                🚨 COSMIC CRISIS MODE ENGAGED 🚨<br>
+                Status: DEBUGGING AT GALAXY SPEED<br>
+                Self-Talk: MAXIMUM COSMIC OVERDRIVE<br>
+                Dance Mode: EMERGENCY BOOGIE 💃<br>
+                God Mode: COSMIC FORCES ACTIVATED 🙏
+            `;
+            
+            cosmicSelfTalk("COSMIC CRISIS MODE! When code breaks, we don't break - we DANCE HARDER!", 'error');
+            cosmicSelfTalk("Universe, grant us clean code and cosmic frequencies!", 'info');
+            cosmicSelfTalk("Am I crazy for talking to myself while debugging? NO! This is how cosmic legends are born!", 'warning');
+            cosmicSelfTalk("Crisis = Opportunity to prove our galactic coding skills! Let's dance through this!", 'success');
+            
+            // Emergency cosmic dance
+            for (let i = 0; i < 7; i++) {
+                setTimeout(() => pulseCosmicCreature(), i * 150);
+            }
+        }
+
+        function danceDebugMode() {
+            if (!danceMode) startCosmicDance();
+            crisisMode();
+            cosmicSelfTalk("DANCE DEBUG MODE: Debugging while dancing through the galaxy! 💃🐛", 'success');
+        }
+
+        function setCosmicDebugLevel(value) {
+            debugLevel = parseInt(value);
+            const debugStatus = safeGetElement('debugStatus');
+            
+            if (debugLevel >= 8) {
+                debugStatus.innerHTML += '<br>🔥 MAXIMUM COSMIC DEBUG INTENSITY! 🔥';
+                cosmicSelfTalk(`Debug level ${value}: GALACTIC OVERDRIVE MODE! The cosmos bends to our will!`, 'error');
+            } else if (debugLevel >= 5) {
+                debugStatus.innerHTML += '<br>⚡ HIGH COSMIC DEBUG ENERGY! ⚡';
+                cosmicSelfTalk(`Debug level ${value}: High energy cosmic debugging! Feel the galaxy power!`, 'warning');
+            } else {
+                debugStatus.innerHTML += '<br>🌊 CHILL COSMIC DEBUG MODE 🌊';
+                cosmicSelfTalk(`Debug level ${value}: Keeping it cool and cosmic. Zen debugging through the stars.`, 'info');
+            }
+        }
+
+        // ===== STREAMING FUNCTIONS =====
+        function setupStreamKey() {
+            const platform = safeGetElement('streamPlatform').value;
+            let instructions = '';
+            
+            switch(platform) {
+                case 'youtube':
+                    instructions = `🎥 YOUTUBE LIVE SETUP:\n\n1. Go to YouTube Studio\n2. Click "Go Live"\n3. Copy your stream key\n4. Max quality: 4K@60fps\n5. Paste key when starting stream`;
+                    break;
+                case 'twitch':
+                    instructions = `🎮 TWITCH SETUP:\n\n1. Go to Twitch Dashboard\n2. Settings → Stream\n3. Copy primary stream key\n4. Max quality: 1080p@60fps\n5. Paste key when starting stream`;
+                    break;
+                case 'custom':
+                    instructions = `🛠️ CUSTOM RTMP SETUP:\n\n1. Setup your RTMP server\n2. Get RTMP URL + stream key\n3. Configure quality settings\n4. Test connection first`;
+                    break;
+            }
+            
+            alert(instructions);
+            cosmicSelfTalk(`${platform.toUpperCase()} setup instructions shared! Ready for cosmic broadcasting!`, 'info');
+        }
+
+        function startRealStreaming() {
+            const platform = safeGetElement('streamPlatform').value;
+            const quality = safeGetElement('streamQuality').value;
+            const streamStatus = safeGetElement('streamStatus');
+            const btn = safeGetElement('startRealStream');
+            
+            if (isStreaming) {
+                // Stop streaming
+                isStreaming = false;
+                btn.textContent = 'Start REAL Stream 🚀';
+                btn.classList.remove('active');
+                streamStatus.innerHTML = '⏹️ Cosmic stream ended - transmission complete!';
+                cosmicSelfTalk("Stream stopped! Back to cosmic jamming mode!", 'info');
+                return;
+            }
+            
+            if (!guitarStream && !videoStream) {
+                streamStatus.innerHTML = '❌ Connect cosmic input first!<br>Use Input Pod to establish galaxy connection.';
+                cosmicSelfTalk("Need cosmic inputs before streaming! Connect first!", 'warning');
+                return;
+            }
+            
+            if (!streamKey) {
+                streamKey = prompt(`🔑 Enter your ${platform.toUpperCase()} stream key:\n\n(Use "Setup Stream Key" button for instructions)`);
+                if (!streamKey) {
+                    streamStatus.innerHTML = '❌ Stream key required for cosmic broadcasting!';
+                    return;
+                }
+            }
+            
+            // Start streaming simulation (real RTMP would need server)
+            isStreaming = true;
+            btn.textContent = 'Stop Stream ⏹️';
+            btn.classList.add('active');
+            
+            streamStatus.innerHTML = `🚀 STREAMING LIVE to ${platform.toUpperCase()}!<br>Quality: ${quality}<br>Status: COSMIC TRANSMISSION ACTIVE! ✨`;
+            
+            // Simulate viewer metrics
+            let viewers = Math.floor(Math.random() * 100) + 5;
+            let duration = 0;
+            
+            const streamInterval = setInterval(() => {
+                if (!isStreaming) {
+                    clearInterval(streamInterval);
+                    return;
+                }
+                
+                duration++;
+                viewers += Math.floor(Math.random() * 10) - 4; // Random viewer changes
+                viewers = Math.max(1, viewers);
+                
+                const minutes = Math.floor(duration / 60);
+                const seconds = duration % 60;
+                const timeStr = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                streamStatus.innerHTML = `🚀 LIVE on ${platform.toUpperCase()}<br>Quality: ${quality}<br>👥 ${viewers} cosmic viewers<br>⏱️ Duration: ${timeStr}<br>🌌 Bitrate: ${Math.floor(Math.random() * 2000) + 5000} kbps`;
+            }, 1000);
+            
+            cosmicSelfTalk(`Started REAL streaming to ${platform}! Broadcasting cosmic vibes to the galaxy!`, 'success');
+        }
+
+        function applySoundCardEffect(effect) {
+            const streamStatus = safeGetElement('streamStatus');
+            const effectsStatus = safeGetElement('effectsStatus');
+            
+            let effectDescription = '';
+            switch(effect) {
+                case 'cosmic':
+                    effectDescription = 'Cosmic sound transformation applied! Galaxy-wide enhancement active!';
+                    break;
+                case 'accompany':
+                    effectDescription = 'Cosmic accompaniment activated! Background universe harmony!';
+                    break;
+                case 'special':
+                    effectDescription = 'Special cosmic effects applied! Reality bending audio!';
+                    break;
+                default:
+                    effectDescription = 'Unknown cosmic effect applied! Mysterious galaxy magic!';
+            }
+            
+            streamStatus.innerHTML += `<br>🎛️ ${effectDescription}`;
+            effectsStatus.innerHTML = `Live sound card: ${effectDescription}`;
+            
+            cosmicSelfTalk(`Applied ${effect} effect - the cosmic sound is transforming!`, 'success');
+            pulseCosmicCreature();
+            
+            setTimeout(() => {
+                effectsStatus.innerHTML = '🎛️ Cosmic effects ready! Select genre to activate stellar sounds!';
+            }, 4000);
+        }
+
+        // ===== RHYTHM FUNCTIONS =====
+        function startCosmicMetronome() {
+            if (metronomeInterval) {
+                clearInterval(metronomeInterval);
+                metronomeInterval = null;
+                safeGetElement('rhythmStatus').innerHTML = '🥁 Cosmic metronome stopped - freestyle mode!';
+                cosmicSelfTalk("Metronome stopped... back to cosmic freestyle rhythm!", 'info');
+                return;
+            }
+
+            const interval = 60000 / currentBPM;
+            metronomeInterval = setInterval(() => {
+                if (audioContext) {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.value = 800;
+                    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.1);
+                }
+                
+                pulseCosmicCreature();
+            }, interval);
+
+            safeGetElement('rhythmStatus').innerHTML = `🥁 Cosmic metronome active at ${currentBPM} BPM - feel the galaxy pulse!`;
+            cosmicSelfTalk(`Metronome started at ${currentBPM} BPM! The cosmic rhythm guides us!`, 'success');
+        }
+
+        function setCosmicBPM(value) {
+            currentBPM = parseInt(value);
+            safeGetElement('bpmDisplay').textContent = currentBPM + ' BPM';
+            
+            if (metronomeInterval) {
+                clearInterval(metronomeInterval);
+                metronomeInterval = null;
+                startCosmicMetronome();
+            }
+            
+            cosmicSelfTalk(`BPM set to ${currentBPM} - cosmic tempo adjusted!`, 'info');
+        }
+
+        function showCosmicTuner() {
+            safeGetElement('rhythmStatus').innerHTML = '🎵 Cosmic tuner activated! Play your stellar strings to tune with the galaxy!';
+            if (!pitchDetectionActive) {
+                togglePitchDetection();
+            }
+            cosmicSelfTalk("Cosmic tuner activated! Let's find those perfect galactic frequencies!", 'success');
+        }
+
+        // ===== MASTER CONTROLS =====
+        function setMasterVolume(value) {
+            try {
+                if (effectsChain.outputGain) {
+                    const volume = value / 100;
+                    effectsChain.outputGain.gain.setValueAtTime(volume, audioContext.currentTime);
+                }
+                safeGetElement('masterStatus').innerHTML = `🎚️ Master cosmic volume: ${value}% - galaxy-wide audio level set!`;
+                cosmicSelfTalk(`Master volume: ${value}% - cosmic sound levels adjusted!`, 'info');
+            } catch (e) {
+                console.error('Master volume error:', e);
+            }
+        }
+
+        function saveCosmicSession() {
+            try {
+                const sessionData = {
+                    effects: currentEffects,
+                    bpm: currentBPM,
+                    genre: safeGetElement('genreSelect').value,
+                    particleIntensity: particleIntensity,
+                    webglEffect: currentEffect,
+                    danceMode: danceMode,
+                    debugLevel: debugLevel,
+                    timestamp: new Date().toISOString(),
+                    cosmicSignature: '🌌 Cosmic Shredder Studio Session 🎸'
+                };
+                
+                const dataStr = JSON.stringify(sessionData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `cosmic_session_${new Date().getTime()}.json`;
+                a.click();
+                
+                URL.revokeObjectURL(url);
+                safeGetElement('masterStatus').innerHTML = '💾 Cosmic session saved successfully! Your galaxy configuration preserved!';
+                cosmicSelfTalk("Session saved! Your cosmic configuration is now eternal!", 'success');
+            } catch (e) {
+                console.error('Save session error:', e);
+                cosmicSelfTalk("Session save glitch... but cosmic memories persist!", 'warning');
+            }
+        }
+
+        function loadCosmicSession() {
+            try {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            try {
+                                const sessionData = JSON.parse(e.target.result);
+                                
+                                if (sessionData.effects) {
+                                    Object.assign(currentEffects, sessionData.effects);
+                                    updateCosmicEffectKnobs();
+                                }
+                                
+                                if (sessionData.bpm) {
+                                    currentBPM = sessionData.bpm;
+                                    safeGetElement('bpmSlider').value = currentBPM;
+                                    setCosmicBPM(currentBPM);
+                                }
+                                
+                                if (sessionData.genre) {
+                                    safeGetElement('genreSelect').value = sessionData.genre;
+                                }
+                                
+                                if (sessionData.particleIntensity) {
+                                    particleIntensity = sessionData.particleIntensity;
+                                    safeGetElement('particleIntensity').value = particleIntensity;
+                                }
+                                
+                                safeGetElement('masterStatus').innerHTML = '📂 Cosmic session loaded successfully! Galaxy configuration restored!';
+                                cosmicSelfTalk("Session loaded! Cosmic configuration restored from the galaxy archives!", 'success');
+                            } catch (e) {
+                                safeGetElement('masterStatus').innerHTML = '❌ Error loading cosmic session: ' + e.message;
+                                cosmicSelfTalk("Session load error... but we adapt and overcome!", 'error');
+                            }
+                        };
+                        reader.readAsText(file);
+                    }
+                };
+                
+                input.click();
+            } catch (e) {
+                console.error('Load session error:', e);
+            }
+        }
+
+        function exportCosmicTrack() {
+            safeGetElement('masterStatus').innerHTML = '🎧 Cosmic track export feature coming soon! Prepare for galaxy-wide distribution!';
+            cosmicSelfTalk("Track export requested! Soon we'll share our cosmic creations with the universe!", 'info');
+            pulseCosmicCreature();
+        }
+
+        function startCosmicJam() {
+            try {
+                const effects = ['slide', 'boogie', 'reverb', 'delay', 'flanger'];
+                effects.forEach(effect => {
+                    currentEffects[effect] = Math.floor(Math.random() * 70) + 30;
+                });
+                
+                updateCosmicEffectKnobs();
+                
+                if (!metronomeInterval) startCosmicMetronome();
+                if (!danceMode) startCosmicDance();
+                
+                safeGetElement('masterStatus').innerHTML = '🎸 COSMIC JAM SESSION STARTED! Let\'s shred through the galaxy! 🌌';
+                cosmicSelfTalk("COSMIC JAM ACTIVATED! Time to shred through dimensions!", 'success');
+                pulseCosmicCreature();
+            } catch (e) {
+                console.error('Jam session error:', e);
+            }
+        }
+
+        function activateGodMode() {
+            selfTalkActive = true;
+            debugLevel = 10;
+            setCosmicDebugLevel(10);
+            danceMode = true;
+            document.body.classList.add('dance-mode');
+            
+            safeGetElement('masterStatus').innerHTML = '🙏 GOD MODE ACTIVATED! Divine cosmic powers engaged! 🌟';
+            
+            cosmicSelfTalk("GOD MODE ACTIVATED! Divine debugging powers engaged!", 'error');
+            cosmicSelfTalk("Universe, grant us the wisdom to debug with cosmic precision!", 'success');
+            cosmicSelfTalk("When mortal code fails, we ascend to galactic programming!", 'warning');
+            cosmicSelfTalk("Dancing through the cosmos with divine inspiration! 💃", 'info');
+            
+            // Divine cosmic pulse sequence
+            for (let i = 0; i < 10; i++) {
+                setTimeout(() => pulseCosmicCreature(), i * 100);
+            }
+        }
+
+        function emergencyStop() {
+            try {
+                // Stop all streams
+                if (guitarStream) {
+                    guitarStream.getTracks().forEach(track => track.stop());
+                    guitarStream = null;
+                }
+                if (videoStream) {
+                    videoStream.getTracks().forEach(track => track.stop());
+                    videoStream = null;
+                }
+                
+                // Stop all activities
+                isStreaming = false;
+                webglActive = false;
+                pitchDetectionActive = false;
+                danceMode = false;
+                
+                if (metronomeInterval) {
+                    clearInterval(metronomeInterval);
+                    metronomeInterval = null;
+                }
+                
+                // Reset effects
+                Object.keys(currentEffects).forEach(key => currentEffects[key] = 0);
+                updateCosmicEffectKnobs();
+                
+                // Reset UI
+                document.body.classList.remove('dance-mode');
+                const tvFrame = safeGetElement('tvFrame');
+                tvFrame.classList.remove('on');
+                
+                // Update status displays
+                safeGetElement('inputStatus').innerHTML = '🛑 Emergency stop activated - all cosmic systems halted safely';
+                safeGetElement('streamStatus').innerHTML = '⏹️ Streaming stopped - cosmic transmission ended';
+                safeGetElement('rhythmStatus').innerHTML = '🥁 Rhythm stopped - cosmic silence';
+                safeGetElement('masterStatus').innerHTML = '🛑 EMERGENCY STOP - All cosmic systems reset and safe';
+                safeGetElement('effectsStatus').innerHTML = '🎛️ Effects reset - cosmic clarity restored';
+                
+                cosmicSelfTalk("EMERGENCY STOP! All cosmic systems safely halted. Ready for fresh start!", 'error');
+                
+            } catch (e) {
+                console.error('Emergency stop error:', e);
+                cosmicSelfTalk("Emergency stop had issues... but cosmic resilience prevails!", 'warning');
+            }
+        }
+
+        // ===== CHECKLIST FUNCTIONS =====
+        function resetCosmicChecklist() {
+            try {
+                const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(checkbox => checkbox.checked = false);
+                safeGetElement('checklistStatus').innerHTML = '🔄 Cosmic checklist reset! Check your galactic gear and start fresh!';
+                cosmicSelfTalk("Checklist reset! Time to verify our cosmic gear setup!", 'info');
+                pulseCosmicCreature();
+            } catch (e) {
+                console.error('Reset checklist error:', e);
+            }
+        }
+
+        function checkAllCosmicItems() {
+            try {
+                const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(checkbox => checkbox.checked = true);
+                safeGetElement('checklistStatus').innerHTML = '✅ All cosmic items checked! Galaxy gear ready for stellar performance!';
+                cosmicSelfTalk("All gear checked! We're cosmically prepared for any galactic adventure!", 'success');
+                pulseCosmicCreature();
+            } catch (e) {
+                console.error('Check all items error:', e);
+            }
+        }
+
+        // ===== COSMIC CREATURE =====
+        function pulseCosmicCreature() {
+            try {
+                const creature = document.querySelector('.cosmic-creature');
+                if (creature) {
+                    creature.classList.add('pulse');
+                    setTimeout(() => {
+                        creature.classList.remove('pulse');
+                    }, 600);
+                }
+            } catch (e) {
+                console.error('Pulse creature error:', e);
+                cosmicSelfTalk("Even the cosmic creature is glitching! But cosmic persistence flows!", 'warning');
+            }
+        }
+
+        // ===== COSMIC INITIALIZATION =====
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                console.log('🎸🌌 ULTIMATE COSMIC SHREDDER STUDIO INITIALIZED! 🌌🎸');
+                cosmicSelfTalk("COSMIC STUDIO INITIALIZED! Ready to dance through the galaxy and shake that trail feather! 💃", 'success');
+                
+                updateCosmicEffectKnobs();
+                
+                // Auto-start cosmic vibes
+                setTimeout(() => {
+                    cosmicSelfTalk("System ready! Time to connect and create cosmic magic through dance!", 'info');
+                    cosmicSelfTalk("Have we danced together yet? Let's shake that trail feather through the stars! ✨", 'success');
+                }, 1500);
+                
+                // Setup canvas resize observer
+                const canvas = safeGetElement('webglCanvas');
+                if (canvas) {
+                    const resizeObserver = new ResizeObserver(() => {
+                        if (renderer) {
+                            const rect = canvas.getBoundingClientRect();
+                            renderer.setSize(rect.width, rect.height);
+                            camera.aspect = rect.width / rect.height;
+                            camera.updateProjectionMatrix();
+                        }
+                    });
+                    resizeObserver.observe(canvas);
+                }
+                
+            } catch (e) {
+                console.error('Cosmic initialization error:', e);
+                cosmicSelfTalk("Initialization hit a cosmic bump... but we debug and dance through it!", 'error');
+            }
+        });
+
+        // ===== GLOBAL COSMIC DEBUG UTILITIES =====
+        window.cosmicDebug = {
+            checkAudio: () => {
+                console.log('🎵 Audio Context:', audioContext);
+                console.log('🎸 Guitar Stream:', guitarStream);
+                console.log('📊 Analyzer:', analyzer);
+                cosmicSelfTalk("Audio systems checked! All cosmic frequencies accounted for!", 'info');
+            },
+            
+            checkWebGL: () => {
+                console.log('✨ WebGL Active:', webglActive);
+                console.log('🌌 Scene:', scene);
+                console.log('⭐ Particles:', particles.length);
+                cosmicSelfTalk(`WebGL status: ${webglActive ? 'COSMIC DANCE MODE' : 'DORMANT'}, Particles: ${particles.length}`, 'info');
+            },
+            
+            emergencySave: () => {
+                const debugData = {
+                    timestamp: new Date().toISOString(),
+                    webglActive, particleIntensity, currentEffect, debugLevel,
+                    audioContext: !!audioContext, guitarStream: !!guitarStream,
+                    danceMode, isStreaming, cosmicEnergy: '🌌 MAXIMUM'
+                };
+                
+                const dataStr = JSON.stringify(debugData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `cosmic_emergency_${Date.now()}.json`;
+                a.click();
+                
+                URL.revokeObjectURL(url);
+                cosmicSelfTalk("Emergency cosmic data saved! We're prepared for galaxy recovery!", 'success');
+            },
+            
+            galaxyMode: () => {
+                activateGodMode();
+                startCosmicDance();
+                cosmicSelfTalk("GALAXY MODE! Maximum cosmic powers with divine dance energy! 🌌💃", 'error');
+            }
+        };
+
+        // Expose cosmic functions globally
+        window.cosmicSelfTalk = cosmicSelfTalk;
+        window.cosmicBooleanCheck = cosmicBooleanCheck;
+        window.crisisMode = crisisMode;
+        window.startCosmicDance = startCosmicDance;
+        
+        // Emergency cosmic keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+                cosmicDebug.galaxyMode();
+            }
+            
+            if (e.ctrlKey && e.shiftKey && e.key === 'S') {
+                cosmicDebug.emergencySave();
+            }
+            
+            if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+                crisisMode();
+            }
+            
+            if (e.ctrlKey && e.shiftKey && e.key === 'G') {
+                startCosmicDance();
+            }
+        });
+    </script>
+</body>
+</html>-display" id="inputStatus">🌌 Ready for cosmic input...<br>Click "Connect Cosmic Input" to start the galaxy dance!</div>
+            </div>
+        </div>
+
+        <!-- 2. Cosmic Effects Rack -->
+        <div class="module">
+            <h2>🎛️ Cosmic Effects Rack</h2>
+            <div class="input-section">
+                <label>Cosmic Genre:</label>
+                <select id="genreSelect" onchange="setCosmicGenre()">
+                    <option value="cosmic-funk">Cosmic Funk 🌌</option>
+                    <option value="stellar-rock">Stellar Rock 🎸</option>
+                    <option value="nebula-blues">Nebula Blues 🎷</option>
+                    <option value="galactic-jazz">Galactic Jazz 🎺</option>
+                    <option value="quantum-metal">Quantum Metal ⚡</option>
+                    <option value="dance-vibes">Galaxy Dance Vibes 💃</option>
+                </select>
+                
+                <div class="effects-grid">
+                    <div class="effect-knob off" data-effect="slide" onclick="toggleEffect('slide')">
+                        <div class="knob-indicator"></div>
+                        <div class="effect-label">Cosmic Slide</div>
+                    </div>
+                    <div class="effect-knob off" data-effect="boogie" onclick="toggleEffect('boogie')">
+                        <div class="knob-indicator"></div>
+                        <div class="effect-label">Galaxy Boogie</div>
+                    </div>
+                    <div class="effect-knob off" data-effect="drive" onclick="toggleEffect('drive')">
+                        <div class="knob-indicator"></div>
+                        <div class="effect-label">Stellar Drive</div>
+                    </div>
+                    <div class="effect-knob off" data-effect="reverb" onclick="toggleEffect('reverb')">
+                        <div class="knob-indicator"></div>
+                        <div class="effect-label">Nebula Verb</div>
+                    </div>
+                    <div class="effect-knob off" data-effect="delay" onclick="toggleEffect('delay')">
+                        <div class="knob-indicator"></div>
+                        <div class="effect-label">Time Delay</div>
+                    </div>
+                    <div class="effect-knob off" data-effect="flanger" onclick="toggleEffect('flanger')">
+                        <div class="knob-indicator"></div>
+                        <div class="effect-label">Cosmic Flange</div>
+                    </div>
+                    <div class="effect-knob off" data-effect="presonus_reverb" onclick="toggleEffect('presonus_reverb')">
+                        <div class="knob-indicator"></div>
+                        <div class="effect-label">PreSonus</div>
+                    </div>
+                    <div class="effect-knob off" data-effect="eddieboost" onclick="toggleEffect('eddieboost')">
+                        <div class="knob-indicator"></div>
+                        <div class="effect-label">EddieBoost</div>
+                    </div>
+                </div>
+                
+                <div class="status-display" id="effectsStatus">🎛️ Cosmic effects ready! Select genre to activate stellar sounds!</div>
+            </div>
+        </div>
+
+        <!-- 3. Rhythm & Cosmic Tuning -->
+        <div class="module">
+            <h2>🥁 Rhythm & Cosmic Tuning</h2>
+            <div class="input-section">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn" onclick="startCosmicMetronome()">Cosmic Metronome ⏱️</button>
+                    <button class="btn" onclick="showCosmicTuner()">Stellar Tuner 🎵</button>
+                    <button class="btn" onclick="danceToTheBeat()">Dance to Beat 💃</button>
+                </div>
+                
+                <label>Cosmic BPM:</label>
+                <input type="range" id="bpmSlider" min="60" max="200" value="120" oninput="setCosmicBPM(this.value)">
+                <span id="bpmDisplay" style="color: #ffd700; font-weight: bold;">120 BPM</span>
+                
+                <label>Time Signature:</label>
+                <select id="timeSignature">
+                    <option value="4/4">4/4 (Classic Cosmic)</option>
+                    <option value="3/4">3/4 (Waltz Vibes)</option>
+                    <option value="6/8">6/8 (Galaxy Flow)</option>
+                    <option value="7/8">7/8 (Cosmic Odd)</option>
+                </select>
+                
+                <div class="status-display" id="rhythmStatus">🥁 Cosmic rhythm section ready! Time to dance through the galaxy!</div>
+            </div>
+        </div>
+
+        <!-- 4. Real Streaming & Podcast -->
+        <div class="module">
+            <h2>📡 Real Cosmic Streaming</h2>
+            <div class="input-section">
+                <label>Streaming Platform:</label>
+                <select id="streamPlatform">
+                    <option value="youtube">YouTube Live 📺</option>
+                    <option value="twitch">Twitch 🎮</option>
+                    <option value="custom">Custom RTMP 🛠️</option>
+                </select>
+                
+                <label>Stream Quality:</label>
+                <select id="streamQuality">
+                    <option value="4k">4K Ultra Cosmic</option>
+                    <option value="1080p">1080p HD</option>
+                    <option value="720p">720p Standard</option>
+                </select>
+                
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn" id="startRealStream" onclick="startRealStreaming()">Start REAL Stream 🚀</button>
+                    <button class="btn" onclick="setupStreamKey()">Setup Stream Key 🔑</button>
+                    <button class="btn" onclick="applySoundCardEffect('cosmic')">Cosmic Effect ✨</button>
+                </div>
+                
+                <div class="status-display" id="streamStatus">📡 Ready for REAL cosmic streaming...<br>Setup your stream key and blast off to the galaxy!</div>
+            </div>
+        </div>
+
+        <!-- 5. Master Cosmic Controls -->
+        <div class="module">
+            <h2>🎚️ Master Cosmic Controls</h2>
+            <div class="input-section">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn" onclick="saveCosmicSession()">Save Cosmic Session 💾</button>
+                    <button class="btn" onclick="loadCosmicSession()">Load Session 📂</button>
+                    <button class="btn" onclick="exportCosmicTrack()">Export Cosmic Track 🎧</button>
+                    <button class="btn" onclick="emergencyStop()">Emergency Stop 🛑</button>
+                </div>
+                
+                <label>Master Cosmic Volume:</label>
+                <input type="range" id="masterVolume" min="0" max="100" value="75" oninput="setMasterVolume(this.value)">
+                
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;">
+                    <button class="btn" onclick="startCosmicJam()">Start Cosmic Jam 🎸</button>
+                    <button class="btn" onclick="activateGodMode()">GOD MODE 🙏</button>
+                </div>
+                
+                <div class="status-display" id="masterStatus">🎚️ Master cosmic controls active - ready to shred the galaxy!</div>
+            </div>
+        </div>
+
+        <!-- 6. Cosmic Gear Checklist -->
+        <div class="module">
+            <h2>🔌 Cosmic Gear Checklist</h2>
+            <div class="checklist-section">
+                <label><input type="checkbox" id="lightning-usbc"> Lightning-to-USB-C (iPhone 6S Plus)</label>
+                <label><input type="checkbox" id="usbc-usbc"> USB-C-to-USB-C (iPhone 16 Pro Max)</label>
+                <label><input type="checkbox" id="xlr-3.5mm"> XLR-to-3.5mm (UHF Mics)</label>
+                <label><input type="checkbox" id="trs-1/4"> 1/4" TRS (Les Paul Cable)</label>
+                <label><input type="checkbox" id="hdmi-usbc"> HDMI-to-USB-C (4K Cam)</label>
+                <label><input type="checkbox" id="bluetooth-dongle"> Bluetooth Dongle (Cosmic)</label>
+                <label><input type="checkbox" id="presonus-cable"> PreSonus AudioBox Cable</label>
+                <label><input type="checkbox" id="piezo-cable"> Piezo Pickup Cable (Aria)</label>
+                <label><input type="checkbox" id="cosmic-energy"> Cosmic Energy Source ⚡</label>
+                <label><input type="checkbox" id="dance-shoes"> Dancing Shoes 💃</label>
+                
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;">
+                    <button class="btn" onclick="resetCosmicChecklist()">Reset Checklist 🔄</button>
+                    <button class="btn" onclick="checkAllCosmicItems()">Check All Cosmic ✅</button>
+                </div>
+                
+                <div class="status-display" id="checklistStatus">🔌 Check your cosmic gear and let's dance through the galaxy!</div>
+            </div>
+        </div>
+
+        <!-- 7. Cosmic Self-Talk Debug -->
+        <div class="module">
+            <h2>🧠 Cosmic Debug Console</h2>
+            <div class="input-section">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn" onclick="selfTalkMode()">Self-Talk Mode 💭</button>
+                    <button class="btn" onclick="cosmicBooleanCheck()">Boolean Check ✅</button>
+                    <button class="btn" onclick="crisisMode()">Crisis Debug 🚨</button>
+                    <button class="btn" onclick="danceDebugMode()">Dance Debug 💃</button>
+                </div>
+                
+                <div class="status
