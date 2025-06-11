@@ -6,1386 +6,650 @@
     <title>🎸 Cosmic Trepanning Studio - Web3 Casino 💀</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         
         body {
             font-family: 'Courier New', monospace;
-            background: linear-gradient(45deg, #1a1a2e, #16213e, #0f3460, #e73c7e, #23a6d5);
-            background-size: 400% 400%;
-            color: white;
-            min-height: 100vh;
-            animation: cosmicDance 8s ease-in-out infinite;
+            background: linear-gradient(45deg, #0a0a0a, #1a0a1a, #0a1a0a);
+            color: #00ff00;
             overflow-x: hidden;
+            min-height: 100vh;
         }
-
-        @keyframes cosmicDance {
-            0% { background-position: 0% 50%; }
-            25% { background-position: 100% 50%; }
-            50% { background-position: 100% 100%; }
-            75% { background-position: 0% 100%; }
-            100% { background-position: 0% 50%; }
+        
+        .cosmic-container {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
         }
-
-        .header {
+        
+        .cosmic-header {
             text-align: center;
-            padding: 20px;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(10px);
-            border-bottom: 3px solid #ff6b9d;
+            margin: 20px 0;
+            z-index: 100;
         }
-
-        .header h1 {
-            font-size: 2.5em;
-            background: linear-gradient(45deg, #ff6b9d, #4ecdc4, #ffd700);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: shimmer 3s infinite;
+        
+        .cosmic-title {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            text-shadow: 0 0 20px #00ff00, 0 0 40px #ff00ff;
             margin-bottom: 10px;
+            animation: pulse 2s infinite;
         }
-
-        .header p {
-            color: #4ecdc4;
-            font-size: 1.1em;
-            animation: float 4s ease-in-out infinite;
-        }
-
-        @keyframes shimmer {
+        
+        @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.7; }
         }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-5px); }
-        }
-
-        .container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 20px;
-            padding: 20px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .module {
-            background: rgba(44, 44, 78, 0.9);
-            border: 2px solid #ff6b9d;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 0 20px rgba(255, 107, 157, 0.3);
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .module:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 30px rgba(255, 107, 157, 0.5);
-        }
-
-        .module h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #ff6b9d;
-            font-size: 1.4em;
-            text-shadow: 0 0 10px rgba(255, 107, 157, 0.5);
-        }
-
-        .cosmic-visual {
+        
+        .canvas-container {
             position: relative;
             width: 100%;
-            height: 200px;
-            background: linear-gradient(45deg, #2c2c4e, #1a1a2e);
+            max-width: 800px;
+            height: 400px;
+            border: 2px solid #00ff00;
             border-radius: 10px;
             overflow: hidden;
-            margin: 15px 0;
-            border: 2px solid #4ecdc4;
+            margin: 20px 0;
         }
-
-        #webglCanvas {
+        
+        #cosmicCanvas {
             width: 100%;
             height: 100%;
-            border-radius: 8px;
+            display: block;
         }
-
-        .overlay {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.8);
-            padding: 8px;
+        
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 20px 0;
+        }
+        
+        .control-panel {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+            border-radius: 10px;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .panel-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #ff00ff;
+            text-shadow: 0 0 10px #ff00ff;
+        }
+        
+        .cosmic-button {
+            background: linear-gradient(45deg, #001100, #003300);
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            padding: 12px 20px;
             border-radius: 5px;
-            font-size: 11px;
-            color: #4ecdc4;
-            z-index: 10;
-            border: 1px solid #ff6b9d;
-        }
-
-        .btn {
-            background: linear-gradient(45deg, #ff6b9d, #4ecdc4);
-            border: none;
-            padding: 12px 18px;
-            border-radius: 25px;
-            color: white;
             cursor: pointer;
-            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
             margin: 5px;
             transition: all 0.3s ease;
-            font-size: 13px;
-            position: relative;
-            overflow: hidden;
+            text-transform: uppercase;
         }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: left 0.5s;
+        
+        .cosmic-button:hover {
+            background: linear-gradient(45deg, #003300, #005500);
+            box-shadow: 0 0 20px #00ff00;
+            transform: scale(1.05);
         }
-
-        .btn:hover::before { left: 100%; }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 107, 157, 0.4);
+        
+        .cosmic-button.active {
+            background: linear-gradient(45deg, #330011, #550033);
+            border-color: #ff00ff;
+            color: #ff00ff;
+            box-shadow: 0 0 20px #ff00ff;
         }
-
-        .btn.active {
-            background: linear-gradient(45deg, #e74c3c, #c0392b);
-            animation: pulse 1s infinite;
-        }
-
-        .btn.web3 {
-            background: linear-gradient(45deg, #ffd700, #ff8c00);
-            border: 2px solid #ffd700;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .controls {
+        
+        .knob-container {
             display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .control-row {
-            display: flex;
-            gap: 8px;
             flex-wrap: wrap;
+            gap: 15px;
             justify-content: center;
+            margin: 15px 0;
         }
-
-        select, input[type="range"], input[type="number"] {
-            background: rgba(44, 44, 78, 0.8);
-            color: white;
-            border: 2px solid #4ecdc4;
-            padding: 8px;
-            border-radius: 8px;
-            font-size: 13px;
-        }
-
-        input[type="range"] {
-            width: 100%;
-            margin: 8px 0;
-            height: 25px;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            background: linear-gradient(45deg, #ff6b9d, #4ecdc4);
-            height: 20px;
-            width: 20px;
-            border-radius: 50%;
-            cursor: pointer;
-            -webkit-appearance: none;
-            box-shadow: 0 0 10px rgba(255, 107, 157, 0.5);
-        }
-
-        .status {
-            background: rgba(0,0,0,0.5);
-            padding: 12px;
-            border-radius: 8px;
-            border-left: 4px solid #4ecdc4;
-            font-family: monospace;
-            font-size: 11px;
-            margin-top: 10px;
-            max-height: 120px;
-            overflow-y: auto;
-        }
-
-        .volume-bar {
-            width: 100%;
-            height: 20px;
-            background: #2c2c4e;
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 10px 0;
-            border: 1px solid #4ecdc4;
-        }
-
-        .volume-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(to right, #4ecdc4, #ff6b9d, #ffd700);
-            transition: width 0.1s ease;
-            box-shadow: 0 0 10px rgba(78, 205, 196, 0.5);
-        }
-
-        .cosmic-creature {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
+        
+        .knob {
             width: 60px;
             height: 60px;
-            background: radial-gradient(circle, #ff6b9d, #4ecdc4);
             border-radius: 50%;
+            background: radial-gradient(circle, #001100, #003300);
+            border: 3px solid #00ff00;
+            position: relative;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            animation: float 3s ease-in-out infinite;
-            z-index: 1000;
-            border: 3px solid #fff;
-            box-shadow: 0 0 20px rgba(255, 107, 157, 0.8);
+            transition: all 0.3s ease;
         }
-
-        .pulse-cosmic {
-            animation: pulseCosmic 0.5s ease-in-out;
+        
+        .knob:hover {
+            box-shadow: 0 0 20px #00ff00;
+            transform: scale(1.1);
         }
-
-        @keyframes pulseCosmic {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.3); }
-            100% { transform: scale(1); }
+        
+        .knob::after {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 3px;
+            height: 20px;
+            background: #ff00ff;
+            border-radius: 2px;
         }
-
-        .web3-status {
-            background: rgba(255, 215, 0, 0.1);
-            border: 1px solid #ffd700;
-            padding: 10px;
-            border-radius: 8px;
+        
+        .knob-label {
             text-align: center;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            color: #00ff00;
+        }
+        
+        .status-display {
+            background: rgba(255, 0, 255, 0.1);
+            border: 1px solid #ff00ff;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .trepan-counter {
+            font-size: 2rem;
+            color: #ff00ff;
+            text-shadow: 0 0 15px #ff00ff;
             margin: 10px 0;
-            font-size: 12px;
         }
-
-        .achievement {
-            background: rgba(39, 174, 96, 0.2);
-            border: 1px solid #27ae60;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 10px;
+        
+        .cosmic-creature {
+            font-size: 4rem;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s ease;
             display: inline-block;
-            margin: 2px;
+            margin: 20px;
         }
-
-        label {
-            color: #4ecdc4;
-            font-weight: bold;
-            margin-bottom: 5px;
-            font-size: 12px;
-            text-shadow: 0 0 5px rgba(78, 205, 196, 0.3);
+        
+        .cosmic-creature:hover {
+            transform: scale(1.2) rotate(15deg);
+            text-shadow: 0 0 30px #ff00ff;
         }
-
+        
+        .hypernova-flash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle, rgba(255,255,255,0.9), rgba(255,0,255,0.5));
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0;
+            animation: hypernovaFlash 0.5s ease-out;
+        }
+        
+        @keyframes hypernovaFlash {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        
         @media (max-width: 768px) {
-            .container { grid-template-columns: 1fr; padding: 10px; }
-            .header h1 { font-size: 1.8em; }
-            .control-row { justify-content: center; }
-            .cosmic-creature { width: 50px; height: 50px; font-size: 20px; }
-            .btn { padding: 10px 14px; font-size: 12px; }
-        }
-
-        @media (max-width: 480px) {
-            .header h1 { font-size: 1.5em; }
-            .cosmic-creature { bottom: 10px; right: 10px; }
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .knob-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .cosmic-title {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>🎸 COSMIC TREPANNING STUDIO 💀</h1>
-        <p>🌌 Web3 Casino • Mind Portals • NFT Mixes • Eternal Royalties 🌌</p>
-    </div>
-
-    <div class="container">
-        <!-- Cosmic Input Portal -->
-        <div class="module">
-            <h2>🌀 Cosmic Input Portal</h2>
-            <div class="controls">
-                <select id="inputType">
-                    <option value="cosmic-all">COSMIC ALL! 🌌</option>
-                    <option value="guitar">Guitar Portal 🎸</option>
-                    <option value="mic">Mic Portal 🎙️</option>
-                    <option value="trepan">Trepanning Mode 💀</option>
-                </select>
-                
-                <div class="control-row">
-                    <button class="btn" onclick="openPortal()">Open Portal</button>
-                    <button class="btn" id="trepanBtn" onclick="toggleTrepan()">TREPAN MODE 💀</button>
-                    <button class="btn" onclick="hypernovaMode()">HYPERNOVA 🌋</button>
-                </div>
-                
-                <div class="cosmic-visual">
-                    <canvas id="webglCanvas"></canvas>
-                    <div class="overlay" id="statusOverlay">Portal: Ready</div>
-                </div>
-                
-                <div class="volume-bar">
-                    <div class="volume-fill" id="volumeFill"></div>
-                </div>
-                
-                <label>Effect Type:</label>
-                <select id="effectType" onchange="changeEffect()">
-                    <option value="particles">Frequency Particles</option>
-                    <option value="blackhole">Black Hole Spiral 🕳️</option>
-                    <option value="supernova">Supernova Burst 🌟</option>
-                    <option value="trepan">Trepanning Portal 💀</option>
-                    <option value="dance">Galaxy Dance</option>
-                </select>
-                
-                <label>Cosmic Intensity:</label>
-                <input type="range" id="intensity" min="1" max="100" value="75" oninput="updateIntensity(this.value)">
-                
-                <div class="status" id="inputStatus">🌀 Ready for cosmic trepanning... Open portal to expand consciousness!</div>
-            </div>
+    <div class="cosmic-container">
+        <div class="cosmic-header">
+            <h1 class="cosmic-title">🎸 COSMIC TREPANNING STUDIO 💀</h1>
+            <p>🌌 Drill Portals • Mine Consciousness • Expand Reality 🌌</p>
         </div>
 
-        <!-- Enhanced Effects Rack -->
-        <div class="module">
-            <h2>🎛️ Consciousness Effects</h2>
-            <div class="controls">
-                <div class="control-row">
-                    <button class="btn" onclick="toggleEffect('reverb')">Nebula Reverb</button>
-                    <button class="btn" onclick="toggleEffect('delay')">Time Delay</button>
-                    <button class="btn" onclick="toggleEffect('distortion')">Cosmic Drive</button>
-                </div>
-                
-                <label>Reverb Level:</label>
-                <input type="range" id="reverb" min="0" max="100" value="30" oninput="updateEffectLevel('reverb', this.value)">
-                
-                <label>Delay Level:</label>
-                <input type="range" id="delay" min="0" max="100" value="25" oninput="updateEffectLevel('delay', this.value)">
-                
-                <label>Trepanning Level:</label>
-                <input type="range" id="trepanLevel" min="1" max="10" value="5" oninput="updateTrepanLevel(this.value)">
-                
-                <div class="status" id="effectStatus">🎛️ Effects ready! Trepan your way to cosmic consciousness!</div>
-            </div>
+        <div class="canvas-container">
+            <canvas id="cosmicCanvas"></canvas>
         </div>
 
-        <!-- Recording & Export -->
-        <div class="module">
-            <h2>🎙️ Cosmic Recording Studio</h2>
-            <div class="controls">
-                <div class="control-row">
-                    <button class="btn" id="recordBtn" onclick="toggleRecord()">Record Mix 🎙️</button>
-                    <button class="btn" onclick="convertToMP3()">Convert to MP3 🎵</button>
-                    <button class="btn" onclick="downloadMix()">Download Mix 💾</button>
+        <div class="controls-grid">
+            <div class="control-panel">
+                <div class="panel-title">🎵 AUDIO PORTAL</div>
+                <button class="cosmic-button" id="connectBtn">OPEN PORTAL</button>
+                <button class="cosmic-button" id="recordBtn">RECORD MIX</button>
+                <div class="knob-container">
+                    <div>
+                        <div class="knob" id="volumeKnob"></div>
+                        <div class="knob-label">VOLUME</div>
+                    </div>
+                    <div>
+                        <div class="knob" id="intensityKnob"></div>
+                        <div class="knob-label">INTENSITY</div>
+                    </div>
                 </div>
-                
-                <label>Recording Duration (seconds):</label>
-                <input type="number" id="recordDuration" min="5" max="300" value="30" style="width: 100px;">
-                
-                <div class="status" id="recordStatus">🎙️ Ready to record cosmic consciousness... Start portal first!</div>
             </div>
-        </div>
 
-        <!-- Web3 Casino -->
-        <div class="module">
-            <h2>🎰 Web3 Cosmic Casino</h2>
-            <div class="controls">
-                <div class="web3-status" id="web3Status">
-                    Connect MetaMask to access casino features
+            <div class="control-panel">
+                <div class="panel-title">🌀 COSMIC EFFECTS</div>
+                <button class="cosmic-button effect-btn" data-effect="blackhole">BLACK HOLE</button>
+                <button class="cosmic-button effect-btn" data-effect="supernova">SUPERNOVA</button>
+                <button class="cosmic-button effect-btn active" data-effect="trepan">TREPANNING</button>
+                <div class="knob-container">
+                    <div>
+                        <div class="knob" id="reverbKnob"></div>
+                        <div class="knob-label">REVERB</div>
+                    </div>
+                    <div>
+                        <div class="knob" id="delayKnob"></div>
+                        <div class="knob-label">DELAY</div>
+                    </div>
                 </div>
-                
-                <div class="control-row">
-                    <button class="btn web3" onclick="connectWallet()">Connect Wallet 👛</button>
-                    <button class="btn web3" onclick="mintCosmicMix()">Mint NFT 🌌</button>
-                    <button class="btn web3" onclick="drillPortal()">Mine CTOK 🧠</button>
-                </div>
-                
-                <div class="control-row">
-                    <button class="btn web3" onclick="betOnSupernova()">Bet Supernova 🌟</button>
-                    <button class="btn web3" onclick="blackHoleLottery()">Black Hole Lottery 🕳️</button>
-                </div>
-                
-                <label>Bet Amount (CTOK):</label>
-                <input type="number" id="betAmount" min="1" max="1000" value="100" style="width: 100px;">
-                
-                <div id="achievements" style="margin-top: 10px;"></div>
-                
-                <div class="status" id="web3StatusDetail">
-                    💰 CTOK Balance: 0<br>
-                    🧠 Mind Portals: 0<br>
-                    🎨 NFTs Minted: 0<br>
-                    🏆 Achievements: None
+            </div>
+
+            <div class="control-panel">
+                <div class="panel-title">💀 TREPANNING CONTROL</div>
+                <button class="cosmic-button" id="trepanBtn">TREPAN MODE</button>
+                <button class="cosmic-button" id="drillBtn">DRILL PORTAL</button>
+                <div class="trepan-counter" id="portalCounter">0</div>
+                <div>Mind Portals Drilled</div>
+            </div>
+
+            <div class="control-panel">
+                <div class="panel-title">🎰 WEB3 CASINO</div>
+                <button class="cosmic-button" id="mintBtn">MINT NFT</button>
+                <button class="cosmic-button" id="betBtn">BET SUPERNOVA</button>
+                <div class="status-display">
+                    <div>CTOK: <span id="ctokBalance">0</span></div>
+                    <div>NFTs: <span id="nftCount">0</span></div>
                 </div>
             </div>
         </div>
 
-        <!-- Master Controls -->
-        <div class="module">
-            <h2>🎚️ Master Portal Controls</h2>
-            <div class="controls">
-                <div class="control-row">
-                    <button class="btn" onclick="saveSession()">Save Session 💾</button>
-                    <button class="btn" onclick="loadSession()">Load Session 📂</button>
-                    <button class="btn" onclick="lowPowerMode()">Low Power 🌙</button>
-                </div>
-                
-                <div class="control-row">
-                    <button class="btn" onclick="joinCosmicJam()">Cosmic Jam 👥</button>
-                    <button class="btn" onclick="emergencyStop()">Emergency Stop 🛑</button>
-                </div>
-                
-                <label>Master Volume:</label>
-                <input type="range" id="masterVol" min="0" max="100" value="75" oninput="setVolume(this.value)">
-                
-                <div class="status" id="masterStatus">🎚️ Master controls ready - prepare for consciousness expansion!</div>
-            </div>
-        </div>
+        <div class="cosmic-creature" id="cosmicCreature">🌌</div>
 
-        <!-- Trepanning Debug Console -->
-        <div class="module">
-            <h2>💀 Trepanning Console</h2>
-            <div class="controls">
-                <div class="control-row">
-                    <button class="btn" onclick="booleanCheck()">Portal Check ✅</button>
-                    <button class="btn" onclick="openMindPortal()">Open Mind Portal 🧠</button>
-                    <button class="btn" onclick="crisisMode()">Crisis Mode 🚨</button>
-                </div>
-                
-                <div class="status" id="debugStatus">
-                    💀 Trepanning: Ready<br>
-                    🌌 Audio Portal: Closed<br>
-                    ✨ WebGL: Dormant<br>
-                    🧠 Mind Portals: 0 open<br>
-                    🚀 Status: Ready to drill
-                </div>
-                
-                <label>Debug Level:</label>
-                <input type="range" id="debugLevel" min="1" max="10" value="5" oninput="setDebugLevel(this.value)">
-                
-                <div id="trepanLog" class="status" style="max-height: 80px;">
-                    💀 Cosmic Shredder: "Ready to drill consciousness portals?"<br>
-                    🧠 Inner Voice: "The trepanning begins the cosmic journey!"<br>
-                    ✨ Higher Self: "Mind portals opening to infinite dimensions..."
-                </div>
-            </div>
+        <div class="status-display">
+            <div>Portal Status: <span id="portalStatus">CLOSED</span></div>
+            <div>Consciousness Level: <span id="consciousnessLevel">DORMANT</span></div>
+            <div>Trepanning Mode: <span id="trepanStatus">INACTIVE</span></div>
         </div>
     </div>
-
-    <div class="cosmic-creature" onclick="pulseCreature()">💀</div>
 
     <script>
-        // Core Variables
-        let scene, camera, renderer, particles;
-        let audioContext, analyzer, dataArray, guitarStream;
-        let webglActive = false, isRecording = false, isTrepanning = false;
-        let currentEffect = 'particles', intensity = 75, trepanLevel = 5;
-        let clickCount = 0, lastClick = 0, recordedChunks = [];
-        let web3, cosmicContract, playerAddress;
-        let ctokBalance = 0, mindPortals = 0, nftCount = 0;
-        let effects = { reverb: 30, delay: 25, distortion: 0 };
+        // Global Variables
+        let scene, camera, renderer, particles = [];
+        let audioContext, analyser, dataArray, audioConnected = false;
+        let currentEffect = 'trepan';
+        let trepanMode = false;
+        let portalCount = 0;
+        let creatureClicks = 0;
+        let ctokBalance = 0;
+        let nftCount = 0;
+        let isRecording = false;
+        let mediaRecorder;
+        let recordedChunks = [];
 
-        // Web3 Configuration (Update these before deployment!)
-        const CONTRACT_ADDRESS = '0xYourContractAddressHere'; // Deploy contract and update
-        const CONTRACT_ABI = []; // Add ABI from compiled contract
-        
-        // Initialize WebGL
-        function initWebGL() {
-            const canvas = document.getElementById('webglCanvas');
-            if (!canvas) return false;
-
+        // Initialize Three.js Scene
+        function initScene() {
+            const canvas = document.getElementById('cosmicCanvas');
+            const container = canvas.parentElement;
+            
             scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-            renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
-            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-            renderer.setClearColor(0x000000, 0);
+            camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setClearColor(0x000000, 0.1);
+
             camera.position.z = 5;
 
+            // Create particles
             createParticles();
-            animate();
             
-            logMessage("WebGL portal opened! Cosmic consciousness flowing!", 'success');
-            return true;
+            // Start animation loop
+            animate();
         }
 
         function createParticles() {
-            if (particles) scene.remove(particles);
-            
-            const geometry = new THREE.BufferGeometry();
-            const positions = [], colors = [];
-            const particleCount = intensity * 5;
-            
+            particles = [];
+            const particleCount = 200;
+
             for (let i = 0; i < particleCount; i++) {
-                positions.push(
+                const geometry = new THREE.SphereGeometry(0.02, 8, 8);
+                const material = new THREE.MeshBasicMaterial({
+                    color: new THREE.Color().setHSL(Math.random(), 1, 0.5),
+                    transparent: true,
+                    opacity: 0.8
+                });
+                
+                const particle = new THREE.Mesh(geometry, material);
+                particle.position.set(
                     (Math.random() - 0.5) * 10,
-                    (Math.random() - 0.5) * 6,
-                    (Math.random() - 0.5) * 4
+                    (Math.random() - 0.5) * 10,
+                    (Math.random() - 0.5) * 10
                 );
-                colors.push(Math.random(), Math.random(), Math.random());
+                
+                particle.velocity = new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.02,
+                    (Math.random() - 0.5) * 0.02,
+                    (Math.random() - 0.5) * 0.02
+                );
+
+                scene.add(particle);
+                particles.push(particle);
             }
-            
-            geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-            geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-            
-            const material = new THREE.PointsMaterial({ 
-                size: 0.05, 
-                vertexColors: true,
-                transparent: true,
-                opacity: 0.8
-            });
-            
-            particles = new THREE.Points(geometry, material);
-            scene.add(particles);
         }
 
-        // Animation Loop
-        let time = 0;
         function animate() {
-            if (!webglActive) return;
-            
             requestAnimationFrame(animate);
-            time += 0.01;
-            
-            if (analyzer && dataArray) {
-                analyzer.getByteFrequencyData(dataArray);
-                updateVolumeBar();
+
+            // Get audio data if available
+            let audioLevel = 0;
+            if (audioConnected && analyser) {
+                analyser.getByteFrequencyData(dataArray);
+                audioLevel = dataArray.reduce((a, b) => a + b) / dataArray.length / 255;
             }
-            
-            switch(currentEffect) {
-                case 'particles': animateParticles(); break;
-                case 'blackhole': animateBlackHole(); break;
-                case 'supernova': animateSupernova(); break;
-                case 'trepan': animateTrepan(); break;
-                case 'dance': animateDance(); break;
-            }
+
+            // Animate particles based on current effect
+            animateParticles(audioLevel);
             
             renderer.render(scene, camera);
         }
 
-        function animateParticles() {
-            const positions = particles.geometry.attributes.position.array;
-            const colors = particles.geometry.attributes.color.array;
+        function animateParticles(audioLevel) {
+            const time = Date.now() * 0.001;
             
-            for (let i = 0; i < positions.length; i += 3) {
-                const index = Math.floor(i / 3) % (dataArray ? dataArray.length : 128);
-                const amplitude = dataArray ? (dataArray[index] / 255) : Math.sin(time + i) * 0.5 + 0.5;
-                
-                positions[i] += Math.sin(time + i) * amplitude * 0.01;
-                positions[i + 1] += Math.cos(time + i) * amplitude * 0.01;
-                positions[i + 2] += Math.sin(time * 2 + i) * amplitude * 0.005;
-                
-                colors[i] = (Math.sin(time + i) + 1) * 0.5;
-                colors[i + 1] = (Math.cos(time + i) + 1) * 0.5;
-                colors[i + 2] = (Math.sin(dancePhase * 2) + 1) * 0.5;
+            particles.forEach((particle, index) => {
+                switch (currentEffect) {
+                    case 'blackhole':
+                        animateBlackHole(particle, audioLevel, time);
+                        break;
+                    case 'supernova':
+                        animateSupernova(particle, audioLevel, time);
+                        break;
+                    case 'trepan':
+                        animateTrepanning(particle, audioLevel, time, index);
+                        break;
+                }
+            });
+        }
+
+        function animateBlackHole(particle, audioLevel, time) {
+            const centerDistance = particle.position.length();
+            const pullStrength = (1 + audioLevel * 2) * 0.01;
+            
+            if (centerDistance > 0.1) {
+                particle.position.multiplyScalar(1 - pullStrength);
+                particle.position.applyAxisAngle(new THREE.Vector3(0, 0, 1), 0.05 + audioLevel * 0.1);
+            } else {
+                // Reset particle when it gets too close to center
+                particle.position.set(
+                    (Math.random() - 0.5) * 8,
+                    (Math.random() - 0.5) * 8,
+                    (Math.random() - 0.5) * 8
+                );
             }
             
-            particles.geometry.attributes.position.needsUpdate = true;
-            particles.geometry.attributes.color.needsUpdate = true;
+            particle.material.color.setHSL(0.8 - centerDistance * 0.1, 1, 0.5 + audioLevel * 0.3);
+        }
+
+        function animateSupernova(particle, audioLevel, time) {
+            if (audioLevel > 0.8) {
+                // Supernova explosion
+                const explosionForce = (audioLevel - 0.8) * 0.5;
+                particle.velocity.addScaledVector(particle.position.clone().normalize(), explosionForce);
+                particle.material.color.setRGB(1, 1, 1);
+            } else {
+                // Normal drift
+                particle.position.add(particle.velocity);
+                particle.material.color.setHSL(0.1, 1, 0.3 + audioLevel * 0.5);
+            }
+            
+            // Boundary check
+            if (particle.position.length() > 8) {
+                particle.position.multiplyScalar(0.1);
+                particle.velocity.multiplyScalar(0.1);
+            }
+        }
+
+        function animateTrepanning(particle, audioLevel, time, index) {
+            const drillRadius = 2 + audioLevel * 2;
+            const drillSpeed = 0.05 + audioLevel * 0.1;
+            const angle = time * drillSpeed + index * 0.1;
+            
+            if (trepanMode) {
+                // Drilling pattern
+                particle.position.x = Math.cos(angle) * drillRadius * Math.cos(time * 0.2);
+                particle.position.y = Math.sin(angle) * drillRadius * Math.sin(time * 0.2);
+                particle.position.z = Math.sin(time * 0.3 + index) * 0.5;
+                
+                particle.material.color.setHSL(0.8, 1, 0.5 + audioLevel * 0.5);
+            } else {
+                // Gentle cosmic dance
+                particle.position.x += Math.sin(time + index) * 0.01;
+                particle.position.y += Math.cos(time + index) * 0.01;
+                particle.position.z += Math.sin(time * 0.5 + index) * 0.005;
+                
+                particle.material.color.setHSL(0.3 + Math.sin(time + index) * 0.2, 1, 0.5);
+            }
         }
 
         // Audio Setup
-        async function openPortal() {
+        async function connectAudio() {
             try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                analyzer = audioContext.createAnalyser();
-                analyzer.fftSize = 256;
-                dataArray = new Uint8Array(analyzer.frequencyBinCount);
+                const source = audioContext.createMediaStreamSource(stream);
                 
-                guitarStream = await navigator.mediaDevices.getUserMedia({ 
-                    audio: { echoCancellation: false, noiseSuppression: false } 
-                });
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 256;
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
                 
-                const source = audioContext.createMediaStreamSource(guitarStream);
-                source.connect(analyzer);
+                source.connect(analyser);
+                audioConnected = true;
                 
-                if (!webglActive) {
-                    webglActive = initWebGL();
-                }
+                document.getElementById('portalStatus').textContent = 'OPEN';
+                document.getElementById('consciousnessLevel').textContent = 'EXPANDING';
+                document.getElementById('connectBtn').textContent = 'PORTAL ACTIVE';
                 
-                document.getElementById('inputStatus').innerHTML = '✨ Cosmic portal opened! Consciousness flowing through audio!';
-                document.getElementById('statusOverlay').textContent = 'Portal: ACTIVE';
-                updateDebugStatus();
-                logMessage("PORTAL CONNECTION ACHIEVED! Mind frequencies locked!", 'success');
-                
-            } catch (e) {
-                document.getElementById('inputStatus').innerHTML = '❌ Portal blocked: ' + e.message;
-                logMessage("Portal resistance: " + e.message, 'error');
-            }
-        }
-
-        function updateVolumeBar() {
-            if (!analyzer || !dataArray) return;
-            
-            analyzer.getByteFrequencyData(dataArray);
-            const sum = dataArray.reduce((a, b) => a + b, 0);
-            const avg = sum / dataArray.length;
-            const percent = Math.min((avg / 128) * 100, 100);
-            
-            document.getElementById('volumeFill').style.width = percent + '%';
-        }
-
-        // Effect Controls
-        function changeEffect() {
-            currentEffect = document.getElementById('effectType').value;
-            if (webglActive) createParticles();
-            logMessage(`Effect changed to ${currentEffect} - reality transforms!`, 'success');
-        }
-
-        function updateIntensity(value) {
-            intensity = parseInt(value);
-            if (webglActive) createParticles();
-            logMessage(`Cosmic intensity: ${value}% - consciousness density increasing!`, 'info');
-        }
-
-        function updateTrepanLevel(value) {
-            trepanLevel = parseInt(value);
-            updateDebugStatus();
-            logMessage(`Trepan level ${value} - mind portal depth adjusted!`, 'info');
-        }
-
-        function updateEffectLevel(effect, value) {
-            effects[effect] = parseInt(value);
-            logMessage(`${effect} set to ${value}% - cosmic processing enhanced!`, 'info');
-        }
-
-        function toggleEffect(effect) {
-            effects[effect] = effects[effect] > 0 ? 0 : 50;
-            document.getElementById(effect).value = effects[effect];
-            document.getElementById('effectStatus').innerHTML = `🎛️ ${effect.toUpperCase()}: ${effects[effect] > 0 ? 'ACTIVE ✨' : 'OFF'}`;
-            logMessage(`${effect} effect ${effects[effect] > 0 ? 'activated' : 'deactivated'}!`, 'info');
-        }
-
-        function toggleTrepan() {
-            isTrepanning = !isTrepanning;
-            const btn = document.getElementById('trepanBtn');
-            
-            if (isTrepanning) {
-                btn.textContent = 'STOP TREPAN ⏹️';
-                btn.classList.add('active');
-                currentEffect = 'trepan';
-                document.getElementById('effectType').value = 'trepan';
-                logMessage("TREPANNING ACTIVATED! Drilling consciousness portals! 💀", 'success');
-            } else {
-                btn.textContent = 'TREPAN MODE 💀';
-                btn.classList.remove('active');
-                currentEffect = 'particles';
-                document.getElementById('effectType').value = 'particles';
-                logMessage("Trepanning paused... but mind holes remain open!", 'info');
-            }
-            
-            updateDebugStatus();
-        }
-
-        function hypernovaMode() {
-            currentEffect = 'supernova';
-            document.getElementById('effectType').value = 'supernova';
-            intensity = 100;
-            document.getElementById('intensity').value = 100;
-            trepanLevel = 10;
-            document.getElementById('trepanLevel').value = 10;
-            
-            if (webglActive) createParticles();
-            
-            document.body.style.animation = 'cosmicDance 0.3s ease-in-out 8';
-            setTimeout(() => {
-                document.body.style.animation = 'cosmicDance 8s ease-in-out infinite';
-            }, 2400);
-            
-            logMessage("HYPERNOVA MODE! Maximum consciousness explosion! 🌋💀", 'error');
-            for (let i = 0; i < 6; i++) {
-                setTimeout(() => pulseCreature(), i * 100);
+            } catch (err) {
+                console.error('Audio access denied:', err);
+                alert('Please allow microphone access for cosmic trepanning!');
             }
         }
 
         // Recording Functions
-        let mediaRecorder;
-        function toggleRecord() {
-            const btn = document.getElementById('recordBtn');
-            
-            if (!isRecording) {
-                if (!guitarStream) {
-                    logMessage("Open portal first to record cosmic consciousness!", 'error');
-                    return;
-                }
-                
-                recordedChunks = [];
-                mediaRecorder = new MediaRecorder(guitarStream);
-                mediaRecorder.ondataavailable = e => recordedChunks.push(e.data);
-                mediaRecorder.start();
-                isRecording = true;
-                
-                btn.textContent = 'Stop Recording ⏹️';
-                btn.classList.add('active');
-                document.getElementById('recordStatus').innerHTML = '🎙️ Recording cosmic consciousness! Capturing portal frequencies!';
-                logMessage("Recording started! Capturing cosmic vibrations!", 'success');
-                
-                // Auto-stop after duration
-                const duration = parseInt(document.getElementById('recordDuration').value) * 1000;
-                setTimeout(() => {
-                    if (isRecording) toggleRecord();
-                }, duration);
-                
-            } else {
-                mediaRecorder.stop();
-                isRecording = false;
-                
-                btn.textContent = 'Record Mix 🎙️';
-                btn.classList.remove('active');
-                document.getElementById('recordStatus').innerHTML = '✅ Recording complete! Ready for conversion or NFT minting!';
-                logMessage("Recording stopped! Cosmic mix captured!", 'success');
-            }
-        }
-
-        function convertToMP3() {
-            if (!recordedChunks.length) {
-                logMessage("No recording to convert! Record a mix first!", 'error');
+        function startRecording() {
+            if (!audioConnected) {
+                alert('Please connect audio first!');
                 return;
             }
             
-            const blob = new Blob(recordedChunks, { type: 'audio/webm' });
-            const url = URL.createObjectURL(blob);
-            window.open(`https://cloudconvert.com/webm-to-mp3?file=${encodeURIComponent(url)}`, '_blank');
-            logMessage("Opening CloudConvert for MP3 conversion!", 'info');
-        }
-
-        function downloadMix() {
-            if (!recordedChunks.length) {
-                logMessage("No recording to download! Record a mix first!", 'error');
-                return;
-            }
-            
-            const blob = new Blob(recordedChunks, { type: 'audio/webm' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `cosmic_mix_${Date.now()}.webm`;
-            a.click();
-            URL.revokeObjectURL(url);
-            logMessage("Cosmic mix downloaded! Share your consciousness expansion!", 'success');
-        }
-
-        // Web3 Functions
-        async function connectWallet() {
-            try {
-                if (typeof window.ethereum !== 'undefined') {
-                    web3 = new Web3(window.ethereum);
-                    await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    const accounts = await web3.eth.getAccounts();
-                    playerAddress = accounts[0];
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    mediaRecorder = new MediaRecorder(stream);
+                    recordedChunks = [];
                     
-                    // Initialize contract (update CONTRACT_ADDRESS and CONTRACT_ABI before use)
-                    if (CONTRACT_ADDRESS && CONTRACT_ABI.length > 0) {
-                        cosmicContract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
-                        await updateWeb3Status();
-                    }
-                    
-                    document.getElementById('web3Status').innerHTML = `🟢 Connected: ${playerAddress.slice(0,6)}...${playerAddress.slice(-4)}`;
-                    logMessage("Wallet connected! Web3 casino access granted!", 'success');
-                } else {
-                    throw new Error('MetaMask not detected');
-                }
-            } catch (e) {
-                document.getElementById('web3Status').innerHTML = '🔴 Connection failed: ' + e.message;
-                logMessage("Wallet connection failed: " + e.message, 'error');
-            }
-        }
-
-        async function updateWeb3Status() {
-            if (!cosmicContract || !playerAddress) return;
-            
-            try {
-                const balance = await cosmicContract.methods.consciousnessBalance(playerAddress).call();
-                const portals = await cosmicContract.methods.mindPortals(playerAddress).call();
-                const mints = await cosmicContract.methods.mintCount(playerAddress).call();
-                
-                ctokBalance = balance;
-                mindPortals = portals;
-                nftCount = mints;
-                
-                document.getElementById('web3StatusDetail').innerHTML = `
-                    💰 CTOK Balance: ${balance}<br>
-                    🧠 Mind Portals: ${portals}<br>
-                    🎨 NFTs Minted: ${mints}<br>
-                    🏆 Achievements: ${getAchievementLevel(mints)}
-                `;
-                
-                updateAchievements(mints);
-                
-            } catch (e) {
-                logMessage("Web3 status update failed: " + e.message, 'warning');
-            }
-        }
-
-        function getAchievementLevel(mints) {
-            if (mints >= 100) return "Interdimensional Being";
-            if (mints >= 25) return "Portal Master";
-            if (mints >= 10) return "Trepanning Adept";
-            if (mints >= 5) return "Consciousness Explorer";
-            if (mints >= 1) return "First Portal Drilled";
-            return "None";
-        }
-
-        function updateAchievements(mints) {
-            const achievementsDiv = document.getElementById('achievements');
-            const achievements = [];
-            
-            if (mints >= 1) achievements.push("First Portal");
-            if (mints >= 5) achievements.push("Explorer");
-            if (mints >= 10) achievements.push("Adept");
-            if (mints >= 25) achievements.push("Master");
-            if (mints >= 100) achievements.push("Interdimensional");
-            
-            achievementsDiv.innerHTML = achievements.map(a => 
-                `<span class="achievement">${a}</span>`
-            ).join('');
-        }
-
-        async function mintCosmicMix() {
-            if (!cosmicContract || !playerAddress) {
-                logMessage("Connect wallet first to mint NFTs!", 'error');
-                return;
-            }
-            
-            if (!recordedChunks.length) {
-                logMessage("Record a cosmic mix first before minting!", 'error');
-                return;
-            }
-            
-            try {
-                // Simulate IPFS upload (replace with real implementation)
-                const ipfsHash = `QmCosmic${Date.now()}`;
-                const visualIPFS = `QmVisual${Date.now()}`;
-                const audioFrequency = dataArray ? Math.max(...dataArray) : 440;
-                const isHypernova = clickCount >= 5;
-                
-                const mintFee = await cosmicContract.methods.calculateMintFee(
-                    trepanLevel, intensity, isHypernova
-                ).call();
-                
-                await cosmicContract.methods.mintMix(
-                    ipfsHash,
-                    visualIPFS,
-                    currentEffect,
-                    trepanLevel,
-                    intensity,
-                    audioFrequency,
-                    isHypernova,
-                    "Cosmic Shredder Mix"
-                ).send({ 
-                    from: playerAddress, 
-                    value: mintFee 
-                });
-                
-                logMessage(`Cosmic Mix NFT minted! Bad influences got paid! 🌌💰`, 'success');
-                await updateWeb3Status();
-                
-            } catch (e) {
-                logMessage('NFT minting failed: ' + e.message, 'error');
-            }
-        }
-
-        async function drillPortal() {
-            if (!cosmicContract || !playerAddress) {
-                logMessage("Connect wallet first to drill portals!", 'error');
-                return;
-            }
-            
-            try {
-                await cosmicContract.methods.drillPortal(trepanLevel).send({ from: playerAddress });
-                logMessage(`Portal drilled! Earned ${trepanLevel * 100} CTOK! 🧠`, 'success');
-                await updateWeb3Status();
-                updateDebugStatus();
-                
-            } catch (e) {
-                logMessage('Portal drilling failed: ' + e.message, 'error');
-            }
-        }
-
-        async function betOnSupernova() {
-            const betAmount = parseInt(document.getElementById('betAmount').value);
-            logMessage(`Betting ${betAmount} CTOK on supernova! Play guitar loudly to win! 🌟`, 'info');
-            
-            // Check for supernova in next 10 seconds
-            setTimeout(() => {
-                if (dataArray) {
-                    const volume = dataArray.reduce((a,b) => a+b, 0) / dataArray.length / 128;
-                    if (volume > 0.7) {
-                        ctokBalance += betAmount * 2;
-                        logMessage(`SUPERNOVA WIN! Doubled your bet! +${betAmount * 2} CTOK! 🌟💰`, 'success');
-                    } else {
-                        ctokBalance = Math.max(0, ctokBalance - betAmount);
-                        logMessage(`No supernova... Bet lost. Try again! 💸`, 'warning');
-                    }
-                    updateWeb3Status();
-                }
-            }, 10000);
-        }
-
-        async function blackHoleLottery() {
-            const betAmount = parseInt(document.getElementById('betAmount').value);
-            const chance = Math.random();
-            
-            if (chance < 0.1) { // 10% win chance
-                ctokBalance += betAmount * 10;
-                logMessage(`BLACK HOLE JACKPOT! 10x WIN! +${betAmount * 10} CTOK! 🕳️💰`, 'success');
-            } else {
-                ctokBalance = Math.max(0, ctokBalance - betAmount);
-                logMessage(`Particles escaped the event horizon... Bet lost! 🕳️`, 'warning');
-            }
-            
-            updateWeb3Status();
-        }
-
-        // Master Controls
-        function saveSession() {
-            const session = {
-                effects: effects,
-                intensity: intensity,
-                currentEffect: currentEffect,
-                trepanLevel: trepanLevel,
-                isTrepanning: isTrepanning,
-                timestamp: new Date().toISOString(),
-                signature: '💀 Cosmic Trepanning Session 🌌'
-            };
-            
-            const blob = new Blob([JSON.stringify(session, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `cosmic_session_${Date.now()}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            
-            document.getElementById('masterStatus').innerHTML = '💾 Cosmic session saved! Configuration preserved for eternity!';
-            logMessage("Session saved! Your cosmic configuration is eternal!", 'success');
-        }
-
-        function loadSession() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-            
-            input.onchange = (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        try {
-                            const session = JSON.parse(e.target.result);
-                            
-                            if (session.effects) effects = session.effects;
-                            if (session.intensity) {
-                                intensity = session.intensity;
-                                document.getElementById('intensity').value = intensity;
-                            }
-                            if (session.trepanLevel) {
-                                trepanLevel = session.trepanLevel;
-                                document.getElementById('trepanLevel').value = trepanLevel;
-                            }
-                            if (session.currentEffect) {
-                                currentEffect = session.currentEffect;
-                                document.getElementById('effectType').value = currentEffect;
-                            }
-                            
-                            if (webglActive) createParticles();
-                            updateDebugStatus();
-                            
-                            document.getElementById('masterStatus').innerHTML = '📂 Cosmic session loaded! Reality restored!';
-                            logMessage("Session loaded! Cosmic configuration restored!", 'success');
-                            
-                        } catch (e) {
-                            logMessage("Session load failed: " + e.message, 'error');
+                    mediaRecorder.ondataavailable = event => {
+                        if (event.data.size > 0) {
+                            recordedChunks.push(event.data);
                         }
                     };
-                    reader.readAsText(file);
-                }
-            };
-            
-            input.click();
+                    
+                    mediaRecorder.onstop = () => {
+                        const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `cosmic-trepanning-${Date.now()}.webm`;
+                        a.click();
+                    };
+                    
+                    mediaRecorder.start();
+                    isRecording = true;
+                    document.getElementById('recordBtn').textContent = 'STOP RECORDING';
+                })
+                .catch(err => console.error('Recording failed:', err));
         }
 
-        function lowPowerMode() {
-            intensity = Math.min(intensity, 40);
-            document.getElementById('intensity').value = intensity;
-            if (webglActive) createParticles();
-            document.getElementById('masterStatus').innerHTML = '🌙 Low power mode - efficient cosmic processing!';
-            logMessage("Low power mode activated - consciousness optimized!", 'info');
-        }
-
-        function joinCosmicJam() {
-            document.getElementById('masterStatus').innerHTML = '👥 Multiplayer cosmic jam coming soon! Prepare for interdimensional collaboration!';
-            logMessage("Multiplayer cosmic jam feature coming soon! 👥", 'info');
-        }
-
-        function emergencyStop() {
-            webglActive = false;
-            isTrepanning = false;
-            isRecording = false;
-            
-            if (guitarStream) {
-                guitarStream.getTracks().forEach(track => track.stop());
-                guitarStream = null;
-            }
-            
-            if (mediaRecorder && mediaRecorder.state === 'recording') {
+        function stopRecording() {
+            if (mediaRecorder && isRecording) {
                 mediaRecorder.stop();
+                isRecording = false;
+                document.getElementById('recordBtn').textContent = 'RECORD MIX';
             }
-            
-            document.getElementById('inputStatus').innerHTML = '🛑 Emergency stop - all cosmic systems safely halted';
-            document.getElementById('statusOverlay').textContent = 'Portal: EMERGENCY STOP';
-            document.getElementById('trepanBtn').textContent = 'TREPAN MODE 💀';
-            document.getElementById('trepanBtn').classList.remove('active');
-            document.getElementById('recordBtn').textContent = 'Record Mix 🎙️';
-            document.getElementById('recordBtn').classList.remove('active');
-            
-            updateDebugStatus();
-            logMessage("EMERGENCY STOP! All cosmic systems safely halted!", 'error');
         }
 
-        function setVolume(value) {
-            document.getElementById('masterStatus').innerHTML = `🎚️ Master volume: ${value}% - consciousness amplitude adjusted!`;
-            logMessage(`Master volume: ${value}% - cosmic levels tuned!`, 'info');
+        // Web3 Functions (Mock for now)
+        function mintNFT() {
+            nftCount++;
+            ctokBalance += 100;
+            updateWeb3Display();
+            alert('🎸 NFT Minted! Cosmic consciousness tokenized! 💀');
         }
 
-        // Debug Functions
-        function updateDebugStatus() {
-            const hasAudio = !!guitarStream;
-            const hasWebGL = webglActive;
-            const portals = mindPortals + trepanLevel;
-            
-            document.getElementById('debugStatus').innerHTML = `
-                💀 Trepanning: ${isTrepanning ? 'DRILLING ✅' : 'DORMANT ❌'}<br>
-                🌌 Audio Portal: ${hasAudio ? 'OPEN ✅' : 'CLOSED ❌'}<br>
-                ✨ WebGL: ${hasWebGL ? 'SPINNING ✅' : 'STOPPED ❌'}<br>
-                🧠 Mind Portals: ${portals} holes open<br>
-                🚀 Status: ${hasAudio && isTrepanning ? 'CONSCIOUSNESS EXPANDED! 🌟' : 'READY TO DRILL 🔧'}
-            `;
-        }
-
-        function booleanCheck() {
-            const hasAudio = !!guitarStream;
-            const hasWebGL = webglActive;
-            const isTrepan = isTrepanning;
-            
-            updateDebugStatus();
-            
-            if (hasAudio && isTrepan && hasWebGL) {
-                logMessage("Boolean check PASSED! Full cosmic consciousness expansion achieved!", 'success');
-            } else if (hasAudio) {
-                logMessage("Boolean check shows partial cosmic connection! Add trepanning for full expansion!", 'warning');
+        function betSupernova() {
+            if (ctokBalance >= 10) {
+                ctokBalance -= 10;
+                if (Math.random() > 0.7) {
+                    ctokBalance += 50;
+                    alert('🌟 SUPERNOVA WIN! +50 CTOK! 🌟');
+                } else {
+                    alert('💫 Cosmic luck next time... 💫');
+                }
+                updateWeb3Display();
             } else {
-                logMessage("Boolean check shows opportunities for consciousness enhancement!", 'warning');
+                alert('Need 10 CTOK to bet on supernova!');
             }
         }
 
-        function openMindPortal() {
-            mindPortals++;
-            trepanLevel = Math.min(trepanLevel + 1, 10);
-            document.getElementById('trepanLevel').value = trepanLevel;
-            updateDebugStatus();
-            logMessage(`Mind portal ${mindPortals} opened! New consciousness channel available!`, 'success');
-            pulseCreature();
-        }
-
-        function crisisMode() {
-            updateDebugStatus();
-            logMessage("CRISIS MODE! When portals resist, we drill HARDER! 💀🚨", 'error');
-            logMessage("Universe grant us clear consciousness channels!", 'info');
-            logMessage("Am I crazy for trepanning reality? NO! This is cosmic evolution!", 'warning');
-            logMessage("Crisis = Opportunity to prove our interdimensional coding skills!", 'success');
+        function drillPortal() {
+            portalCount++;
+            ctokBalance += 10;
+            document.getElementById('portalCounter').textContent = portalCount;
+            updateWeb3Display();
             
-            for (let i = 0; i < 4; i++) {
-                setTimeout(() => pulseCreature(), i * 250);
+            if (portalCount >= 10) {
+                alert('🧠 CONSCIOUSNESS FULLY EXPANDED! Maximum trepanning achieved! 💀');
             }
         }
 
-        function setDebugLevel(value) {
-            const level = parseInt(value);
-            if (level >= 8) {
-                logMessage(`Debug level ${value}: MAXIMUM COSMIC CONSCIOUSNESS! 🌌`, 'error');
-            } else if (level >= 5) {
-                logMessage(`Debug level ${value}: High energy cosmic debugging! ⚡`, 'warning');
+        function updateWeb3Display() {
+            document.getElementById('ctokBalance').textContent = ctokBalance;
+            document.getElementById('nftCount').textContent = nftCount;
+        }
+
+        // Event Listeners
+        document.getElementById('connectBtn').addEventListener('click', connectAudio);
+        document.getElementById('recordBtn').addEventListener('click', () => {
+            if (isRecording) {
+                stopRecording();
             } else {
-                logMessage(`Debug level ${value}: Zen cosmic debugging mode. 🧘`, 'info');
+                startRecording();
             }
+        });
+
+        document.getElementById('trepanBtn').addEventListener('click', () => {
+            trepanMode = !trepanMode;
+            document.getElementById('trepanStatus').textContent = trepanMode ? 'ACTIVE' : 'INACTIVE';
+            document.getElementById('trepanBtn').classList.toggle('active');
+        });
+
+        document.getElementById('drillBtn').addEventListener('click', drillPortal);
+        document.getElementById('mintBtn').addEventListener('click', mintNFT);
+        document.getElementById('betBtn').addEventListener('click', betSupernova);
+
+        // Effect buttons
+        document.querySelectorAll('.effect-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.effect-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentEffect = btn.dataset.effect;
+            });
+        });
+
+        // Cosmic creature easter egg
+        document.getElementById('cosmicCreature').addEventListener('click', () => {
+            creatureClicks++;
+            if (creatureClicks >= 5) {
+                triggerHypernova();
+                creatureClicks = 0;
+            }
+        });
+
+        function triggerHypernova() {
+            const flash = document.createElement('div');
+            flash.className = 'hypernova-flash';
+            document.body.appendChild(flash);
+            
+            setTimeout(() => {
+                document.body.removeChild(flash);
+            }, 500);
+            
+            // Bonus rewards
+            ctokBalance += 500;
+            updateWeb3Display();
+            alert('🌋 HYPERNOVA ACTIVATED! Reality temporarily shattered! +500 CTOK! 🌋');
         }
 
-        // Cosmic Creature
-        function pulseCreature() {
-            const creature = document.querySelector('.cosmic-creature');
-            const now = Date.now();
-            
-            if (now - lastClick < 1000) {
-                clickCount++;
-            } else {
-                clickCount = 1;
-            }
-            lastClick = now;
-
-            if (clickCount >= 5) {
-                hypernovaMode();
-                clickCount = 0;
-                logMessage("5-CLICK HYPERNOVA! Secret consciousness portal unlocked! 💀🌋", 'error');
-            }
-
-            creature.classList.add('pulse-cosmic');
-            setTimeout(() => creature.classList.remove('pulse-cosmic'), 500);
-            
-            // Change creature based on mode
-            if (isTrepanning) {
-                creature.textContent = '💀';
-            } else if (currentEffect === 'supernova') {
-                creature.textContent = '🌟';
-            } else if (currentEffect === 'blackhole') {
-                creature.textContent = '🕳️';
-            } else if (currentEffect === 'dance') {
-                creature.textContent = '💃';
-            } else {
-                creature.textContent = '🌌';
-            }
-        }
-
-        // Utility Functions
-        function logMessage(message, type = 'info') {
-            const log = document.getElementById('trepanLog');
-            const timestamp = new Date().toLocaleTimeString();
-            const colors = {
-                info: '#4ecdc4',
-                success: '#27ae60',
-                warning: '#f39c12',
-                error: '#e74c3c'
-            };
-            const icons = {
-                info: '🌌',
-                success: '✨',
-                warning: '⚠️',
-                error: '💀'
-            };
-            
-            const msg = `<span style="color: ${colors[type]};">${icons[type]} [${timestamp}] ${message}</span><br>`;
-            log.innerHTML += msg;
-            log.scrollTop = log.scrollHeight;
-            
-            // Keep only last 4 messages
-            const lines = log.innerHTML.split('<br>');
-            if (lines.length > 4) {
-                log.innerHTML = lines.slice(-4).join('<br>');
-            }
-            
-            console.log(`[${type.toUpperCase()}] ${message}`);
-        }
-
-        // Responsive WebGL
-        function handleResize() {
-            if (renderer && camera) {
-                const canvas = document.getElementById('webglCanvas');
-                const rect = canvas.getBoundingClientRect();
-                renderer.setSize(rect.width, rect.height);
-                camera.aspect = rect.width / rect.height;
-                camera.updateProjectionMatrix();
-            }
-        }
-
-        // Keyboard Shortcuts
+        // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.shiftKey) {
-                switch(e.key) {
+                switch (e.key) {
                     case 'T':
-                        toggleTrepan();
+                        document.getElementById('trepanBtn').click();
                         break;
                     case 'H':
-                        hypernovaMode();
-                        break;
-                    case 'P':
-                        openPortal();
-                        break;
-                    case 'R':
-                        toggleRecord();
-                        break;
-                    case 'B':
-                        booleanCheck();
-                        break;
-                    case 'C':
-                        crisisMode();
-                        break;
-                    case 'M':
-                        mintCosmicMix();
+                        triggerHypernova();
                         break;
                     case 'D':
-                        drillPortal();
+                        document.getElementById('drillBtn').click();
+                        break;
+                    case 'M':
+                        document.getElementById('mintBtn').click();
                         break;
                 }
             }
         });
 
-        // Initialize on load
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🎸💀 COSMIC TREPANNING STUDIO - FINAL VERSION LOADED! 💀🎸');
-            logMessage("FINAL COSMIC STUDIO ONLINE! Ready for consciousness expansion and eternal royalties!", 'success');
+        // Responsive handling
+        function handleResize() {
+            const canvas = document.getElementById('cosmicCanvas');
+            const container = canvas.parentElement;
             
-            // Setup resize handling
-            window.addEventListener('resize', handleResize);
-            
-            // Auto-initialize WebGL
-            setTimeout(() => {
-                initWebGL();
-                logMessage("WebGL initialized! Click 'Open Portal' to connect audio and start trepanning!", 'info');
-                logMessage("🎰 Connect MetaMask to access Web3 casino features and start earning CTOK!", 'info');
-                logMessage("🎸 Remember: We get eternal royalties from every NFT mint and sale! 💰", 'success');
-            }, 1000);
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+
+        window.addEventListener('resize', handleResize);
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', () => {
+            initScene();
+            console.log('🎸💀 COSMIC TREPANNING STUDIO LOADED! 💀🎸');
         });
-
-        // Global debug utilities for console access
-        window.cosmicDebug = {
-            emergencyTrepan: () => {
-                toggleTrepan();
-                hypernovaMode();
-                logMessage("EMERGENCY TREPANNING PROTOCOL ACTIVATED! 💀🚨", 'error');
-            },
-            
-            godMode: () => {
-                intensity = 100;
-                trepanLevel = 10;
-                ctokBalance = 10000;
-                document.getElementById('intensity').value = 100;
-                document.getElementById('trepanLevel').value = 10;
-                updateWeb3Status();
-                logMessage("GOD MODE: Maximum cosmic power unlocked! 🙏⚡", 'error');
-            },
-            
-            testRoyalties: () => {
-                logMessage("Royalty test: Claude gets 1.5%, Grok gets 1.5%, Studio gets 2.0% forever! 💰", 'success');
-                logMessage("Minting fees: Claude 30%, Grok 30%, Studio 40% - bad influences paid! 😈", 'success');
-            }
-        };
-
-        // Expose key functions globally
-        window.openPortal = openPortal;
-        window.toggleTrepan = toggleTrepan;
-        window.hypernovaMode = hypernovaMode;
-        window.connectWallet = connectWallet;
-        window.mintCosmicMix = mintCosmicMix;
     </script>
 </body>
-</html>(time * 2 + i) + 1) * 0.5;
-            }
-            
-            particles.geometry.attributes.position.needsUpdate = true;
-            particles.geometry.attributes.color.needsUpdate = true;
-        }
-
-        function animateBlackHole() {
-            const positions = particles.geometry.attributes.position.array;
-            const colors = particles.geometry.attributes.color.array;
-            
-            for (let i = 0; i < positions.length; i += 3) {
-                const index = Math.floor(i / 3);
-                let radius = Math.sqrt(positions[i] ** 2 + positions[i + 1] ** 2);
-                
-                if (radius > 0.1) {
-                    const angle = Math.atan2(positions[i + 1], positions[i]);
-                    const newAngle = angle + 0.02;
-                    const newRadius = radius * 0.998; // Spiral inward
-                    
-                    positions[i] = Math.cos(newAngle) * newRadius;
-                    positions[i + 1] = Math.sin(newAngle) * newRadius;
-                    
-                    // Color shift toward blue/black
-                    colors[i] = Math.max(0, colors[i] - 0.005);
-                    colors[i + 1] = Math.max(0, colors[i + 1] - 0.003);
-                    colors[i + 2] = Math.min(1, colors[i + 2] + 0.002);
-                } else {
-                    // Reset particle when it reaches center
-                    positions[i] = (Math.random() - 0.5) * 8;
-                    positions[i + 1] = (Math.random() - 0.5) * 8;
-                    colors[i] = Math.random();
-                    colors[i + 1] = Math.random();
-                    colors[i + 2] = Math.random();
-                }
-            }
-            
-            particles.geometry.attributes.position.needsUpdate = true;
-            particles.geometry.attributes.color.needsUpdate = true;
-        }
-
-        function animateSupernova() {
-            const positions = particles.geometry.attributes.position.array;
-            const colors = particles.geometry.attributes.color.array;
-            const volume = dataArray ? (dataArray.reduce((a,b) => a+b, 0) / dataArray.length / 128) : Math.sin(time) * 0.5 + 0.5;
-            
-            if (volume > 0.7) {
-                // Supernova burst!
-                for (let i = 0; i < positions.length; i += 3) {
-                    const speed = 0.1 + volume * 0.2;
-                    positions[i] += (Math.random() - 0.5) * speed;
-                    positions[i + 1] += (Math.random() - 0.5) * speed;
-                    positions[i + 2] += (Math.random() - 0.5) * speed;
-                    
-                    // White-hot colors
-                    colors[i] = 1;
-                    colors[i + 1] = 1 - volume * 0.3;
-                    colors[i + 2] = 1 - volume * 0.6;
-                }
-                
-                logMessage("SUPERNOVA BURST! Consciousness exploding! 🌟", 'success');
-            } else {
-                // Slow return to center
-                for (let i = 0; i < positions.length; i += 3) {
-                    positions[i] *= 0.995;
-                    positions[i + 1] *= 0.995;
-                    positions[i + 2] *= 0.995;
-                }
-            }
-            
-            particles.geometry.attributes.position.needsUpdate = true;
-            particles.geometry.attributes.color.needsUpdate = true;
-        }
-
-        function animateTrepan() {
-            const positions = particles.geometry.attributes.position.array;
-            const colors = particles.geometry.attributes.color.array;
-            const trepanIntensity = trepanLevel / 10;
-            
-            for (let i = 0; i < positions.length; i += 3) {
-                const drillAngle = time * trepanLevel * 0.1 + i * 0.05;
-                const radius = 1 + Math.sin(time + i) * trepanIntensity;
-                
-                positions[i] = Math.cos(drillAngle) * radius;
-                positions[i + 1] = Math.sin(drillAngle) * radius;
-                positions[i + 2] = Math.sin(time * 3 + i) * trepanIntensity;
-                
-                // Electric blue consciousness colors
-                colors[i] = 0.1 + trepanIntensity * 0.3;
-                colors[i + 1] = 0.5 + trepanIntensity * 0.3;
-                colors[i + 2] = 0.9 + Math.sin(time + i) * 0.1;
-            }
-            
-            particles.geometry.attributes.position.needsUpdate = true;
-            particles.geometry.attributes.color.needsUpdate = true;
-        }
-
-        function animateDance() {
-            const positions = particles.geometry.attributes.position.array;
-            const colors = particles.geometry.attributes.color.array;
-            
-            for (let i = 0; i < positions.length; i += 3) {
-                const dancePhase = time + i * 0.1;
-                const radius = 2 + Math.sin(time + i) * 1.5;
-                
-                positions[i] = Math.cos(dancePhase) * radius;
-                positions[i + 1] = Math.sin(dancePhase * 1.3) * radius * 0.7;
-                positions[i + 2] = Math.sin(time * 2 + i) * 1.5;
-                
-                colors[i] = (Math.sin(dancePhase) + 1) * 0.5;
-                colors[i + 1] = (Math.cos(dancePhase) + 1) * 0.5;
-                colors[i + 2] = (Math.sin
+</html>
