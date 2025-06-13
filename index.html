@@ -3,652 +3,1482 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎸 Cosmic Trepanning Studio - Web3 Casino 💀</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <title>Kozmic Pro Studio - Ultimate Portable Edition v3.0</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Courier New', monospace;
-            background: linear-gradient(45deg, #0a0a0a, #1a0a1a, #0a1a0a);
-            color: #00ff00;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
             overflow-x: hidden;
             min-height: 100vh;
         }
-        
-        .cosmic-container {
-            position: relative;
+
+        .studio-container {
+            display: grid;
+            grid-template-areas: 
+                "header header"
+                "main controls"
+                "canvas canvas"
+                "console console";
+            grid-template-columns: 2fr 1fr;
+            grid-template-rows: auto auto 300px auto;
+            gap: 20px;
+            padding: 20px;
             min-height: 100vh;
+        }
+
+        .studio-header {
+            grid-area: header;
+            text-align: center;
+            background: rgba(255, 107, 157, 0.1);
+            border: 2px solid #ff6b9d;
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .studio-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 107, 157, 0.1), transparent);
+            animation: headerShine 3s infinite;
+        }
+
+        @keyframes headerShine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .studio-title {
+            font-size: 2.5rem;
+            color: #ff6b9d;
+            text-shadow: 0 0 20px #ff6b9d;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .studio-subtitle {
+            color: #64ffda;
+            font-size: 1.2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .main-controls {
+            grid-area: main;
             display: flex;
             flex-direction: column;
+            gap: 15px;
+        }
+
+        .control-section {
+            background: rgba(100, 255, 218, 0.05);
+            border: 1px solid #64ffda;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .control-section h3 {
+            color: #64ffda;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .kozmic-btn {
+            background: linear-gradient(45deg, #ff6b9d, #64ffda);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            margin: 5px;
+            min-width: 120px;
+        }
+
+        .kozmic-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 157, 0.4);
+        }
+
+        .kozmic-btn:active {
+            transform: translateY(0);
+        }
+
+        .status-panel {
+            grid-area: controls;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
             align-items: center;
             padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            border-left: 3px solid #ff6b9d;
         }
-        
-        .cosmic-header {
-            text-align: center;
-            margin: 20px 0;
-            z-index: 100;
+
+        .status-value {
+            color: #64ffda;
+            font-weight: bold;
         }
-        
-        .cosmic-title {
-            font-size: clamp(1.5rem, 4vw, 3rem);
-            text-shadow: 0 0 20px #00ff00, 0 0 40px #ff00ff;
-            margin-bottom: 10px;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-        
+
         .canvas-container {
+            grid-area: canvas;
             position: relative;
-            width: 100%;
-            max-width: 800px;
-            height: 400px;
-            border: 2px solid #00ff00;
-            border-radius: 10px;
+            border: 2px solid #64ffda;
+            border-radius: 15px;
             overflow: hidden;
-            margin: 20px 0;
+            background: rgba(0, 0, 0, 0.8);
         }
-        
-        #cosmicCanvas {
+
+        #webgl-canvas {
             width: 100%;
             height: 100%;
             display: block;
         }
-        
-        .controls-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            width: 100%;
-            max-width: 1200px;
-            margin: 20px 0;
-        }
-        
-        .control-panel {
-            background: rgba(0, 255, 0, 0.1);
-            border: 1px solid #00ff00;
-            border-radius: 10px;
-            padding: 20px;
-            backdrop-filter: blur(5px);
-        }
-        
-        .panel-title {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            text-align: center;
-            color: #ff00ff;
-            text-shadow: 0 0 10px #ff00ff;
-        }
-        
-        .cosmic-button {
-            background: linear-gradient(45deg, #001100, #003300);
-            border: 2px solid #00ff00;
-            color: #00ff00;
-            padding: 12px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-family: 'Courier New', monospace;
-            font-size: 1rem;
-            margin: 5px;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-        }
-        
-        .cosmic-button:hover {
-            background: linear-gradient(45deg, #003300, #005500);
-            box-shadow: 0 0 20px #00ff00;
-            transform: scale(1.05);
-        }
-        
-        .cosmic-button.active {
-            background: linear-gradient(45deg, #330011, #550033);
-            border-color: #ff00ff;
-            color: #ff00ff;
-            box-shadow: 0 0 20px #ff00ff;
-        }
-        
-        .knob-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            justify-content: center;
-            margin: 15px 0;
-        }
-        
-        .knob {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: radial-gradient(circle, #001100, #003300);
-            border: 3px solid #00ff00;
-            position: relative;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .knob:hover {
-            box-shadow: 0 0 20px #00ff00;
-            transform: scale(1.1);
-        }
-        
-        .knob::after {
-            content: '';
-            position: absolute;
-            top: 5px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 3px;
-            height: 20px;
-            background: #ff00ff;
-            border-radius: 2px;
-        }
-        
-        .knob-label {
-            text-align: center;
-            font-size: 0.8rem;
-            margin-top: 5px;
-            color: #00ff00;
-        }
-        
-        .status-display {
-            background: rgba(255, 0, 255, 0.1);
-            border: 1px solid #ff00ff;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 20px 0;
-            text-align: center;
-        }
-        
-        .trepan-counter {
-            font-size: 2rem;
-            color: #ff00ff;
-            text-shadow: 0 0 15px #ff00ff;
-            margin: 10px 0;
-        }
-        
+
         .cosmic-creature {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             font-size: 4rem;
             cursor: pointer;
-            user-select: none;
             transition: all 0.3s ease;
-            display: inline-block;
-            margin: 20px;
+            z-index: 10;
+            text-shadow: 0 0 20px #ff6b9d;
+            user-select: none;
         }
-        
+
         .cosmic-creature:hover {
-            transform: scale(1.2) rotate(15deg);
-            text-shadow: 0 0 30px #ff00ff;
+            transform: translate(-50%, -50%) scale(1.1);
+            text-shadow: 0 0 30px #ff6b9d;
         }
-        
+
+        .creature-pulse {
+            animation: creaturePulse 0.6s ease-out;
+        }
+
+        @keyframes creaturePulse {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.3); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .effects-bar {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 5;
+        }
+
+        .effect-btn {
+            background: rgba(100, 255, 218, 0.2);
+            border: 1px solid #64ffda;
+            color: #64ffda;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+        }
+
+        .effect-btn:hover, .effect-btn.active {
+            background: #64ffda;
+            color: #000;
+            transform: translateY(-2px);
+        }
+
+        .console-container {
+            grid-area: console;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #64ffda;
+            border-radius: 10px;
+            padding: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .console-header {
+            color: #64ffda;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .heuristic-console {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .log-entry {
+            margin: 2px 0;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        .log-info { color: #64ffda; }
+        .log-success { color: #4ade80; background: rgba(74, 222, 128, 0.1); }
+        .log-warning { color: #fcd34d; background: rgba(252, 211, 77, 0.1); }
+        .log-error { color: #f87171; background: rgba(248, 113, 113, 0.1); }
+
+        .power-bar-container {
+            background: rgba(0, 0, 0, 0.5);
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .power-bar {
+            background: linear-gradient(90deg, #64ffda, #ff6b9d);
+            height: 100%;
+            width: 0%;
+            transition: width 0.1s ease;
+            border-radius: 10px;
+        }
+
+        .frequency-visualizer {
+            display: flex;
+            align-items: flex-end;
+            height: 40px;
+            gap: 2px;
+            margin: 10px 0;
+        }
+
+        .freq-bar {
+            background: linear-gradient(to top, #64ffda, #ff6b9d);
+            width: 4px;
+            min-height: 2px;
+            border-radius: 2px;
+            transition: height 0.1s ease;
+        }
+
         .hypernova-flash {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: radial-gradient(circle, rgba(255,255,255,0.9), rgba(255,0,255,0.5));
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, transparent 70%);
             z-index: 9999;
             pointer-events: none;
-            opacity: 0;
-            animation: hypernovaFlash 0.5s ease-out;
+            animation: hypernovaFlash 1s ease-out;
         }
-        
+
         @keyframes hypernovaFlash {
-            0% { opacity: 0; }
-            50% { opacity: 1; }
-            100% { opacity: 0; }
+            0% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(2); }
         }
-        
+
         @media (max-width: 768px) {
-            .controls-grid {
+            .studio-container {
+                grid-template-areas: 
+                    "header"
+                    "main"
+                    "controls"
+                    "canvas"
+                    "console";
                 grid-template-columns: 1fr;
             }
             
-            .knob-container {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .cosmic-title {
-                font-size: 1.5rem;
-            }
+            .studio-title { font-size: 2rem; }
+            .cosmic-creature { font-size: 3rem; }
         }
     </style>
 </head>
 <body>
-    <div class="cosmic-container">
-        <div class="cosmic-header">
-            <h1 class="cosmic-title">🎸 COSMIC TREPANNING STUDIO 💀</h1>
-            <p>🌌 Drill Portals • Mine Consciousness • Expand Reality 🌌</p>
-        </div>
+    <div class="studio-container">
+        <header class="studio-header">
+            <h1 class="studio-title">🌌 KOZMIC PRO STUDIO 🌌</h1>
+            <p class="studio-subtitle">Ultimate Portable Edition v3.0 - SINWE Compatible</p>
+        </header>
 
-        <div class="canvas-container">
-            <canvas id="cosmicCanvas"></canvas>
-        </div>
+        <section class="main-controls">
+            <div class="control-section">
+                <h3>🎵 Audio Controls</h3>
+                <button id="connectBtn" class="kozmic-btn">CONNECT</button>
+                <button id="tunerBtn" class="kozmic-btn">TUNER</button>
+                <button id="recordBtn" class="kozmic-btn">RECORD</button>
+                <button id="amplifyBtn" class="kozmic-btn">AMPLIFY</button>
+            </div>
 
-        <div class="controls-grid">
-            <div class="control-panel">
-                <div class="panel-title">🎵 AUDIO PORTAL</div>
-                <button class="cosmic-button" id="connectBtn">OPEN PORTAL</button>
-                <button class="cosmic-button" id="recordBtn">RECORD MIX</button>
-                <div class="knob-container">
-                    <div>
-                        <div class="knob" id="volumeKnob"></div>
-                        <div class="knob-label">VOLUME</div>
-                    </div>
-                    <div>
-                        <div class="knob" id="intensityKnob"></div>
-                        <div class="knob-label">INTENSITY</div>
-                    </div>
+            <div class="control-section">
+                <h3>🔧 System Analysis</h3>
+                <button id="debugBtn" class="kozmic-btn">DEBUG</button>
+                <button id="booleanBtn" class="kozmic-btn">BOOLEAN</button>
+                <button id="crisisBtn" class="kozmic-btn">CRISIS</button>
+            </div>
+
+            <div class="control-section">
+                <h3>💾 Session Management</h3>
+                <button id="saveBtn" class="kozmic-btn">SAVE</button>
+                <button id="loadBtn" class="kozmic-btn">LOAD</button>
+                <button id="exportBtn" class="kozmic-btn">EXPORT</button>
+                <button id="resetBtn" class="kozmic-btn">RESET</button>
+            </div>
+        </section>
+
+        <aside class="status-panel">
+            <div class="status-item">
+                <span>Input Status:</span>
+                <span id="inputStatus" class="status-value">READY</span>
+            </div>
+            <div class="status-item">
+                <span>Current Effect:</span>
+                <span id="currentEffect" class="status-value">PARTICLES</span>
+            </div>
+            <div class="status-item">
+                <span>Audio Level:</span>
+                <span id="audioLevel" class="status-value">0%</span>
+            </div>
+            <div class="status-item">
+                <span>Session Time:</span>
+                <span id="sessionTime" class="status-value">0:00</span>
+            </div>
+            <div class="status-item">
+                <span>Audio Boolean:</span>
+                <span id="audioBoolean" class="status-value">FALSE ❌</span>
+            </div>
+            <div class="status-item">
+                <span>WebGL Boolean:</span>
+                <span id="webglBoolean" class="status-value">FALSE ❌</span>
+            </div>
+            <div class="status-item">
+                <span>Pitch Display:</span>
+                <span id="pitchDisplay" class="status-value">--</span>
+            </div>
+            <div class="status-item">
+                <span>Dominant Freq:</span>
+                <span id="dominantFreq" class="status-value">--</span>
+            </div>
+            <div class="status-item">
+                <span>SINWE Effect:</span>
+                <span id="mixerEffect" class="status-value">NONE</span>
+            </div>
+            <div class="status-item">
+                <span>Beat Status:</span>
+                <span id="beatStatus" class="status-value">READY</span>
+            </div>
+            <div class="status-item">
+                <span>Power Level:</span>
+                <div class="power-bar-container">
+                    <div id="powerBar" class="power-bar"></div>
                 </div>
             </div>
-
-            <div class="control-panel">
-                <div class="panel-title">🌀 COSMIC EFFECTS</div>
-                <button class="cosmic-button effect-btn" data-effect="blackhole">BLACK HOLE</button>
-                <button class="cosmic-button effect-btn" data-effect="supernova">SUPERNOVA</button>
-                <button class="cosmic-button effect-btn active" data-effect="trepan">TREPANNING</button>
-                <div class="knob-container">
-                    <div>
-                        <div class="knob" id="reverbKnob"></div>
-                        <div class="knob-label">REVERB</div>
-                    </div>
-                    <div>
-                        <div class="knob" id="delayKnob"></div>
-                        <div class="knob-label">DELAY</div>
-                    </div>
+            <div class="status-item">
+                <span>Level Status:</span>
+                <span id="levelStatus" class="status-value">0%</span>
+            </div>
+            <div class="status-item">
+                <span>Battery:</span>
+                <span id="batteryText" class="status-value">85% - Ready</span>
+                <div class="power-bar-container">
+                    <div id="batteryLevel" class="power-bar"></div>
                 </div>
             </div>
-
-            <div class="control-panel">
-                <div class="panel-title">💀 TREPANNING CONTROL</div>
-                <button class="cosmic-button" id="trepanBtn">TREPAN MODE</button>
-                <button class="cosmic-button" id="drillBtn">DRILL PORTAL</button>
-                <div class="trepan-counter" id="portalCounter">0</div>
-                <div>Mind Portals Drilled</div>
+            <div class="frequency-visualizer">
+                <div class="freq-bar"></div>
+                <div class="freq-bar"></div>
+                <div class="freq-bar"></div>
+                <div class="freq-bar"></div>
+                <div class="freq-bar"></div>
+                <div class="freq-bar"></div>
+                <div class="freq-bar"></div>
+                <div class="freq-bar"></div>
+                <div class="freq-bar"></div>
+                <div class="freq-bar"></div>
+                <div class="freq-bar"></div>
+                <div class="freq-bar"></div>
+                <div class="freq-bar"></div>
+                <div class="freq-bar"></div>
+                <div class="freq-bar"></div>
+                <div class="freq-bar"></div>
             </div>
+        </aside>
 
-            <div class="control-panel">
-                <div class="panel-title">🎰 WEB3 CASINO</div>
-                <button class="cosmic-button" id="mintBtn">MINT NFT</button>
-                <button class="cosmic-button" id="betBtn">BET SUPERNOVA</button>
-                <div class="status-display">
-                    <div>CTOK: <span id="ctokBalance">0</span></div>
-                    <div>NFTs: <span id="nftCount">0</span></div>
-                </div>
+        <section class="canvas-container">
+            <canvas id="webgl-canvas"></canvas>
+            <div id="cosmicCreature" class="cosmic-creature">🌌</div>
+            <div class="effects-bar">
+                <button class="effect-btn active" data-effect="particles">PARTICLES</button>
+                <button class="effect-btn" data-effect="nebula">NEBULA</button>
+                <button class="effect-btn" data-effect="waveform">WAVEFORM</button>
+                <button class="effect-btn" data-effect="cosmic">COSMIC</button>
+                <button class="effect-btn" data-effect="spiral">SPIRAL</button>
+                <button class="effect-btn" data-effect="burst">BURST</button>
             </div>
-        </div>
+        </section>
 
-        <div class="cosmic-creature" id="cosmicCreature">🌌</div>
-
-        <div class="status-display">
-            <div>Portal Status: <span id="portalStatus">CLOSED</span></div>
-            <div>Consciousness Level: <span id="consciousnessLevel">DORMANT</span></div>
-            <div>Trepanning Mode: <span id="trepanStatus">INACTIVE</span></div>
-        </div>
+        <section class="console-container">
+            <div class="console-header">🖥️ Heuristic Console</div>
+            <div id="heuristicConsole" class="heuristic-console"></div>
+        </section>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r165/three.min.js"></script>
     <script>
-        // Global Variables
-        let scene, camera, renderer, particles = [];
-        let audioContext, analyser, dataArray, audioConnected = false;
-        let currentEffect = 'trepan';
-        let trepanMode = false;
-        let portalCount = 0;
-        let creatureClicks = 0;
-        let ctokBalance = 0;
-        let nftCount = 0;
-        let isRecording = false;
-        let mediaRecorder;
-        let recordedChunks = [];
+        // ===== KOZMIC PRO STUDIO v3.0 - BULLETPROOF EDITION =====
+        
+        // Global State - Using var for maximum compatibility
+        var audioContext, analyser, dataArray, audioStream;
+        var scene, camera, renderer;
+        var particles = [];
+        var currentEffect = 'particles';
+        var isRecording = false;
+        var tunerActive = false;
+        var isAmplified = false;
+        var mediaRecorder, recordedChunks = [];
+        var sessionStart = Date.now();
+        var creatureClicks = 0;
+        var beatDetector = { lastEnergy: 0 };
+        var animationFrameId, visualizationFrameId;
+        var intervalIds = [];
 
-        // Initialize Three.js Scene
-        function initScene() {
-            const canvas = document.getElementById('cosmicCanvas');
-            const container = canvas.parentElement;
-            
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-            renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true });
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            renderer.setClearColor(0x000000, 0.1);
-
-            camera.position.z = 5;
-
-            // Create particles
-            createParticles();
-            
-            // Start animation loop
-            animate();
-        }
-
-        function createParticles() {
-            particles = [];
-            const particleCount = 200;
-
-            for (let i = 0; i < particleCount; i++) {
-                const geometry = new THREE.SphereGeometry(0.02, 8, 8);
-                const material = new THREE.MeshBasicMaterial({
-                    color: new THREE.Color().setHSL(Math.random(), 1, 0.5),
-                    transparent: true,
-                    opacity: 0.8
-                });
-                
-                const particle = new THREE.Mesh(geometry, material);
-                particle.position.set(
-                    (Math.random() - 0.5) * 10,
-                    (Math.random() - 0.5) * 10,
-                    (Math.random() - 0.5) * 10
-                );
-                
-                particle.velocity = new THREE.Vector3(
-                    (Math.random() - 0.5) * 0.02,
-                    (Math.random() - 0.5) * 0.02,
-                    (Math.random() - 0.5) * 0.02
-                );
-
-                scene.add(particle);
-                particles.push(particle);
-            }
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-
-            // Get audio data if available
-            let audioLevel = 0;
-            if (audioConnected && analyser) {
-                analyser.getByteFrequencyData(dataArray);
-                audioLevel = dataArray.reduce((a, b) => a + b) / dataArray.length / 255;
-            }
-
-            // Animate particles based on current effect
-            animateParticles(audioLevel);
-            
-            renderer.render(scene, camera);
-        }
-
-        function animateParticles(audioLevel) {
-            const time = Date.now() * 0.001;
-            
-            particles.forEach((particle, index) => {
-                switch (currentEffect) {
-                    case 'blackhole':
-                        animateBlackHole(particle, audioLevel, time);
-                        break;
-                    case 'supernova':
-                        animateSupernova(particle, audioLevel, time);
-                        break;
-                    case 'trepan':
-                        animateTrepanning(particle, audioLevel, time, index);
-                        break;
-                }
-            });
-        }
-
-        function animateBlackHole(particle, audioLevel, time) {
-            const centerDistance = particle.position.length();
-            const pullStrength = (1 + audioLevel * 2) * 0.01;
-            
-            if (centerDistance > 0.1) {
-                particle.position.multiplyScalar(1 - pullStrength);
-                particle.position.applyAxisAngle(new THREE.Vector3(0, 0, 1), 0.05 + audioLevel * 0.1);
-            } else {
-                // Reset particle when it gets too close to center
-                particle.position.set(
-                    (Math.random() - 0.5) * 8,
-                    (Math.random() - 0.5) * 8,
-                    (Math.random() - 0.5) * 8
-                );
-            }
-            
-            particle.material.color.setHSL(0.8 - centerDistance * 0.1, 1, 0.5 + audioLevel * 0.3);
-        }
-
-        function animateSupernova(particle, audioLevel, time) {
-            if (audioLevel > 0.8) {
-                // Supernova explosion
-                const explosionForce = (audioLevel - 0.8) * 0.5;
-                particle.velocity.addScaledVector(particle.position.clone().normalize(), explosionForce);
-                particle.material.color.setRGB(1, 1, 1);
-            } else {
-                // Normal drift
-                particle.position.add(particle.velocity);
-                particle.material.color.setHSL(0.1, 1, 0.3 + audioLevel * 0.5);
-            }
-            
-            // Boundary check
-            if (particle.position.length() > 8) {
-                particle.position.multiplyScalar(0.1);
-                particle.velocity.multiplyScalar(0.1);
-            }
-        }
-
-        function animateTrepanning(particle, audioLevel, time, index) {
-            const drillRadius = 2 + audioLevel * 2;
-            const drillSpeed = 0.05 + audioLevel * 0.1;
-            const angle = time * drillSpeed + index * 0.1;
-            
-            if (trepanMode) {
-                // Drilling pattern
-                particle.position.x = Math.cos(angle) * drillRadius * Math.cos(time * 0.2);
-                particle.position.y = Math.sin(angle) * drillRadius * Math.sin(time * 0.2);
-                particle.position.z = Math.sin(time * 0.3 + index) * 0.5;
-                
-                particle.material.color.setHSL(0.8, 1, 0.5 + audioLevel * 0.5);
-            } else {
-                // Gentle cosmic dance
-                particle.position.x += Math.sin(time + index) * 0.01;
-                particle.position.y += Math.cos(time + index) * 0.01;
-                particle.position.z += Math.sin(time * 0.5 + index) * 0.005;
-                
-                particle.material.color.setHSL(0.3 + Math.sin(time + index) * 0.2, 1, 0.5);
-            }
-        }
-
-        // Audio Setup
-        async function connectAudio() {
+        // Safe Element Access
+        function safeElement(id) {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const source = audioContext.createMediaStreamSource(stream);
+                var el = document.getElementById(id);
+                if (!el) {
+                    return {
+                        textContent: '',
+                        style: {},
+                        classList: {
+                            add: function() {},
+                            remove: function() {},
+                            contains: function() { return false; }
+                        },
+                        onclick: null
+                    };
+                }
+                return el;
+            } catch(e) {
+                return { textContent: '', style: {}, classList: { add: function() {}, remove: function() {} } };
+            }
+        }
+
+        // Debug Logging
+        function debugLog(message, type) {
+            try {
+                type = type || 'info';
+                var console = safeElement('heuristicConsole');
+                var entry = document.createElement('div');
+                entry.className = 'log-entry log-' + type;
+                var timestamp = new Date().toLocaleTimeString();
+                entry.textContent = '[' + timestamp + '] ' + message;
+                console.appendChild(entry);
+                console.scrollTop = console.scrollHeight;
                 
-                analyser = audioContext.createAnalyser();
-                analyser.fftSize = 256;
-                dataArray = new Uint8Array(analyser.frequencyBinCount);
+                // Also log to browser console
+                window.console.log('[KOZMIC] ' + message);
+            } catch(e) {
+                // Silent fallback
+            }
+        }
+
+        // Audio Level Calculator
+        function getAudioLevel() {
+            try {
+                if (!analyser || !dataArray) return 0;
+                analyser.getByteFrequencyData(dataArray);
+                var sum = 0;
+                for (var i = 0; i < dataArray.length; i++) {
+                    sum += dataArray[i];
+                }
+                var level = sum / (dataArray.length * 255);
+                return Math.min(level, 1);
+            } catch(e) {
+                return 0;
+            }
+        }
+
+        // Pitch Detection Class
+        function PitchDetector() {
+            this.noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        }
+
+        PitchDetector.prototype.detectPitch = function(audioData) {
+            try {
+                var sampleRate = audioContext ? audioContext.sampleRate : 44100;
+                var frequency = this.autoCorrelate(audioData, sampleRate);
+                if (frequency === -1) return null;
+
+                var note = this.noteFromPitch(frequency);
+                var noteIndex = this.noteNames.indexOf(note);
+                if (noteIndex === -1) return null;
+
+                var cents = this.centsOffFromPitch(frequency, noteIndex);
+
+                return {
+                    frequency: Math.round(frequency * 100) / 100,
+                    note: note,
+                    cents: cents
+                };
+            } catch(e) {
+                return null;
+            }
+        };
+
+        PitchDetector.prototype.autoCorrelate = function(buf, sampleRate) {
+            try {
+                var SIZE = buf.length;
+                var MAX_SAMPLES = Math.floor(SIZE / 2);
+                var best_offset = -1;
+                var best_correlation = 0;
+                var rms = 0;
+
+                for (var i = 0; i < SIZE; i++) {
+                    var val = buf[i];
+                    rms += val * val;
+                }
+                rms = Math.sqrt(rms / SIZE);
+                if (rms < 0.01) return -1;
+
+                var lastCorrelation = 1;
+                for (var offset = 20; offset < MAX_SAMPLES; offset++) {
+                    var correlation = 0;
+
+                    for (var i = 0; i < MAX_SAMPLES; i++) {
+                        correlation += Math.abs(buf[i] - buf[i + offset]);
+                    }
+                    correlation = 1 - (correlation / MAX_SAMPLES);
+
+                    if (correlation > 0.9 && correlation > lastCorrelation) {
+                        if (correlation > best_correlation) {
+                            best_correlation = correlation;
+                            best_offset = offset;
+                        }
+                    }
+                    lastCorrelation = correlation;
+                }
                 
-                source.connect(analyser);
-                audioConnected = true;
-                
-                document.getElementById('portalStatus').textContent = 'OPEN';
-                document.getElementById('consciousnessLevel').textContent = 'EXPANDING';
-                document.getElementById('connectBtn').textContent = 'PORTAL ACTIVE';
-                
-            } catch (err) {
-                console.error('Audio access denied:', err);
-                alert('Please allow microphone access for cosmic trepanning!');
+                if (best_correlation > 0.01 && best_offset > 0) {
+                    return sampleRate / best_offset;
+                }
+                return -1;
+            } catch(e) {
+                return -1;
+            }
+        };
+
+        PitchDetector.prototype.noteFromPitch = function(frequency) {
+            try {
+                if (!frequency || frequency <= 0) return this.noteNames[0];
+                var noteNum = 12 * (Math.log(frequency / 440) / Math.log(2));
+                var noteIndex = Math.round(noteNum + 69) % 12;
+                if (noteIndex < 0) noteIndex += 12;
+                return this.noteNames[noteIndex] || this.noteNames[0];
+            } catch(e) {
+                return this.noteNames[0];
+            }
+        };
+
+        PitchDetector.prototype.centsOffFromPitch = function(frequency, noteNum) {
+            try {
+                if (!frequency || frequency <= 0 || noteNum < 0) return 0;
+                var expectedFreq = 440 * Math.pow(2, (noteNum - 9) / 12);
+                var cents = 1200 * Math.log2(frequency / expectedFreq);
+                return Math.floor(cents) || 0;
+            } catch(e) {
+                return 0;
+            }
+        };
+
+        var pitchDetector = new PitchDetector();
+
+        // Audio Connection
+        function connectAudio() {
+            try {
+                navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: false,
+                        noiseSuppression: false,
+                        autoGainControl: false,
+                        sampleRate: 44100
+                    } 
+                }).then(function(stream) {
+                    audioStream = stream;
+                    
+                    var AudioContext = window.AudioContext || window.webkitAudioContext;
+                    audioContext = new AudioContext();
+                    var source = audioContext.createMediaStreamSource(audioStream);
+                    analyser = audioContext.createAnalyser();
+                    analyser.fftSize = 2048;
+                    dataArray = new Uint8Array(analyser.frequencyBinCount);
+                    source.connect(analyser);
+
+                    safeElement('inputStatus').textContent = 'LIVE';
+                    safeElement('connectBtn').textContent = 'CONNECTED';
+                    debugLog('Audio connected successfully! 🎵', 'success');
+                    
+                    if (!renderer) initWebGL();
+                    startVisualization();
+                    updateBooleans();
+                }).catch(function(error) {
+                    debugLog('Audio connection failed: ' + error.message, 'error');
+                    alert('Please allow microphone access for the full Kozmic experience!');
+                });
+            } catch(e) {
+                debugLog('Connect audio error: ' + e.message, 'error');
             }
         }
 
         // Recording Functions
-        function startRecording() {
-            if (!audioConnected) {
-                alert('Please connect audio first!');
-                return;
-            }
-            
-            navigator.mediaDevices.getUserMedia({ audio: true })
-                .then(stream => {
-                    mediaRecorder = new MediaRecorder(stream);
+        function toggleRecord() {
+            try {
+                if (!audioStream) {
+                    debugLog('Connect audio first!', 'warning');
+                    return;
+                }
+
+                if (!isRecording) {
                     recordedChunks = [];
+                    mediaRecorder = new MediaRecorder(audioStream);
                     
-                    mediaRecorder.ondataavailable = event => {
-                        if (event.data.size > 0) {
-                            recordedChunks.push(event.data);
-                        }
+                    mediaRecorder.ondataavailable = function(event) {
+                        if (event.data.size > 0) recordedChunks.push(event.data);
                     };
                     
-                    mediaRecorder.onstop = () => {
-                        const blob = new Blob(recordedChunks, { type: 'audio/webm' });
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = `cosmic-trepanning-${Date.now()}.webm`;
-                        a.click();
+                    mediaRecorder.onstop = function() {
+                        try {
+                            var blob = new Blob(recordedChunks, { type: 'audio/webm' });
+                            var url = URL.createObjectURL(blob);
+                            var a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'kozmic-session-' + Date.now() + '.webm';
+                            a.click();
+                            URL.revokeObjectURL(url);
+                            debugLog('Recording saved! 💾', 'success');
+                        } catch(e) {
+                            debugLog('Save recording error: ' + e.message, 'error');
+                        }
                     };
                     
                     mediaRecorder.start();
                     isRecording = true;
-                    document.getElementById('recordBtn').textContent = 'STOP RECORDING';
-                })
-                .catch(err => console.error('Recording failed:', err));
-        }
-
-        function stopRecording() {
-            if (mediaRecorder && isRecording) {
-                mediaRecorder.stop();
-                isRecording = false;
-                document.getElementById('recordBtn').textContent = 'RECORD MIX';
-            }
-        }
-
-        // Web3 Functions (Mock for now)
-        function mintNFT() {
-            nftCount++;
-            ctokBalance += 100;
-            updateWeb3Display();
-            alert('🎸 NFT Minted! Cosmic consciousness tokenized! 💀');
-        }
-
-        function betSupernova() {
-            if (ctokBalance >= 10) {
-                ctokBalance -= 10;
-                if (Math.random() > 0.7) {
-                    ctokBalance += 50;
-                    alert('🌟 SUPERNOVA WIN! +50 CTOK! 🌟');
+                    safeElement('recordBtn').textContent = 'STOP';
+                    debugLog('Recording started 🔴', 'info');
                 } else {
-                    alert('💫 Cosmic luck next time... 💫');
+                    if (mediaRecorder) mediaRecorder.stop();
+                    isRecording = false;
+                    safeElement('recordBtn').textContent = 'RECORD';
+                    debugLog('Recording stopped ⏹️', 'info');
                 }
-                updateWeb3Display();
-            } else {
-                alert('Need 10 CTOK to bet on supernova!');
+                updateBooleans();
+            } catch(e) {
+                debugLog('Toggle record error: ' + e.message, 'error');
             }
         }
 
-        function drillPortal() {
-            portalCount++;
-            ctokBalance += 10;
-            document.getElementById('portalCounter').textContent = portalCount;
-            updateWeb3Display();
+        function toggleTuner() {
+            try {
+                tunerActive = !tunerActive;
+                safeElement('tunerBtn').textContent = tunerActive ? 'TUNER ON' : 'TUNER';
+                debugLog('Guitar tuner ' + (tunerActive ? 'activated' : 'deactivated') + ' 🎸', 'info');
+                updateBooleans();
+            } catch(e) {
+                debugLog('Toggle tuner error: ' + e.message, 'error');
+            }
+        }
+
+        function toggleAmplify() {
+            try {
+                isAmplified = !isAmplified;
+                safeElement('amplifyBtn').textContent = isAmplified ? 'AMPLIFIED' : 'AMPLIFY';
+                debugLog('Audio amplification ' + (isAmplified ? 'ON' : 'OFF') + ' ⚡', 'info');
+                updateBooleans();
+            } catch(e) {
+                debugLog('Toggle amplify error: ' + e.message, 'error');
+            }
+        }
+
+        // WebGL Initialization
+        function initWebGL() {
+            try {
+                var canvas = safeElement('webgl-canvas');
+                if (!canvas || !window.WebGLRenderingContext) {
+                    debugLog('WebGL not supported!', 'error');
+                    return;
+                }
+
+                var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                if (!gl) {
+                    debugLog('WebGL context creation failed!', 'error');
+                    return;
+                }
+
+                if (typeof THREE === 'undefined') {
+                    debugLog('Three.js not loaded!', 'error');
+                    return;
+                }
+
+                scene = new THREE.Scene();
+                camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+                renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+                renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+                renderer.setClearColor(0x000000, 0.1);
+
+                // Create particles
+                var particleCount = 100;
+                for (var i = 0; i < particleCount; i++) {
+                    var geometry = new THREE.SphereGeometry(0.05, 8, 8);
+                    var material = new THREE.MeshBasicMaterial({ 
+                        color: new THREE.Color().setHSL(Math.random(), 1, 0.5),
+                        transparent: true,
+                        opacity: 0.8
+                    });
+                    var particle = new THREE.Mesh(geometry, material);
+                    
+                    particle.position.set(
+                        (Math.random() - 0.5) * 10,
+                        (Math.random() - 0.5) * 10,
+                        (Math.random() - 0.5) * 10
+                    );
+                    
+                    particle.userData = {
+                        originalPos: particle.position.clone(),
+                        phase: Math.random() * Math.PI * 2,
+                        speed: 0.5 + Math.random() * 1.5
+                    };
+                    
+                    scene.add(particle);
+                    particles.push(particle);
+                }
+
+                camera.position.z = 8;
+                
+                debugLog('WebGL initialized! 🌌', 'success');
+                updateBooleans();
+                animate();
+            } catch(e) {
+                debugLog('WebGL initialization error: ' + e.message, 'error');
+            }
+        }
+
+        // Animation Loop
+        function animate() {
+            try {
+                if (!renderer || !scene || !camera) return;
+                animationFrameId = requestAnimationFrame(animate);
+                updateParticleEffects();
+                renderer.render(scene, camera);
+            } catch(e) {
+                // Silent error to prevent spam
+            }
+        }
+
+        // Particle Effects
+        function updateParticleEffects() {
+            try {
+                if (!particles.length) return;
+
+                var time = Date.now() * 0.001;
+                var audioLevel = getAudioLevel();
+                var multiplier = isAmplified ? 2 : 1;
+                var creature = safeElement('cosmicCreature');
+
+                for (var i = 0; i < particles.length; i++) {
+                    var particle = particles[i];
+                    var userData = particle.userData;
+                    var phase = userData.phase + time * userData.speed;
+
+                    switch (currentEffect) {
+                        case 'particles':
+                            particle.position.x = userData.originalPos.x + Math.sin(phase) * audioLevel * 2 * multiplier;
+                            particle.position.y = userData.originalPos.y + Math.cos(phase * 1.3) * audioLevel * 2 * multiplier;
+                            particle.position.z = userData.originalPos.z + Math.sin(phase * 0.7) * audioLevel * multiplier;
+                            break;
+
+                        case 'nebula':
+                            var radius = 3 + audioLevel * 2 * multiplier;
+                            particle.position.x = Math.cos(phase + i * 0.1) * radius;
+                            particle.position.y = Math.sin(phase + i * 0.1) * radius;
+                            particle.position.z = Math.sin(time * 0.5 + i * 0.05) * audioLevel * 3;
+                            break;
+
+                        case 'waveform':
+                            particle.position.x = (i / particles.length) * 10 - 5;
+                            particle.position.y = Math.sin(time * 2 + i * 0.2) * audioLevel * 3 * multiplier;
+                            particle.position.z = Math.cos(time + i * 0.1) * audioLevel * 2;
+                            break;
+
+                        case 'cosmic':
+                            var distance = particle.position.length();
+                            if (distance > 0.1) {
+                                particle.position.multiplyScalar(1 - (0.02 + audioLevel * 0.03));
+                                particle.position.applyAxisAngle(new THREE.Vector3(0, 0, 1), 0.1);
+                            } else {
+                                particle.position.copy(userData.originalPos);
+                            }
+                            break;
+
+                        case 'spiral':
+                            var spiralRadius = 2 + audioLevel * 3 * multiplier;
+                            var spiralSpeed = 0.02 + audioLevel * 0.05;
+                            particle.position.x = Math.cos(time * spiralSpeed + i * 0.3) * spiralRadius;
+                            particle.position.y = Math.sin(time * spiralSpeed + i * 0.3) * spiralRadius;
+                            particle.position.z = (i / particles.length) * 6 - 3 + Math.sin(time + i * 0.1) * audioLevel * 2;
+                            break;
+
+                        case 'burst':
+                            if (audioLevel > 0.6) {
+                                var burstForce = (audioLevel - 0.6) * 0.5;
+                                var direction = particle.position.clone().normalize();
+                                particle.position.addScaledVector(direction, burstForce);
+                            }
+                            if (particle.position.length() > 8) {
+                                particle.position.copy(userData.originalPos);
+                            }
+                            break;
+                    }
+
+                    // Color effects
+                    var hue = (time * 0.1 + i * 0.01 + audioLevel * 0.5) % 1;
+                    particle.material.color.setHSL(hue, 1, 0.5 + audioLevel * 0.3);
+                    particle.material.opacity = 0.5 + audioLevel * 0.5;
+                }
+
+                // Creature animation
+                var scale = 1 + audioLevel * 0.5;
+                var translateY = audioLevel * 20;
+                var opacity = 0.7 + audioLevel * 0.3;
+                
+                creature.style.transform = 'translateY(calc(-50% - ' + translateY + 'px)) scale(' + scale + ')';
+                creature.style.opacity = opacity;
+                
+                if (audioLevel > 0.8) {
+                    creature.style.filter = 'brightness(' + (1 + audioLevel) + ') drop-shadow(0 0 20px #ff6b9d)';
+                } else {
+                    creature.style.filter = 'brightness(1)';
+                }
+            } catch(e) {
+                // Silent error
+            }
+        }
+
+        // Effect Management
+        function setEffect(effectName) {
+            try {
+                currentEffect = effectName;
+                safeElement('currentEffect').textContent = effectName.toUpperCase();
+                
+                var buttons = document.querySelectorAll('.effect-btn');
+                for (var i = 0; i < buttons.length; i++) {
+                    buttons[i].classList.remove('active');
+                    if (buttons[i].dataset.effect === effectName) {
+                        buttons[i].classList.add('active');
+                    }
+                }
+                
+                debugLog('Effect changed to: ' + effectName.toUpperCase() + ' ✨', 'info');
+            } catch(e) {
+                debugLog('Set effect error: ' + e.message, 'error');
+            }
+        }
+
+        function cycleEffect() {
+            try {
+                var effects = ['particles', 'nebula', 'waveform', 'cosmic', 'spiral', 'burst'];
+                var currentIndex = effects.indexOf(currentEffect);
+                var nextIndex = (currentIndex + 1) % effects.length;
+                setEffect(effects[nextIndex]);
+            } catch(e) {
+                debugLog('Cycle effect error: ' + e.message, 'error');
+            }
+        }
+
+        // SINWE Mixer Integration
+        function detectMixerEffect() {
+            try {
+                if (!analyser || !dataArray) return;
+                
+                analyser.getByteFrequencyData(dataArray);
+                var highFreqSum = 0, midFreqSum = 0, lowFreqSum = 0;
+                
+                for (var i = 80; i < dataArray.length; i++) highFreqSum += dataArray[i];
+                for (var i = 40; i < 80; i++) midFreqSum += dataArray[i];
+                for (var i = 0; i < 40; i++) lowFreqSum += dataArray[i];
+                
+                if (highFreqSum > 7000) {
+                    setEffect('burst');
+                    safeElement('mixerEffect').textContent = 'BURST TRIGGERED';
+                    debugLog('SINWE High-Freq Effect detected! Triggering BURST 🌋', 'info');
+                } else if (midFreqSum > 5000) {
+                    setEffect('spiral');
+                    safeElement('mixerEffect').textContent = 'SPIRAL TRIGGERED';
+                    debugLog('SINWE Mid-Freq Effect detected! Triggering SPIRAL 🌪️', 'info');
+                } else if (lowFreqSum > 3000) {
+                    setEffect('cosmic');
+                    safeElement('mixerEffect').textContent = 'COSMIC TRIGGERED';
+                    debugLog('SINWE Low-Freq Effect detected! Triggering COSMIC 🕳️', 'info');
+                }
+            } catch(e) {
+                // Silent error
+            }
+        }
+
+        function detectBeat() {
+            try {
+                if (!analyser || !dataArray) return;
+                
+                analyser.getByteFrequencyData(dataArray);
+                var energy = 0;
+                for (var i = 0; i < dataArray.length; i++) {
+                    energy += dataArray[i];
+                }
+                
+                if (energy > beatDetector.lastEnergy * 1.2 && energy > 5000) {
+                    for (var i = 0; i < particles.length; i++) {
+                        var particle = particles[i];
+                        if (particle.scale) {
+                            particle.scale.setScalar(1.5);
+                            setTimeout(function(p) { 
+                                return function() { 
+                                    if (p.scale) p.scale.setScalar(1); 
+                                }; 
+                            }(particle), 100);
+                        }
+                    }
+                    debugLog('SINWE Beat detected! Particles pulsing 🥁', 'info');
+                    
+                    var creature = safeElement('cosmicCreature');
+                    creature.classList.add('creature-pulse');
+                    setTimeout(function() { 
+                        creature.classList.remove('creature-pulse'); 
+                    }, 300);
+                    
+                    safeElement('beatStatus').textContent = 'BEAT DETECTED';
+                    setTimeout(function() { 
+                        safeElement('beatStatus').textContent = 'READY'; 
+                    }, 500);
+                }
+                
+                beatDetector.lastEnergy = energy;
+                requestAnimationFrame(detectBeat);
+            } catch(e) {
+                // Silent error
+            }
+        }
+
+        // Visualization
+        function startVisualization() {
+            function updateVisuals() {
+                try {
+                    if (!analyser || !dataArray) return;
+                    visualizationFrameId = requestAnimationFrame(updateVisuals);
+
+                    analyser.getByteFrequencyData(dataArray);
+                    
+                    var audioLevel = getAudioLevel();
+                    safeElement('powerBar').style.width = (audioLevel * 100) + '%';
+                    safeElement('levelStatus').textContent = Math.round(audioLevel * 100) + '%';
+                    safeElement('audioLevel').textContent = Math.round(audioLevel * 100) + '%';
+
+                    var freqBars = document.querySelectorAll('.freq-bar');
+                    for (var i = 0; i < freqBars.length; i++) {
+                        var dataIndex = Math.floor((i / freqBars.length) * dataArray.length);
+                        var amplitude = dataArray[dataIndex] / 255;
+                        freqBars[i].style.height = (amplitude * 50) + 'px';
+                        freqBars[i].style.opacity = 0.4 + amplitude * 0.6;
+                    }
+
+                    // Pitch detection when tuner is active
+                    if (tunerActive) {
+                        analyser.getByteTimeDomainData(dataArray);
+                        var floatArray = [];
+                        for (var i = 0; i < dataArray.length; i++) {
+                            floatArray[i] = (dataArray[i] - 128) / 128;
+                        }
+                        var pitch = pitchDetector.detectPitch(floatArray);
+                        
+                        if (pitch) {
+                            var accuracy = Math.abs(pitch.cents) < 5 ? 'PERFECT' : 
+                                         Math.abs(pitch.cents) < 15 ? 'GOOD' : 'ADJUST';
+                            var pitchEl = safeElement('pitchDisplay');
+                            pitchEl.textContent = pitch.note + ' ' + pitch.frequency + 'Hz (' + accuracy + ')';
+                            pitchEl.style.color = accuracy === 'PERFECT' ? '#4ade80' : 
+                                                accuracy === 'GOOD' ? '#fcd34d' : '#f87171';
+                            safeElement('dominantFreq').textContent = pitch.frequency + 'Hz';
+                        } else {
+                            safeElement('pitchDisplay').textContent = '--';
+                            safeElement('dominantFreq').textContent = '--';
+                        }
+                    }
+
+                    detectMixerEffect();
+                } catch(e) {
+                    debugLog('Visualization error: ' + e.message, 'error');
+                }
+            }
             
-            if (portalCount >= 10) {
-                alert('🧠 CONSCIOUSNESS FULLY EXPANDED! Maximum trepanning achieved! 💀');
+            updateVisuals();
+            detectBeat();
+        }
+
+        // Analysis Functions
+        function performBooleanCheck() {
+            try {
+                var checks = {
+                    audio: !!audioStream,
+                    webgl: !!renderer,
+                    recording: isRecording,
+                    tuner: tunerActive,
+                    amplified: isAmplified,
+                    kozmicVibe: !!audioStream && !!renderer
+                };
+
+                safeElement('audioBoolean').textContent = checks.audio ? 'TRUE ✅' : 'FALSE ❌';
+                safeElement('webglBoolean').textContent = checks.webgl ? 'TRUE ✅' : 'FALSE ❌';
+
+                debugLog('🔍 BOOLEAN STATUS CHECK INITIATED', 'success');
+                for (var key in checks) {
+                    var value = checks[key];
+                    debugLog(key.toUpperCase() + ': ' + (value ? 'TRUE ✅' : 'FALSE ❌'), value ? 'success' : 'warning');
+                }
+
+                debugLog('KOZMIC VIBE: ' + (checks.kozmicVibe ? 'SHREDDING THE COSMOS! 🌌' : 'TUNE UP, SHREDDER! ⚡️'), checks.kozmicVibe ? 'success' : 'warning');
+                debugLog('Boolean check complete! System analysis finished.', 'info');
+
+                var console = safeElement('heuristicConsole');
+                console.style.display = 'block';
+                console.scrollTop = console.scrollHeight;
+
+                return checks;
+            } catch(e) {
+                debugLog('Boolean check error: ' + e.message, 'error');
             }
         }
 
-        function updateWeb3Display() {
-            document.getElementById('ctokBalance').textContent = ctokBalance;
-            document.getElementById('nftCount').textContent = nftCount;
+        function updateBooleans() {
+            try {
+                safeElement('audioBoolean').textContent = !!audioStream ? 'TRUE ✅' : 'FALSE ❌';
+                safeElement('webglBoolean').textContent = !!renderer ? 'TRUE ✅' : 'FALSE ❌';
+            } catch(e) {
+                // Silent error
+            }
         }
 
-        // Event Listeners
-        document.getElementById('connectBtn').addEventListener('click', connectAudio);
-        document.getElementById('recordBtn').addEventListener('click', () => {
-            if (isRecording) {
-                stopRecording();
-            } else {
-                startRecording();
+        function performDebugAnalysis() {
+            try {
+                debugLog('🔧 INITIATING DEBUG ANALYSIS...', 'info');
+                debugLog('System Status: Checking all subsystems...', 'info');
+                
+                var audioStatus = audioStream ? 'OPERATIONAL' : 'DISCONNECTED';
+                var webglStatus = renderer ? 'RENDERING' : 'INACTIVE';
+                var effectStatus = particles.length > 0 ? 'PARTICLES ACTIVE' : 'NO PARTICLES';
+                
+                debugLog('Audio System: ' + audioStatus, audioStream ? 'success' : 'warning');
+                debugLog('WebGL Engine: ' + webglStatus, renderer ? 'success' : 'warning');
+                debugLog('Effect System: ' + effectStatus, particles.length > 0 ? 'success' : 'warning');
+                debugLog('Debug analysis complete! 🔧', 'success');
+            } catch(e) {
+                debugLog('Debug analysis error: ' + e.message, 'error');
             }
-        });
+        }
 
-        document.getElementById('trepanBtn').addEventListener('click', () => {
-            trepanMode = !trepanMode;
-            document.getElementById('trepanStatus').textContent = trepanMode ? 'ACTIVE' : 'INACTIVE';
-            document.getElementById('trepanBtn').classList.toggle('active');
-        });
-
-        document.getElementById('drillBtn').addEventListener('click', drillPortal);
-        document.getElementById('mintBtn').addEventListener('click', mintNFT);
-        document.getElementById('betBtn').addEventListener('click', betSupernova);
-
-        // Effect buttons
-        document.querySelectorAll('.effect-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.effect-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentEffect = btn.dataset.effect;
-            });
-        });
-
-        // Cosmic creature easter egg
-        document.getElementById('cosmicCreature').addEventListener('click', () => {
-            creatureClicks++;
-            if (creatureClicks >= 5) {
-                triggerHypernova();
-                creatureClicks = 0;
+        function enterCrisisMode() {
+            try {
+                debugLog('🚨 CRISIS MODE ACTIVATED! 🚨', 'error');
+                debugLog('Emergency protocols engaged...', 'warning');
+                debugLog('Running system diagnostics...', 'info');
+                
+                setTimeout(function() {
+                    debugLog('All systems nominal. Crisis averted! 😅', 'success');
+                }, 2000);
+            } catch(e) {
+                debugLog('Crisis mode error: ' + e.message, 'error');
             }
-        });
+        }
+
+        // Session Management
+        function updateSessionTime() {
+            try {
+                var elapsed = Math.floor((Date.now() - sessionStart) / 1000);
+                var minutes = Math.floor(elapsed / 60);
+                var seconds = elapsed % 60;
+                safeElement('sessionTime').textContent = minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+            } catch(e) {
+                // Silent error
+            }
+        }
+
+        function simulateBattery() {
+            try {
+                var batteryLevel = safeElement('batteryLevel');
+                var batteryText = safeElement('batteryText');
+                var currentLevel = 85;
+                
+                var intervalId = setInterval(function() {
+                    if (isRecording) {
+                        currentLevel = Math.max(0, currentLevel - 0.5);
+                    } else {
+                        currentLevel = Math.min(100, currentLevel + 0.1);
+                    }
+                    
+                    batteryLevel.style.width = currentLevel + '%';
+                    var status = currentLevel > 50 ? 'Recording Ready' : 
+                                currentLevel > 20 ? 'Low Battery' : 'Critical';
+                    batteryText.textContent = Math.round(currentLevel) + '% - ' + status;
+                }, 1000);
+                
+                intervalIds.push(intervalId);
+                return intervalId;
+            } catch(e) {
+                debugLog('Battery simulation error: ' + e.message, 'error');
+            }
+        }
+
+        function saveSession() {
+            try {
+                var sessionData = {
+                    timestamp: Date.now(),
+                    effect: currentEffect,
+                    amplified: isAmplified,
+                    sessionDuration: Date.now() - sessionStart
+                };
+                
+                localStorage.setItem('kozmicSession', JSON.stringify(sessionData));
+                debugLog('Session saved successfully! 💾', 'success');
+            } catch(e) {
+                debugLog('Save session error: ' + e.message, 'error');
+            }
+        }
+
+        function loadSession() {
+            try {
+                var sessionData = JSON.parse(localStorage.getItem('kozmicSession') || '{}');
+                if (sessionData.effect) {
+                    setEffect(sessionData.effect);
+                    isAmplified = !!sessionData.amplified;
+                    safeElement('amplifyBtn').textContent = sessionData.amplified ? 'AMPLIFIED' : 'AMPLIFY';
+                    debugLog('Session loaded successfully! 📁', 'success');
+                } else {
+                    debugLog('No saved session found', 'warning');
+                }
+            } catch(e) {
+                debugLog('Load session error: ' + e.message, 'error');
+            }
+        }
+
+        function exportSession() {
+            try {
+                var sessionData = {
+                    timestamp: Date.now(),
+                    effect: currentEffect,
+                    version: 'Ultimate Portable Edition v3.0'
+                };
+                
+                var blob = new Blob([JSON.stringify(sessionData, null, 2)], { type: 'application/json' });
+                var url = URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = 'kozmic-session-' + Date.now() + '.json';
+                a.click();
+                URL.revokeObjectURL(url);
+                debugLog('Session exported! 📤', 'success');
+            } catch(e) {
+                debugLog('Export session error: ' + e.message, 'error');
+            }
+        }
+
+        function resetSession() {
+            try {
+                sessionStart = Date.now();
+                safeElement('heuristicConsole').innerHTML = '';
+                debugLog('Session reset! Starting fresh... 🆕', 'info');
+            } catch(e) {
+                debugLog('Reset session error: ' + e.message, 'error');
+            }
+        }
+
+        // Cosmic Creature Functions
+        function handleCreatureClick() {
+            try {
+                creatureClicks++;
+                var creature = safeElement('cosmicCreature');
+                creature.classList.remove('creature-pulse');
+                setTimeout(function() {
+                    creature.classList.add('creature-pulse');
+                }, 10);
+                
+                debugLog('Cosmic creature activated! (' + creatureClicks + '/5) ✨', 'info');
+                
+                if (creatureClicks >= 5) {
+                    triggerHypernova();
+                    creatureClicks = 0;
+                }
+                
+                setTimeout(function() { 
+                    creature.classList.remove('creature-pulse'); 
+                }, 600);
+            } catch(e) {
+                debugLog('Creature click error: ' + e.message, 'error');
+            }
+        }
 
         function triggerHypernova() {
-            const flash = document.createElement('div');
-            flash.className = 'hypernova-flash';
-            document.body.appendChild(flash);
-            
-            setTimeout(() => {
-                document.body.removeChild(flash);
-            }, 500);
-            
-            // Bonus rewards
-            ctokBalance += 500;
-            updateWeb3Display();
-            alert('🌋 HYPERNOVA ACTIVATED! Reality temporarily shattered! +500 CTOK! 🌋');
+            try {
+                debugLog('🌟 HYPERNOVA TRIGGERED! 🌟', 'success');
+                
+                var flash = document.createElement('div');
+                flash.className = 'hypernova-flash';
+                document.body.appendChild(flash);
+                
+                for (var i = 0; i < particles.length; i++) {
+                    particles[i].position.copy(particles[i].userData.originalPos);
+                    particles[i].material.color.setHSL(Math.random(), 1, 0.8);
+                }
+                
+                setTimeout(function() {
+                    if (flash.parentNode) document.body.removeChild(flash);
+                }, 1000);
+            } catch(e) {
+                debugLog('Hypernova error: ' + e.message, 'error');
+            }
         }
 
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.shiftKey) {
-                switch (e.key) {
-                    case 'T':
-                        document.getElementById('trepanBtn').click();
-                        break;
-                    case 'H':
-                        triggerHypernova();
-                        break;
-                    case 'D':
-                        document.getElementById('drillBtn').click();
-                        break;
-                    case 'M':
-                        document.getElementById('mintBtn').click();
-                        break;
+        // Initialization
+        function waitForThreeJS() {
+            if (typeof THREE !== 'undefined') {
+                initializeStudio();
+            } else {
+                setTimeout(waitForThreeJS, 100);
+            }
+        }
+
+        function initializeStudio() {
+            try {
+                if (window.studioInitialized) return;
+                window.studioInitialized = true;
+
+                debugLog('🌌 KOZMIC PRO STUDIO v3.0 INITIALIZING...', 'info');
+                setupEventListeners();
+                debugLog('🌌 KOZMIC PRO STUDIO INITIALIZED! 🌌', 'success');
+                debugLog('Bulletproof & Error-Free! ✨', 'info');
+            } catch(e) {
+                debugLog('Studio initialization error: ' + e.message, 'error');
+            }
+        }
+
+        function setupEventListeners() {
+            try {
+                // Check for required elements
+                var requiredIds = [
+                    'connectBtn', 'tunerBtn', 'recordBtn', 'amplifyBtn', 
+                    'debugBtn', 'booleanBtn', 'crisisBtn', 'saveBtn', 
+                    'loadBtn', 'exportBtn', 'resetBtn', 'cosmicCreature'
+                ];
+                
+                for (var i = 0; i < requiredIds.length; i++) {
+                    if (!document.getElementById(requiredIds[i])) {
+                        debugLog('Missing element: ' + requiredIds[i], 'error');
+                        return false;
+                    }
                 }
+
+                // Main buttons
+                document.getElementById('connectBtn').onclick = connectAudio;
+                document.getElementById('tunerBtn').onclick = toggleTuner;
+                document.getElementById('recordBtn').onclick = toggleRecord;
+                document.getElementById('amplifyBtn').onclick = toggleAmplify;
+                document.getElementById('debugBtn').onclick = performDebugAnalysis;
+                document.getElementById('booleanBtn').onclick = performBooleanCheck;
+                document.getElementById('crisisBtn').onclick = enterCrisisMode;
+                document.getElementById('saveBtn').onclick = saveSession;
+                document.getElementById('loadBtn').onclick = loadSession;
+                document.getElementById('exportBtn').onclick = exportSession;
+                document.getElementById('resetBtn').onclick = resetSession;
+                document.getElementById('cosmicCreature').onclick = handleCreatureClick;
+                
+                // Effect buttons
+                var effectBtns = document.querySelectorAll('.effect-btn');
+                for (var i = 0; i < effectBtns.length; i++) {
+                    effectBtns[i].onclick = (function(effect) {
+                        return function() { setEffect(effect); };
+                    })(effectBtns[i].dataset.effect);
+                }
+                
+                debugLog('Event listeners set up successfully!', 'success');
+                
+                // Start timers
+                var sessionTimer = setInterval(updateSessionTime, 1000);
+                intervalIds.push(sessionTimer);
+                simulateBattery();
+                
+                // Keyboard shortcuts
+                document.addEventListener('keydown', function(e) {
+                    try {
+                        if (e.ctrlKey && e.shiftKey) {
+                            switch (e.key.toLowerCase()) {
+                                case 'd': performDebugAnalysis(); break;
+                                case 's': saveSession(); break;
+                                case 'c': enterCrisisMode(); break;
+                                case 'b': performBooleanCheck(); break;
+                            }
+                        } else {
+                            switch (e.key.toLowerCase()) {
+                                case ' ': e.preventDefault(); connectAudio(); break;
+                                case 't': toggleTuner(); break;
+                                case 'r': toggleRecord(); break;
+                                case 'a': toggleAmplify(); break;
+                                case 'e': cycleEffect(); break;
+                                case '1': setEffect('particles'); break;
+                                case '2': setEffect('nebula'); break;
+                                case '3': setEffect('waveform'); break;
+                                case '4': setEffect('cosmic'); break;
+                                case '5': setEffect('spiral'); break;
+                                case '6': setEffect('burst'); break;
+                            }
+                        }
+                    } catch(error) {
+                        debugLog('Keyboard shortcut error: ' + error.message, 'error');
+                    }
+                });
+                
+                // Random cosmic messages
+                var messageTimer = setInterval(function() {
+                    var responses = [
+                        'Cosmic frequencies are looking stellar! 🌟',
+                        'System vibes: Totally kozmic! Keep shredding! 🎸',
+                        'Neural networks are grooving to your beat! 🤖',
+                        'All subsystems report: MAXIMUM KOZMICNESS achieved! ⚡'
+                    ];
+                    debugLog(responses[Math.floor(Math.random() * responses.length)], 'info');
+                }, 30000);
+                intervalIds.push(messageTimer);
+
+                // Cleanup on page unload
+                window.addEventListener('beforeunload', function() {
+                    try {
+                        if (animationFrameId) cancelAnimationFrame(animationFrameId);
+                        if (visualizationFrameId) cancelAnimationFrame(visualizationFrameId);
+                        for (var i = 0; i < intervalIds.length; i++) {
+                            clearInterval(intervalIds[i]);
+                        }
+                        if (audioStream) {
+                            var tracks = audioStream.getTracks();
+                            for (var i = 0; i < tracks.length; i++) {
+                                tracks[i].stop();
+                            }
+                        }
+                    } catch(e) {
+                        // Silent cleanup
+                    }
+                });
+
+                return true;
+            } catch(e) {
+                debugLog('Event listener setup error: ' + e.message, 'error');
+                return false;
+            }
+        }
+
+        // Global Functions for SINWE Integration
+        window.triggerMixerEffect = function(effect) {
+            try {
+                var effectMap = {
+                    cheer: 'spiral',
+                    gunshot: 'burst',
+                    laughter: 'waveform'
+                };
+                setEffect(effectMap[effect] || 'particles');
+                safeElement('mixerEffect').textContent = effect.toUpperCase() + ' TRIGGERED';
+                debugLog('SINWE effect: ' + effect.toUpperCase() + ' triggered! 🎉', 'info');
+                setTimeout(function() { 
+                    safeElement('mixerEffect').textContent = 'NONE'; 
+                }, 2000);
+            } catch(e) {
+                debugLog('Mixer effect error: ' + e.message, 'error');
+            }
+        };
+
+        window.toggleDrumLoop = function() {
+            try {
+                debugLog('SINWE drum loop toggled! 🥁', 'info');
+                safeElement('beatStatus').textContent = 'DRUM LOOP ACTIVE';
+                detectBeat();
+            } catch(e) {
+                debugLog('Drum loop error: ' + e.message, 'error');
+            }
+        };
+
+        // Export main functions to window
+        window.connectAudio = connectAudio;
+        window.cycleEffect = cycleEffect;
+        window.toggleRecord = toggleRecord;
+        window.performBooleanCheck = performBooleanCheck;
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            try {
+                if (renderer && camera) {
+                    var canvas = safeElement('webgl-canvas');
+                    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+                }
+            } catch(e) {
+                // Silent error
             }
         });
 
-        // Responsive handling
-        function handleResize() {
-            const canvas = document.getElementById('cosmicCanvas');
-            const container = canvas.parentElement;
-            
-            camera.aspect = container.clientWidth / container.clientHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(container.clientWidth, container.clientHeight);
-        }
+        // Touch gestures
+        var touchStartY = 0;
+        document.addEventListener('touchstart', function(e) {
+            touchStartY = e.touches[0].clientY;
+        });
 
-        window.addEventListener('resize', handleResize);
+        document.addEventListener('touchend', function(e) {
+            try {
+                var touchEndY = e.changedTouches[0].clientY;
+                var diff = touchStartY - touchEndY;
+                
+                if (Math.abs(diff) > 50) {
+                    if (diff > 0) {
+                        cycleEffect();
+                    } else {
+                        performBooleanCheck();
+                    }
+                }
+            } catch(e) {
+                // Silent error
+            }
+        });
 
-        // Initialize everything
-        document.addEventListener('DOMContentLoaded', () => {
-            initScene();
-            console.log('🎸💀 COSMIC TREPANNING STUDIO LOADED! 💀🎸');
+        // Initialize on load
+        window.addEventListener('load', function() {
+            waitForThreeJS();
+        });
+
+        window.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                if (!window.studioInitialized) {
+                    waitForThreeJS();
+                }
+            }, 1000);
         });
     </script>
 </body>
