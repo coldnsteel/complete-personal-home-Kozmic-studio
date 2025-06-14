@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kozmic Pro Studio - Ultimate Portable Edition v3.0</title>
+    <title>Kozmic Pro Studio - SINWE Edition</title>
     <style>
         * {
             margin: 0;
@@ -13,1473 +13,1636 @@
 
         body {
             font-family: 'Courier New', monospace;
-            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 50%, #16213e 100%);
-            color: #ffffff;
-            overflow-x: hidden;
+            background: linear-gradient(45deg, #1a1a2e, #16213e, #0f3460);
+            color: white;
+            overflow-x: auto;
             min-height: 100vh;
+            animation: cosmicPulse 4s ease-in-out infinite alternate;
         }
 
-        .studio-container {
+        @keyframes cosmicPulse {
+            0% { background: linear-gradient(45deg, #1a1a2e, #16213e, #0f3460); }
+            100% { background: linear-gradient(45deg, #16213e, #0f3460, #1a1a2e); }
+        }
+
+        .container {
             display: grid;
-            grid-template-areas: 
-                "header header"
-                "main controls"
-                "canvas canvas"
-                "console console";
-            grid-template-columns: 2fr 1fr;
-            grid-template-rows: auto auto 300px auto;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 20px;
             padding: 20px;
-            min-height: 100vh;
+            max-width: 1600px;
+            margin: 0 auto;
         }
 
-        .studio-header {
-            grid-area: header;
-            text-align: center;
-            background: rgba(255, 107, 157, 0.1);
+        .module {
+            background: rgba(44, 44, 78, 0.9);
             border: 2px solid #ff6b9d;
             border-radius: 15px;
             padding: 20px;
-            position: relative;
-            overflow: hidden;
+            box-shadow: 0 0 20px rgba(255, 107, 157, 0.3);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
 
-        .studio-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255, 107, 157, 0.1), transparent);
-            animation: headerShine 3s infinite;
+        .module:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 30px rgba(255, 107, 157, 0.5);
         }
 
-        @keyframes headerShine {
-            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-        }
-
-        .studio-title {
-            font-size: 2.5rem;
+        .module h2 {
+            text-align: center;
+            margin-bottom: 20px;
             color: #ff6b9d;
-            text-shadow: 0 0 20px #ff6b9d;
-            margin-bottom: 10px;
-            position: relative;
-            z-index: 1;
+            text-shadow: 0 0 10px rgba(255, 107, 157, 0.5);
+            font-size: 1.5em;
         }
 
-        .studio-subtitle {
-            color: #64ffda;
-            font-size: 1.2rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .main-controls {
-            grid-area: main;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .control-section {
-            background: rgba(100, 255, 218, 0.05);
-            border: 1px solid #64ffda;
-            border-radius: 10px;
-            padding: 15px;
-        }
-
-        .control-section h3 {
-            color: #64ffda;
-            margin-bottom: 10px;
-            font-size: 1.1rem;
-        }
-
-        .kozmic-btn {
-            background: linear-gradient(45deg, #ff6b9d, #64ffda);
+        .btn {
+            background: linear-gradient(45deg, #ff6b9d, #4ecdc4);
             border: none;
             padding: 12px 20px;
-            border-radius: 8px;
-            color: #000;
-            font-weight: bold;
+            border-radius: 25px;
+            color: white;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: inherit;
+            font-weight: bold;
             margin: 5px;
-            min-width: 120px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
-        .kozmic-btn:hover {
+        .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 107, 157, 0.4);
+            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.4);
         }
 
-        .kozmic-btn:active {
-            transform: translateY(0);
+        .btn.active {
+            background: linear-gradient(45deg, #4ade80, #64ffda);
+            box-shadow: 0 0 15px rgba(74, 222, 128, 0.5);
         }
 
-        .status-panel {
-            grid-area: controls;
+        .input-section {
             display: flex;
             flex-direction: column;
             gap: 15px;
         }
 
-        .status-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        select {
+            background: rgba(44, 44, 78, 0.8);
+            color: white;
+            border: 2px solid #ff6b9d;
             padding: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 5px;
-            border-left: 3px solid #ff6b9d;
+            border-radius: 10px;
+            font-size: 14px;
         }
 
-        .status-value {
-            color: #64ffda;
-            font-weight: bold;
-        }
-
-        .canvas-container {
-            grid-area: canvas;
+        .guitar-visual {
             position: relative;
-            border: 2px solid #64ffda;
-            border-radius: 15px;
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #2c2c4e, #1a1a2e);
+            border-radius: 10px;
             overflow: hidden;
-            background: rgba(0, 0, 0, 0.8);
+            margin: 15px 0;
         }
 
-        #webgl-canvas {
+        #videoFeed {
             width: 100%;
             height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+            display: none;
+        }
+
+        #videoFeed.active {
             display: block;
         }
 
-        .cosmic-creature {
+        #noVideoOverlay {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 4rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            z-index: 10;
-            text-shadow: 0 0 20px #ff6b9d;
-            user-select: none;
-        }
-
-        .cosmic-creature:hover {
-            transform: translate(-50%, -50%) scale(1.1);
-            text-shadow: 0 0 30px #ff6b9d;
-        }
-
-        .creature-pulse {
-            animation: creaturePulse 0.6s ease-out;
-        }
-
-        @keyframes creaturePulse {
-            0% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.3); }
-            100% { transform: translate(-50%, -50%) scale(1); }
-        }
-
-        .effects-bar {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 10px;
+            text-align: center;
+            color: #fff;
+            font-size: 14px;
             z-index: 5;
         }
 
-        .effect-btn {
-            background: rgba(100, 255, 218, 0.2);
-            border: 1px solid #64ffda;
-            color: #64ffda;
-            padding: 8px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.8rem;
+        .string {
+            position: absolute;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to bottom, #ffd700, #ffed4e);
+            box-shadow: 0 0 5px #ffd700;
         }
 
-        .effect-btn:hover, .effect-btn.active {
-            background: #64ffda;
-            color: #000;
-            transform: translateY(-2px);
-        }
-
-        .console-container {
-            grid-area: console;
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid #64ffda;
-            border-radius: 10px;
-            padding: 15px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .console-header {
-            color: #64ffda;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        .heuristic-console {
-            font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
-            line-height: 1.4;
-        }
-
-        .log-entry {
-            margin: 2px 0;
-            padding: 2px 5px;
-            border-radius: 3px;
-        }
-
-        .log-info { color: #64ffda; }
-        .log-success { color: #4ade80; background: rgba(74, 222, 128, 0.1); }
-        .log-warning { color: #fcd34d; background: rgba(252, 211, 77, 0.1); }
-        .log-error { color: #f87171; background: rgba(248, 113, 113, 0.1); }
-
-        .power-bar-container {
-            background: rgba(0, 0, 0, 0.5);
+        .volume-meter {
+            width: 100%;
             height: 20px;
+            background: #2c2c4e;
             border-radius: 10px;
             overflow: hidden;
-            position: relative;
-        }
-
-        .power-bar {
-            background: linear-gradient(90deg, #64ffda, #ff6b9d);
-            height: 100%;
-            width: 0%;
-            transition: width 0.1s ease;
-            border-radius: 10px;
-        }
-
-        .frequency-visualizer {
-            display: flex;
-            align-items: flex-end;
-            height: 40px;
-            gap: 2px;
             margin: 10px 0;
         }
 
-        .freq-bar {
-            background: linear-gradient(to top, #64ffda, #ff6b9d);
+        .volume-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, #4ecdc4, #ff6b9d);
+            transition: width 0.1s ease;
+        }
+
+        .status-display {
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 10px;
+            border-left: 4px solid #4ecdc4;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .sinwe-mixer {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .mixer-section {
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #64ffda;
+        }
+
+        .mixer-section h4 {
+            color: #64ffda;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .effects-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .effect-btn {
+            background: rgba(44, 44, 78, 0.7);
+            border: 1px solid #ff6b9d;
+            color: #ff6b9d;
+            padding: 8px 6px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .effect-btn:hover, .effect-btn.active {
+            background: #ff6b9d;
+            color: #000;
+            transform: translateY(-1px);
+        }
+
+        .slider-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 5px 0;
+        }
+
+        .slider-control label {
+            color: #4ecdc4;
+            font-size: 11px;
+            min-width: 60px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            background: transparent;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-track {
+            background: #2c2c4e;
+            height: 6px;
+            border-radius: 3px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            background: #ff6b9d;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            cursor: pointer;
+            -webkit-appearance: none;
+            box-shadow: 0 0 5px rgba(255, 107, 157, 0.5);
+        }
+
+        .level-indicator {
+            display: flex;
+            gap: 2px;
+            margin: 5px 0;
+        }
+
+        .level-bar {
             width: 4px;
-            min-height: 2px;
+            height: 20px;
+            background: #2c2c4e;
             border-radius: 2px;
-            transition: height 0.1s ease;
+            transition: background 0.1s ease;
         }
 
-        .hypernova-flash {
+        .level-bar.active-green { background: #4ade80; }
+        .level-bar.active-yellow { background: #fcd34d; }
+        .level-bar.active-red { background: #f87171; }
+
+        .checklist-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .checklist-section label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .checklist-section label:hover {
+            background: rgba(255, 107, 157, 0.1);
+        }
+
+        .checklist-section input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #ff6b9d;
+        }
+
+        #guitarStatus {
+            font-weight: bold;
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .cosmic-creature {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, transparent 70%);
-            z-index: 9999;
-            pointer-events: none;
-            animation: hypernovaFlash 1s ease-out;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, #ff6b9d, #4ecdc4);
+            border-radius: 50%;
+            z-index: 1000;
+            animation: float 3s ease-in-out infinite;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 107, 157, 0.5);
         }
 
-        @keyframes hypernovaFlash {
-            0% { opacity: 0; transform: scale(0); }
-            50% { opacity: 1; transform: scale(1); }
-            100% { opacity: 0; transform: scale(2); }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
         }
 
-        @media (max-width: 768px) {
-            .studio-container {
-                grid-template-areas: 
-                    "header"
-                    "main"
-                    "controls"
-                    "canvas"
-                    "console";
-                grid-template-columns: 1fr;
-            }
-            
-            .studio-title { font-size: 2rem; }
-            .cosmic-creature { font-size: 3rem; }
+        .pulse {
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .drum-pad {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #64ffda, #4ecdc4);
+            border: 2px solid #ff6b9d;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .drum-pad:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(100, 255, 218, 0.5);
+        }
+
+        .drum-pad.active {
+            background: linear-gradient(45deg, #ff6b9d, #fcd34d);
+        }
+
+        .rhythm-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 15px;
         }
     </style>
 </head>
 <body>
-    <div class="studio-container">
-        <header class="studio-header">
-            <h1 class="studio-title">🌌 KOZMIC PRO STUDIO 🌌</h1>
-            <p class="studio-subtitle">Ultimate Portable Edition v3.0 - SINWE Compatible</p>
-        </header>
-
-        <section class="main-controls">
-            <div class="control-section">
-                <h3>🎵 Audio Controls</h3>
-                <button id="connectBtn" class="kozmic-btn">CONNECT</button>
-                <button id="tunerBtn" class="kozmic-btn">TUNER</button>
-                <button id="recordBtn" class="kozmic-btn">RECORD</button>
-                <button id="amplifyBtn" class="kozmic-btn">AMPLIFY</button>
-            </div>
-
-            <div class="control-section">
-                <h3>🔧 System Analysis</h3>
-                <button id="debugBtn" class="kozmic-btn">DEBUG</button>
-                <button id="booleanBtn" class="kozmic-btn">BOOLEAN</button>
-                <button id="crisisBtn" class="kozmic-btn">CRISIS</button>
-            </div>
-
-            <div class="control-section">
-                <h3>💾 Session Management</h3>
-                <button id="saveBtn" class="kozmic-btn">SAVE</button>
-                <button id="loadBtn" class="kozmic-btn">LOAD</button>
-                <button id="exportBtn" class="kozmic-btn">EXPORT</button>
-                <button id="resetBtn" class="kozmic-btn">RESET</button>
-            </div>
-        </section>
-
-        <aside class="status-panel">
-            <div class="status-item">
-                <span>Input Status:</span>
-                <span id="inputStatus" class="status-value">READY</span>
-            </div>
-            <div class="status-item">
-                <span>Current Effect:</span>
-                <span id="currentEffect" class="status-value">PARTICLES</span>
-            </div>
-            <div class="status-item">
-                <span>Audio Level:</span>
-                <span id="audioLevel" class="status-value">0%</span>
-            </div>
-            <div class="status-item">
-                <span>Session Time:</span>
-                <span id="sessionTime" class="status-value">0:00</span>
-            </div>
-            <div class="status-item">
-                <span>Audio Boolean:</span>
-                <span id="audioBoolean" class="status-value">FALSE ❌</span>
-            </div>
-            <div class="status-item">
-                <span>WebGL Boolean:</span>
-                <span id="webglBoolean" class="status-value">FALSE ❌</span>
-            </div>
-            <div class="status-item">
-                <span>Pitch Display:</span>
-                <span id="pitchDisplay" class="status-value">--</span>
-            </div>
-            <div class="status-item">
-                <span>Dominant Freq:</span>
-                <span id="dominantFreq" class="status-value">--</span>
-            </div>
-            <div class="status-item">
-                <span>SINWE Effect:</span>
-                <span id="mixerEffect" class="status-value">NONE</span>
-            </div>
-            <div class="status-item">
-                <span>Beat Status:</span>
-                <span id="beatStatus" class="status-value">READY</span>
-            </div>
-            <div class="status-item">
-                <span>Power Level:</span>
-                <div class="power-bar-container">
-                    <div id="powerBar" class="power-bar"></div>
+    <div class="container">
+        <!-- 1. Input Module -->
+        <div class="module">
+            <h2>🎤🎸 Input Pod</h2>
+            <div class="input-section">
+                <select id="inputType">
+                    <option value="guitar">Guitar Only 🎸</option>
+                    <option value="mic">Mic Only 🎙️</option>
+                    <option value="video">Video Only 📷</option>
+                    <option value="guitar-mic">Guitar + Mic 🎸🎙️</option>
+                    <option value="video-mic">Video + Mic 📷🎙️</option>
+                </select>
+                <button class="btn" id="connectInput">Connect Input</button>
+                <button class="btn" id="recordAudioBtn">Record Audio 🎙</button>
+                <button class="btn" id="recordVideoBtn">Record Video 🎥</button>
+                
+                <div class="guitar-visual" id="guitarVisual">
+                    <video id="videoFeed" autoplay muted></video>
+                    <div id="noVideoOverlay">
+                        🎸 Input Ready<br><small>Connect device to start</small>
+                    </div>
+                    <div class="string" style="left: 15%;"></div>
+                    <div class="string" style="left: 25%;"></div>
+                    <div class="string" style="left: 35%;"></div>
+                    <div class="string" style="left: 45%;"></div>
+                    <div class="string" style="left: 55%;"></div>
+                    <div class="string" style="left: 65%;"></div>
                 </div>
-            </div>
-            <div class="status-item">
-                <span>Level Status:</span>
-                <span id="levelStatus" class="status-value">0%</span>
-            </div>
-            <div class="status-item">
-                <span>Battery:</span>
-                <span id="batteryText" class="status-value">85% - Ready</span>
-                <div class="power-bar-container">
-                    <div id="batteryLevel" class="power-bar"></div>
+                
+                <div class="volume-meter">
+                    <div class="volume-bar" id="volumeBar"></div>
                 </div>
+                
+                <div class="slider-control">
+                    <label>Input Gain:</label>
+                    <input type="range" id="inputGain" min="0" max="100" value="50">
+                </div>
+                
+                <div class="status-display" id="inputStatus">Ready for inputs...<br>Click "Connect Input" to start!</div>
+                <div id="guitarStatus">Guitar: Not Connected</div>
             </div>
-            <div class="frequency-visualizer">
-                <div class="freq-bar"></div>
-                <div class="freq-bar"></div>
-                <div class="freq-bar"></div>
-                <div class="freq-bar"></div>
-                <div class="freq-bar"></div>
-                <div class="freq-bar"></div>
-                <div class="freq-bar"></div>
-                <div class="freq-bar"></div>
-                <div class="freq-bar"></div>
-                <div class="freq-bar"></div>
-                <div class="freq-bar"></div>
-                <div class="freq-bar"></div>
-                <div class="freq-bar"></div>
-                <div class="freq-bar"></div>
-                <div class="freq-bar"></div>
-                <div class="freq-bar"></div>
-            </div>
-        </aside>
+        </div>
 
-        <section class="canvas-container">
-            <canvas id="webgl-canvas"></canvas>
-            <div id="cosmicCreature" class="cosmic-creature">🌌</div>
-            <div class="effects-bar">
-                <button class="effect-btn active" data-effect="particles">PARTICLES</button>
-                <button class="effect-btn" data-effect="nebula">NEBULA</button>
-                <button class="effect-btn" data-effect="waveform">WAVEFORM</button>
-                <button class="effect-btn" data-effect="cosmic">COSMIC</button>
-                <button class="effect-btn" data-effect="spiral">SPIRAL</button>
-                <button class="effect-btn" data-effect="burst">BURST</button>
+        <!-- 2. SINWE Mixer Module -->
+        <div class="module">
+            <h2>🎛️ SINWE Mixer</h2>
+            <div class="input-section">
+                <div class="sinwe-mixer">
+                    <div class="mixer-section">
+                        <h4>🎵 Recording Modes</h4>
+                        <div class="effects-grid">
+                            <div class="effect-btn" data-mode="primal">Primal</div>
+                            <div class="effect-btn" data-mode="studio">Studio</div>
+                            <div class="effect-btn" data-mode="pro">PRO</div>
+                            <div class="effect-btn" data-mode="pop">POP</div>
+                            <div class="effect-btn" data-mode="mc">MC</div>
+                            <div class="effect-btn" data-mode="karaoke">Karaoke</div>
+                            <div class="effect-btn" data-mode="lightning">Lightning</div>
+                            <div class="effect-btn" data-mode="change">Change</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mixer-section">
+                        <h4>🔊 Sound Effects</h4>
+                        <div class="effects-grid">
+                            <div class="effect-btn" data-effect="cheer">Cheer</div>
+                            <div class="effect-btn" data-effect="din">Din</div>
+                            <div class="effect-btn" data-effect="9277">9277</div>
+                            <div class="effect-btn" data-effect="kiss">Kiss</div>
+                            <div class="effect-btn" data-effect="gunshot">Gunshot</div>
+                            <div class="effect-btn" data-effect="yell">Yell</div>
+                            <div class="effect-btn" data-effect="laughter">Laughter</div>
+                            <div class="effect-btn" data-effect="pubg">PUBG</div>
+                            <div class="effect-btn" data-effect="dindin">Dindin</div>
+                            <div class="effect-btn" data-effect="awesome">Awesome</div>
+                            <div class="effect-btn" data-effect="giggle">Giggle</div>
+                            <div class="effect-btn" data-effect="applause">Applause</div>
+                            <div class="effect-btn" data-effect="slash">Slash</div>
+                            <div class="effect-btn" data-effect="mary">Mary</div>
+                            <div class="effect-btn" data-effect="awkward">Awkward</div>
+                            <div class="effect-btn" data-effect="guys">Guys</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mixer-section">
+                    <h4>🎚️ EQ Controls</h4>
+                    <div class="slider-control">
+                        <label>Treble:</label>
+                        <input type="range" id="treble" min="0" max="100" value="50">
+                        <span id="trebleValue">50%</span>
+                    </div>
+                    <div class="slider-control">
+                        <label>Mid:</label>
+                        <input type="range" id="mid" min="0" max="100" value="50">
+                        <span id="midValue">50%</span>
+                    </div>
+                    <div class="slider-control">
+                        <label>Bass:</label>
+                        <input type="range" id="bass" min="0" max="100" value="50">
+                        <span id="bassValue">50%</span>
+                    </div>
+                    <div class="slider-control">
+                        <label>Echo:</label>
+                        <input type="range" id="echo" min="0" max="100" value="0">
+                        <span id="echoValue">0%</span>
+                    </div>
+                </div>
+                
+                <div class="mixer-section">
+                    <h4>📊 Level Indicators</h4>
+                    <div>Mic Level:</div>
+                    <div class="level-indicator" id="micLevels">
+                        <div class="level-bar"></div><div class="level-bar"></div><div class="level-bar"></div>
+                        <div class="level-bar"></div><div class="level-bar"></div><div class="level-bar"></div>
+                        <div class="level-bar"></div><div class="level-bar"></div><div class="level-bar"></div>
+                        <div class="level-bar"></div>
+                    </div>
+                </div>
+                
+                <div class="sinwe-mixer">
+                    <div class="mixer-section">
+                        <h4>🔧 Functions</h4>
+                        <button class="btn" id="eliminationBtn">Elimination</button>
+                        <button class="btn" id="muteBtn">Mute</button>
+                        <button class="btn" id="denoiseBtn">Denoise</button>
+                        <button class="btn" id="voiceOverBtn">Voice Over</button>
+                    </div>
+                    
+                    <div class="mixer-section">
+                        <h4>📱 Connectivity</h4>
+                        <button class="btn" id="bluetoothBtn">Bluetooth</button>
+                        <button class="btn" id="internalPlayBtn">Internal Play</button>
+                        <div class="status-display" id="connectionStatus">USB-C Connected<br>Ready for 3-phone streaming</div>
+                    </div>
+                </div>
+                
+                <div class="status-display" id="mixerStatus">SINWE Mixer Ready - 44.1kHz/16-bit</div>
             </div>
-        </section>
+        </div>
 
-        <section class="console-container">
-            <div class="console-header">🖥️ Heuristic Console</div>
-            <div id="heuristicConsole" class="heuristic-console"></div>
-        </section>
+        <!-- 3. Rhythm & Beat Module -->
+        <div class="module">
+            <h2>🥁 Rhythm & Beat</h2>
+            <div class="input-section">
+                <button class="btn" id="metronomeBtn">Metronome ⏱️</button>
+                <button class="btn" id="tunerBtn">Guitar Tuner 🎵</button>
+                
+                <div class="slider-control">
+                    <label>BPM:</label>
+                    <input type="range" id="bpmSlider" min="60" max="200" value="120">
+                    <span id="bpmDisplay">120</span>
+                </div>
+                
+                <select id="timeSignature">
+                    <option value="4/4">4/4</option>
+                    <option value="3/4">3/4</option>
+                    <option value="6/8">6/8</option>
+                </select>
+                
+                <div class="rhythm-grid">
+                    <div class="drum-pad" data-sound="kick">KICK</div>
+                    <div class="drum-pad" data-sound="snare">SNARE</div>
+                    <div class="drum-pad" data-sound="hat">HAT</div>
+                    <div class="drum-pad" data-sound="crash">CRASH</div>
+                    <div class="drum-pad" data-sound="ride">RIDE</div>
+                    <div class="drum-pad" data-sound="tom">TOM</div>
+                    <div class="drum-pad" data-sound="clap">CLAP</div>
+                    <div class="drum-pad" data-sound="gallop">GALLOP</div>
+                </div>
+                
+                <div class="status-display" id="rhythmStatus">Rhythm section ready!</div>
+            </div>
+        </div>
+
+        <!-- 4. Streaming Module -->
+        <div class="module">
+            <h2>🎥 Streaming</h2>
+            <div class="input-section">
+                <select id="streamPlatform">
+                    <option value="youtube">YouTube</option>
+                    <option value="twitch">Twitch</option>
+                    <option value="custom">Custom RTMP</option>
+                </select>
+                
+                <button class="btn" id="startStream">Start Stream 🚀</button>
+                
+                <select id="streamQuality">
+                    <option value="4k">4K Ultra HD</option>
+                    <option value="1080p">1080p HD</option>
+                    <option value="720p">720p</option>
+                </select>
+                
+                <div class="status-display" id="streamStatus">Ready to stream...<br>Select platform and start!</div>
+            </div>
+        </div>
+
+        <!-- 5. Master Controls -->
+        <div class="module">
+            <h2>🎚️ Master Controls</h2>
+            <div class="input-section">
+                <button class="btn" id="saveBtn">Save Session 💾</button>
+                <button class="btn" id="loadBtn">Load Session 📂</button>
+                <button class="btn" id="exportBtn">Export Track 🎧</button>
+                
+                <div class="slider-control">
+                    <label>Master Volume:</label>
+                    <input type="range" id="masterVolume" min="0" max="100" value="75">
+                    <span id="masterVolumeValue">75%</span>
+                </div>
+                
+                <button class="btn" id="jamBtn">Start Jam Session 🎸</button>
+                <button class="btn" id="emergencyBtn">Emergency Stop 🛑</button>
+                
+                <div class="status-display" id="masterStatus">Master controls active</div>
+            </div>
+        </div>
+
+        <!-- 6. Equipment Checklist -->
+        <div class="module">
+            <h2>🔌 Equipment Checklist</h2>
+            <div class="checklist-section">
+                <label><input type="checkbox" id="lightning-usbc"> Lightning-to-USB-C (iPhone 6S Plus)</label>
+                <label><input type="checkbox" id="usbc-usbc"> USB-C-to-USB-C (iPhone 16 Pro Max)</label>
+                <label><input type="checkbox" id="xlr-3.5mm"> XLR-to-3.5mm (UHF Mics)</label>
+                <label><input type="checkbox" id="trs-1/4"> 1/4" TRS (Guitar Cable)</label>
+                <label><input type="checkbox" id="hdmi-usbc"> HDMI-to-USB-C (4K Cam)</label>
+                <label><input type="checkbox" id="sinwe-mixer"> SINWE Podcast Mixer</label>
+                <label><input type="checkbox" id="condenser-mic"> SINWE Condenser Microphone</label>
+                <label><input type="checkbox" id="tripod-stand"> Microphone Tripod Stand</label>
+                
+                <button class="btn" id="resetChecklistBtn">Reset Checklist 🔄</button>
+                <button class="btn" id="checkAllBtn">Check All Items ✅</button>
+                
+                <div class="status-display" id="checklistStatus">Check your SINWE equipment setup!</div>
+            </div>
+        </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r165/three.min.js"></script>
+    <div class="cosmic-creature"></div>
+
     <script>
-        // ===== KOZMIC PRO STUDIO v3.0 - BULLETPROOF EDITION =====
+        // ===== KOZMIC PRO STUDIO - SINWE EDITION =====
         
-        // Global State - Using var for maximum compatibility
-        var audioContext, analyser, dataArray, audioStream;
-        var scene, camera, renderer;
-        var particles = [];
-        var currentEffect = 'particles';
-        var isRecording = false;
-        var tunerActive = false;
-        var isAmplified = false;
-        var mediaRecorder, recordedChunks = [];
-        var sessionStart = Date.now();
-        var creatureClicks = 0;
-        var beatDetector = { lastEnergy: 0 };
-        var animationFrameId, visualizationFrameId;
-        var intervalIds = [];
+        // Global Studio State
+        const KozmicStudio = {
+            // Audio System
+            audioContext: null,
+            guitarStream: null,
+            videoStream: null,
+            analyzer: null,
+            dataArray: null,
+            effectsChain: {},
+            
+            // SINWE Mixer State
+            sinwe: {
+                mode: 'primal',
+                activeEffects: new Set(),
+                eq: { treble: 50, mid: 50, bass: 50, echo: 0 },
+                functions: { elimination: false, mute: false, denoise: false, voiceOver: false },
+                connectivity: { bluetooth: false, internalPlay: false }
+            },
+            
+            // Recording System
+            isRecording: false,
+            mediaRecorder: null,
+            recordedChunks: [],
+            
+            // Rhythm System
+            metronomeInterval: null,
+            currentBPM: 120,
+            isMetronomeActive: false,
+            
+            // Streaming System
+            isStreaming: false,
+            
+            // Session State
+            sessionActive: false
+        };
 
-        // Safe Element Access
-        function safeElement(id) {
-            try {
-                var el = document.getElementById(id);
-                if (!el) {
-                    return {
-                        textContent: '',
-                        style: {},
-                        classList: {
-                            add: function() {},
-                            remove: function() {},
-                            contains: function() { return false; }
-                        },
-                        onclick: null
-                    };
-                }
-                return el;
-            } catch(e) {
-                return { textContent: '', style: {}, classList: { add: function() {}, remove: function() {} } };
-            }
-        }
-
-        // Debug Logging
-        function debugLog(message, type) {
-            try {
-                type = type || 'info';
-                var console = safeElement('heuristicConsole');
-                var entry = document.createElement('div');
-                entry.className = 'log-entry log-' + type;
-                var timestamp = new Date().toLocaleTimeString();
-                entry.textContent = '[' + timestamp + '] ' + message;
-                console.appendChild(entry);
-                console.scrollTop = console.scrollHeight;
-                
-                // Also log to browser console
-                window.console.log('[KOZMIC] ' + message);
-            } catch(e) {
-                // Silent fallback
-            }
-        }
-
-        // Audio Level Calculator
-        function getAudioLevel() {
-            try {
-                if (!analyser || !dataArray) return 0;
-                analyser.getByteFrequencyData(dataArray);
-                var sum = 0;
-                for (var i = 0; i < dataArray.length; i++) {
-                    sum += dataArray[i];
-                }
-                var level = sum / (dataArray.length * 255);
-                return Math.min(level, 1);
-            } catch(e) {
-                return 0;
-            }
-        }
-
-        // Pitch Detection Class
-        function PitchDetector() {
-            this.noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-        }
-
-        PitchDetector.prototype.detectPitch = function(audioData) {
-            try {
-                var sampleRate = audioContext ? audioContext.sampleRate : 44100;
-                var frequency = this.autoCorrelate(audioData, sampleRate);
-                if (frequency === -1) return null;
-
-                var note = this.noteFromPitch(frequency);
-                var noteIndex = this.noteNames.indexOf(note);
-                if (noteIndex === -1) return null;
-
-                var cents = this.centsOffFromPitch(frequency, noteIndex);
-
-                return {
-                    frequency: Math.round(frequency * 100) / 100,
-                    note: note,
-                    cents: cents
+        // Utility Functions
+        function safeGetElement(id) {
+            const element = document.getElementById(id);
+            if (!element) {
+                console.warn(`Element with id '${id}' not found`);
+                return { 
+                    style: {}, 
+                    innerHTML: '', 
+                    textContent: '', 
+                    value: '',
+                    classList: { add: () => {}, remove: () => {}, toggle: () => {} },
+                    addEventListener: () => {}
                 };
-            } catch(e) {
-                return null;
             }
-        };
+            return element;
+        }
 
-        PitchDetector.prototype.autoCorrelate = function(buf, sampleRate) {
-            try {
-                var SIZE = buf.length;
-                var MAX_SAMPLES = Math.floor(SIZE / 2);
-                var best_offset = -1;
-                var best_correlation = 0;
-                var rms = 0;
-
-                for (var i = 0; i < SIZE; i++) {
-                    var val = buf[i];
-                    rms += val * val;
-                }
-                rms = Math.sqrt(rms / SIZE);
-                if (rms < 0.01) return -1;
-
-                var lastCorrelation = 1;
-                for (var offset = 20; offset < MAX_SAMPLES; offset++) {
-                    var correlation = 0;
-
-                    for (var i = 0; i < MAX_SAMPLES; i++) {
-                        correlation += Math.abs(buf[i] - buf[i + offset]);
-                    }
-                    correlation = 1 - (correlation / MAX_SAMPLES);
-
-                    if (correlation > 0.9 && correlation > lastCorrelation) {
-                        if (correlation > best_correlation) {
-                            best_correlation = correlation;
-                            best_offset = offset;
-                        }
-                    }
-                    lastCorrelation = correlation;
-                }
-                
-                if (best_correlation > 0.01 && best_offset > 0) {
-                    return sampleRate / best_offset;
-                }
-                return -1;
-            } catch(e) {
-                return -1;
-            }
-        };
-
-        PitchDetector.prototype.noteFromPitch = function(frequency) {
-            try {
-                if (!frequency || frequency <= 0) return this.noteNames[0];
-                var noteNum = 12 * (Math.log(frequency / 440) / Math.log(2));
-                var noteIndex = Math.round(noteNum + 69) % 12;
-                if (noteIndex < 0) noteIndex += 12;
-                return this.noteNames[noteIndex] || this.noteNames[0];
-            } catch(e) {
-                return this.noteNames[0];
-            }
-        };
-
-        PitchDetector.prototype.centsOffFromPitch = function(frequency, noteNum) {
-            try {
-                if (!frequency || frequency <= 0 || noteNum < 0) return 0;
-                var expectedFreq = 440 * Math.pow(2, (noteNum - 9) / 12);
-                var cents = 1200 * Math.log2(frequency / expectedFreq);
-                return Math.floor(cents) || 0;
-            } catch(e) {
-                return 0;
-            }
-        };
-
-        var pitchDetector = new PitchDetector();
-
-        // Audio Connection
-        function connectAudio() {
-            try {
-                navigator.mediaDevices.getUserMedia({ 
-                    audio: {
-                        echoCancellation: false,
-                        noiseSuppression: false,
-                        autoGainControl: false,
-                        sampleRate: 44100
-                    } 
-                }).then(function(stream) {
-                    audioStream = stream;
-                    
-                    var AudioContext = window.AudioContext || window.webkitAudioContext;
-                    audioContext = new AudioContext();
-                    var source = audioContext.createMediaStreamSource(audioStream);
-                    analyser = audioContext.createAnalyser();
-                    analyser.fftSize = 2048;
-                    dataArray = new Uint8Array(analyser.frequencyBinCount);
-                    source.connect(analyser);
-
-                    safeElement('inputStatus').textContent = 'LIVE';
-                    safeElement('connectBtn').textContent = 'CONNECTED';
-                    debugLog('Audio connected successfully! 🎵', 'success');
-                    
-                    if (!renderer) initWebGL();
-                    startVisualization();
-                    updateBooleans();
-                }).catch(function(error) {
-                    debugLog('Audio connection failed: ' + error.message, 'error');
-                    alert('Please allow microphone access for the full Kozmic experience!');
-                });
-            } catch(e) {
-                debugLog('Connect audio error: ' + e.message, 'error');
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            console.log(`[${timestamp}] KOZMIC: ${message}`);
+            
+            // Update relevant status displays
+            if (type === 'mixer') {
+                safeGetElement('mixerStatus').innerHTML = `SINWE: ${message}`;
             }
         }
 
-        // Recording Functions
-        function toggleRecord() {
-            try {
-                if (!audioStream) {
-                    debugLog('Connect audio first!', 'warning');
-                    return;
-                }
-
-                if (!isRecording) {
-                    recordedChunks = [];
-                    mediaRecorder = new MediaRecorder(audioStream);
-                    
-                    mediaRecorder.ondataavailable = function(event) {
-                        if (event.data.size > 0) recordedChunks.push(event.data);
-                    };
-                    
-                    mediaRecorder.onstop = function() {
-                        try {
-                            var blob = new Blob(recordedChunks, { type: 'audio/webm' });
-                            var url = URL.createObjectURL(blob);
-                            var a = document.createElement('a');
-                            a.href = url;
-                            a.download = 'kozmic-session-' + Date.now() + '.webm';
-                            a.click();
-                            URL.revokeObjectURL(url);
-                            debugLog('Recording saved! 💾', 'success');
-                        } catch(e) {
-                            debugLog('Save recording error: ' + e.message, 'error');
-                        }
-                    };
-                    
-                    mediaRecorder.start();
-                    isRecording = true;
-                    safeElement('recordBtn').textContent = 'STOP';
-                    debugLog('Recording started 🔴', 'info');
-                } else {
-                    if (mediaRecorder) mediaRecorder.stop();
-                    isRecording = false;
-                    safeElement('recordBtn').textContent = 'RECORD';
-                    debugLog('Recording stopped ⏹️', 'info');
-                }
-                updateBooleans();
-            } catch(e) {
-                debugLog('Toggle record error: ' + e.message, 'error');
-            }
-        }
-
-        function toggleTuner() {
-            try {
-                tunerActive = !tunerActive;
-                safeElement('tunerBtn').textContent = tunerActive ? 'TUNER ON' : 'TUNER';
-                debugLog('Guitar tuner ' + (tunerActive ? 'activated' : 'deactivated') + ' 🎸', 'info');
-                updateBooleans();
-            } catch(e) {
-                debugLog('Toggle tuner error: ' + e.message, 'error');
-            }
-        }
-
-        function toggleAmplify() {
-            try {
-                isAmplified = !isAmplified;
-                safeElement('amplifyBtn').textContent = isAmplified ? 'AMPLIFIED' : 'AMPLIFY';
-                debugLog('Audio amplification ' + (isAmplified ? 'ON' : 'OFF') + ' ⚡', 'info');
-                updateBooleans();
-            } catch(e) {
-                debugLog('Toggle amplify error: ' + e.message, 'error');
-            }
-        }
-
-        // WebGL Initialization
-        function initWebGL() {
-            try {
-                var canvas = safeElement('webgl-canvas');
-                if (!canvas || !window.WebGLRenderingContext) {
-                    debugLog('WebGL not supported!', 'error');
-                    return;
-                }
-
-                var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-                if (!gl) {
-                    debugLog('WebGL context creation failed!', 'error');
-                    return;
-                }
-
-                if (typeof THREE === 'undefined') {
-                    debugLog('Three.js not loaded!', 'error');
-                    return;
-                }
-
-                scene = new THREE.Scene();
-                camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-                renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-                renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-                renderer.setClearColor(0x000000, 0.1);
-
-                // Create particles
-                var particleCount = 100;
-                for (var i = 0; i < particleCount; i++) {
-                    var geometry = new THREE.SphereGeometry(0.05, 8, 8);
-                    var material = new THREE.MeshBasicMaterial({ 
-                        color: new THREE.Color().setHSL(Math.random(), 1, 0.5),
-                        transparent: true,
-                        opacity: 0.8
-                    });
-                    var particle = new THREE.Mesh(geometry, material);
-                    
-                    particle.position.set(
-                        (Math.random() - 0.5) * 10,
-                        (Math.random() - 0.5) * 10,
-                        (Math.random() - 0.5) * 10
-                    );
-                    
-                    particle.userData = {
-                        originalPos: particle.position.clone(),
-                        phase: Math.random() * Math.PI * 2,
-                        speed: 0.5 + Math.random() * 1.5
-                    };
-                    
-                    scene.add(particle);
-                    particles.push(particle);
-                }
-
-                camera.position.z = 8;
-                
-                debugLog('WebGL initialized! 🌌', 'success');
-                updateBooleans();
-                animate();
-            } catch(e) {
-                debugLog('WebGL initialization error: ' + e.message, 'error');
-            }
-        }
-
-        // Animation Loop
-        function animate() {
-            try {
-                if (!renderer || !scene || !camera) return;
-                animationFrameId = requestAnimationFrame(animate);
-                updateParticleEffects();
-                renderer.render(scene, camera);
-            } catch(e) {
-                // Silent error to prevent spam
-            }
-        }
-
-        // Particle Effects
-        function updateParticleEffects() {
-            try {
-                if (!particles.length) return;
-
-                var time = Date.now() * 0.001;
-                var audioLevel = getAudioLevel();
-                var multiplier = isAmplified ? 2 : 1;
-                var creature = safeElement('cosmicCreature');
-
-                for (var i = 0; i < particles.length; i++) {
-                    var particle = particles[i];
-                    var userData = particle.userData;
-                    var phase = userData.phase + time * userData.speed;
-
-                    switch (currentEffect) {
-                        case 'particles':
-                            particle.position.x = userData.originalPos.x + Math.sin(phase) * audioLevel * 2 * multiplier;
-                            particle.position.y = userData.originalPos.y + Math.cos(phase * 1.3) * audioLevel * 2 * multiplier;
-                            particle.position.z = userData.originalPos.z + Math.sin(phase * 0.7) * audioLevel * multiplier;
-                            break;
-
-                        case 'nebula':
-                            var radius = 3 + audioLevel * 2 * multiplier;
-                            particle.position.x = Math.cos(phase + i * 0.1) * radius;
-                            particle.position.y = Math.sin(phase + i * 0.1) * radius;
-                            particle.position.z = Math.sin(time * 0.5 + i * 0.05) * audioLevel * 3;
-                            break;
-
-                        case 'waveform':
-                            particle.position.x = (i / particles.length) * 10 - 5;
-                            particle.position.y = Math.sin(time * 2 + i * 0.2) * audioLevel * 3 * multiplier;
-                            particle.position.z = Math.cos(time + i * 0.1) * audioLevel * 2;
-                            break;
-
-                        case 'cosmic':
-                            var distance = particle.position.length();
-                            if (distance > 0.1) {
-                                particle.position.multiplyScalar(1 - (0.02 + audioLevel * 0.03));
-                                particle.position.applyAxisAngle(new THREE.Vector3(0, 0, 1), 0.1);
-                            } else {
-                                particle.position.copy(userData.originalPos);
-                            }
-                            break;
-
-                        case 'spiral':
-                            var spiralRadius = 2 + audioLevel * 3 * multiplier;
-                            var spiralSpeed = 0.02 + audioLevel * 0.05;
-                            particle.position.x = Math.cos(time * spiralSpeed + i * 0.3) * spiralRadius;
-                            particle.position.y = Math.sin(time * spiralSpeed + i * 0.3) * spiralRadius;
-                            particle.position.z = (i / particles.length) * 6 - 3 + Math.sin(time + i * 0.1) * audioLevel * 2;
-                            break;
-
-                        case 'burst':
-                            if (audioLevel > 0.6) {
-                                var burstForce = (audioLevel - 0.6) * 0.5;
-                                var direction = particle.position.clone().normalize();
-                                particle.position.addScaledVector(direction, burstForce);
-                            }
-                            if (particle.position.length() > 8) {
-                                particle.position.copy(userData.originalPos);
-                            }
-                            break;
-                    }
-
-                    // Color effects
-                    var hue = (time * 0.1 + i * 0.01 + audioLevel * 0.5) % 1;
-                    particle.material.color.setHSL(hue, 1, 0.5 + audioLevel * 0.3);
-                    particle.material.opacity = 0.5 + audioLevel * 0.5;
-                }
-
-                // Creature animation
-                var scale = 1 + audioLevel * 0.5;
-                var translateY = audioLevel * 20;
-                var opacity = 0.7 + audioLevel * 0.3;
-                
-                creature.style.transform = 'translateY(calc(-50% - ' + translateY + 'px)) scale(' + scale + ')';
-                creature.style.opacity = opacity;
-                
-                if (audioLevel > 0.8) {
-                    creature.style.filter = 'brightness(' + (1 + audioLevel) + ') drop-shadow(0 0 20px #ff6b9d)';
-                } else {
-                    creature.style.filter = 'brightness(1)';
-                }
-            } catch(e) {
-                // Silent error
-            }
-        }
-
-        // Effect Management
-        function setEffect(effectName) {
-            try {
-                currentEffect = effectName;
-                safeElement('currentEffect').textContent = effectName.toUpperCase();
-                
-                var buttons = document.querySelectorAll('.effect-btn');
-                for (var i = 0; i < buttons.length; i++) {
-                    buttons[i].classList.remove('active');
-                    if (buttons[i].dataset.effect === effectName) {
-                        buttons[i].classList.add('active');
-                    }
-                }
-                
-                debugLog('Effect changed to: ' + effectName.toUpperCase() + ' ✨', 'info');
-            } catch(e) {
-                debugLog('Set effect error: ' + e.message, 'error');
-            }
-        }
-
-        function cycleEffect() {
-            try {
-                var effects = ['particles', 'nebula', 'waveform', 'cosmic', 'spiral', 'burst'];
-                var currentIndex = effects.indexOf(currentEffect);
-                var nextIndex = (currentIndex + 1) % effects.length;
-                setEffect(effects[nextIndex]);
-            } catch(e) {
-                debugLog('Cycle effect error: ' + e.message, 'error');
-            }
-        }
-
-        // SINWE Mixer Integration
-        function detectMixerEffect() {
-            try {
-                if (!analyser || !dataArray) return;
-                
-                analyser.getByteFrequencyData(dataArray);
-                var highFreqSum = 0, midFreqSum = 0, lowFreqSum = 0;
-                
-                for (var i = 80; i < dataArray.length; i++) highFreqSum += dataArray[i];
-                for (var i = 40; i < 80; i++) midFreqSum += dataArray[i];
-                for (var i = 0; i < 40; i++) lowFreqSum += dataArray[i];
-                
-                if (highFreqSum > 7000) {
-                    setEffect('burst');
-                    safeElement('mixerEffect').textContent = 'BURST TRIGGERED';
-                    debugLog('SINWE High-Freq Effect detected! Triggering BURST 🌋', 'info');
-                } else if (midFreqSum > 5000) {
-                    setEffect('spiral');
-                    safeElement('mixerEffect').textContent = 'SPIRAL TRIGGERED';
-                    debugLog('SINWE Mid-Freq Effect detected! Triggering SPIRAL 🌪️', 'info');
-                } else if (lowFreqSum > 3000) {
-                    setEffect('cosmic');
-                    safeElement('mixerEffect').textContent = 'COSMIC TRIGGERED';
-                    debugLog('SINWE Low-Freq Effect detected! Triggering COSMIC 🕳️', 'info');
-                }
-            } catch(e) {
-                // Silent error
-            }
-        }
-
-        function detectBeat() {
-            try {
-                if (!analyser || !dataArray) return;
-                
-                analyser.getByteFrequencyData(dataArray);
-                var energy = 0;
-                for (var i = 0; i < dataArray.length; i++) {
-                    energy += dataArray[i];
-                }
-                
-                if (energy > beatDetector.lastEnergy * 1.2 && energy > 5000) {
-                    for (var i = 0; i < particles.length; i++) {
-                        var particle = particles[i];
-                        if (particle.scale) {
-                            particle.scale.setScalar(1.5);
-                            setTimeout(function(p) { 
-                                return function() { 
-                                    if (p.scale) p.scale.setScalar(1); 
-                                }; 
-                            }(particle), 100);
-                        }
-                    }
-                    debugLog('SINWE Beat detected! Particles pulsing 🥁', 'info');
-                    
-                    var creature = safeElement('cosmicCreature');
-                    creature.classList.add('creature-pulse');
-                    setTimeout(function() { 
-                        creature.classList.remove('creature-pulse'); 
-                    }, 300);
-                    
-                    safeElement('beatStatus').textContent = 'BEAT DETECTED';
-                    setTimeout(function() { 
-                        safeElement('beatStatus').textContent = 'READY'; 
-                    }, 500);
-                }
-                
-                beatDetector.lastEnergy = energy;
-                requestAnimationFrame(detectBeat);
-            } catch(e) {
-                // Silent error
-            }
-        }
-
-        // Visualization
-        function startVisualization() {
-            function updateVisuals() {
+        // Audio System Initialization
+        function initAudio() {
+            if (!KozmicStudio.audioContext) {
                 try {
-                    if (!analyser || !dataArray) return;
-                    visualizationFrameId = requestAnimationFrame(updateVisuals);
-
-                    analyser.getByteFrequencyData(dataArray);
-                    
-                    var audioLevel = getAudioLevel();
-                    safeElement('powerBar').style.width = (audioLevel * 100) + '%';
-                    safeElement('levelStatus').textContent = Math.round(audioLevel * 100) + '%';
-                    safeElement('audioLevel').textContent = Math.round(audioLevel * 100) + '%';
-
-                    var freqBars = document.querySelectorAll('.freq-bar');
-                    for (var i = 0; i < freqBars.length; i++) {
-                        var dataIndex = Math.floor((i / freqBars.length) * dataArray.length);
-                        var amplitude = dataArray[dataIndex] / 255;
-                        freqBars[i].style.height = (amplitude * 50) + 'px';
-                        freqBars[i].style.opacity = 0.4 + amplitude * 0.6;
-                    }
-
-                    // Pitch detection when tuner is active
-                    if (tunerActive) {
-                        analyser.getByteTimeDomainData(dataArray);
-                        var floatArray = [];
-                        for (var i = 0; i < dataArray.length; i++) {
-                            floatArray[i] = (dataArray[i] - 128) / 128;
-                        }
-                        var pitch = pitchDetector.detectPitch(floatArray);
-                        
-                        if (pitch) {
-                            var accuracy = Math.abs(pitch.cents) < 5 ? 'PERFECT' : 
-                                         Math.abs(pitch.cents) < 15 ? 'GOOD' : 'ADJUST';
-                            var pitchEl = safeElement('pitchDisplay');
-                            pitchEl.textContent = pitch.note + ' ' + pitch.frequency + 'Hz (' + accuracy + ')';
-                            pitchEl.style.color = accuracy === 'PERFECT' ? '#4ade80' : 
-                                                accuracy === 'GOOD' ? '#fcd34d' : '#f87171';
-                            safeElement('dominantFreq').textContent = pitch.frequency + 'Hz';
-                        } else {
-                            safeElement('pitchDisplay').textContent = '--';
-                            safeElement('dominantFreq').textContent = '--';
-                        }
-                    }
-
-                    detectMixerEffect();
-                } catch(e) {
-                    debugLog('Visualization error: ' + e.message, 'error');
+                    KozmicStudio.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    KozmicStudio.analyzer = KozmicStudio.audioContext.createAnalyser();
+                    KozmicStudio.analyzer.fftSize = 256;
+                    KozmicStudio.dataArray = new Uint8Array(KozmicStudio.analyzer.frequencyBinCount);
+                    log('Audio context initialized successfully');
+                } catch (e) {
+                    log('Audio context initialization failed: ' + e.message, 'error');
                 }
+            }
+        }
+
+        // Input Connection System
+        async function connectInput() {
+            try {
+                initAudio();
+                const inputType = safeGetElement('inputType').value;
+                const inputStatus = safeGetElement('inputStatus');
+                
+                // Reset previous streams
+                if (KozmicStudio.guitarStream) {
+                    KozmicStudio.guitarStream.getTracks().forEach(track => track.stop());
+                    KozmicStudio.guitarStream = null;
+                }
+                if (KozmicStudio.videoStream) {
+                    KozmicStudio.videoStream.getTracks().forEach(track => track.stop());
+                    KozmicStudio.videoStream = null;
+                }
+
+                inputStatus.innerHTML = 'Connecting to SINWE system...';
+
+                // Audio input constraints optimized for SINWE mixer
+                const audioConstraints = { 
+                    echoCancellation: false, 
+                    noiseSuppression: false, 
+                    autoGainControl: false,
+                    sampleRate: 44100,
+                    channelCount: 1
+                };
+                
+                // Handle audio inputs
+                if (inputType.includes('guitar') || inputType.includes('mic')) {
+                    try {
+                        KozmicStudio.guitarStream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
+                        setupSINWEEffectsChain();
+                        startVolumeMonitoring();
+                        startLevelIndicators();
+                        
+                        inputStatus.innerHTML = '🎸 SINWE Audio Connected!<br>44.1kHz/16-bit Active';
+                        log('SINWE audio input connected');
+                    } catch (e) {
+                        inputStatus.innerHTML = '❌ Audio Error: ' + e.message;
+                        log('Audio connection failed: ' + e.message, 'error');
+                    }
+                }
+
+                // Handle video input
+                if (inputType.includes('video')) {
+                    try {
+                        const videoConstraints = { 
+                            width: { ideal: 1920, max: 1920 }, 
+                            height: { ideal: 1080, max: 1080 },
+                            frameRate: { ideal: 30 }
+                        };
+                        
+                        KozmicStudio.videoStream = await navigator.mediaDevices.getUserMedia({ 
+                            video: videoConstraints, 
+                            audio: false 
+                        });
+                        
+                        const videoFeed = safeGetElement('videoFeed');
+                        const noVideoOverlay = safeGetElement('noVideoOverlay');
+                        
+                        if (videoFeed && KozmicStudio.videoStream) {
+                            videoFeed.srcObject = KozmicStudio.videoStream;
+                            videoFeed.classList.add('active');
+                            noVideoOverlay.style.display = 'none';
+                            inputStatus.innerHTML += '<br>📷 Video Active!';
+                        }
+                    } catch (e) {
+                        inputStatus.innerHTML += '<br>❌ Video Error: ' + e.message;
+                        log('Video connection failed: ' + e.message, 'error');
+                    }
+                }
+
+                pulseCreature();
+                
+            } catch (e) {
+                log('Input connection error: ' + e.message, 'error');
+                safeGetElement('inputStatus').innerHTML = '❌ Connection Error: ' + e.message;
+            }
+        }
+
+        // SINWE Effects Chain Setup
+        function setupSINWEEffectsChain() {
+            if (!KozmicStudio.audioContext || !KozmicStudio.guitarStream) return;
+            
+            try {
+                const source = KozmicStudio.audioContext.createMediaStreamSource(KozmicStudio.guitarStream);
+                
+                // Create SINWE-specific effects chain
+                KozmicStudio.effectsChain = {
+                    inputGain: KozmicStudio.audioContext.createGain(),
+                    trebleFilter: KozmicStudio.audioContext.createBiquadFilter(),
+                    midFilter: KozmicStudio.audioContext.createBiquadFilter(),
+                    bassFilter: KozmicStudio.audioContext.createBiquadFilter(),
+                    echoDelay: KozmicStudio.audioContext.createDelay(2.0),
+                    echoGain: KozmicStudio.audioContext.createGain(),
+                    outputGain: KozmicStudio.audioContext.createGain()
+                };
+
+                // Configure EQ filters to match SINWE specs
+                KozmicStudio.effectsChain.trebleFilter.type = 'highshelf';
+                KozmicStudio.effectsChain.trebleFilter.frequency.setValueAtTime(8000, KozmicStudio.audioContext.currentTime);
+                
+                KozmicStudio.effectsChain.midFilter.type = 'peaking';
+                KozmicStudio.effectsChain.midFilter.frequency.setValueAtTime(1000, KozmicStudio.audioContext.currentTime);
+                KozmicStudio.effectsChain.midFilter.Q.setValueAtTime(1, KozmicStudio.audioContext.currentTime);
+                
+                KozmicStudio.effectsChain.bassFilter.type = 'lowshelf';
+                KozmicStudio.effectsChain.bassFilter.frequency.setValueAtTime(200, KozmicStudio.audioContext.currentTime);
+
+                // Connect the SINWE chain
+                source.connect(KozmicStudio.effectsChain.inputGain);
+                KozmicStudio.effectsChain.inputGain.connect(KozmicStudio.analyzer);
+                KozmicStudio.effectsChain.inputGain.connect(KozmicStudio.effectsChain.trebleFilter);
+                KozmicStudio.effectsChain.trebleFilter.connect(KozmicStudio.effectsChain.midFilter);
+                KozmicStudio.effectsChain.midFilter.connect(KozmicStudio.effectsChain.bassFilter);
+                KozmicStudio.effectsChain.bassFilter.connect(KozmicStudio.effectsChain.echoDelay);
+                KozmicStudio.effectsChain.echoDelay.connect(KozmicStudio.effectsChain.echoGain);
+                KozmicStudio.effectsChain.echoGain.connect(KozmicStudio.effectsChain.outputGain);
+                KozmicStudio.effectsChain.bassFilter.connect(KozmicStudio.effectsChain.outputGain);
+                KozmicStudio.effectsChain.outputGain.connect(KozmicStudio.audioContext.destination);
+
+                // Set initial SINWE values
+                KozmicStudio.effectsChain.inputGain.gain.setValueAtTime(0.5, KozmicStudio.audioContext.currentTime);
+                KozmicStudio.effectsChain.outputGain.gain.setValueAtTime(0.75, KozmicStudio.audioContext.currentTime);
+                KozmicStudio.effectsChain.echoDelay.delayTime.setValueAtTime(0.3, KozmicStudio.audioContext.currentTime);
+                KozmicStudio.effectsChain.echoGain.gain.setValueAtTime(0, KozmicStudio.audioContext.currentTime);
+                
+                log('SINWE effects chain initialized', 'mixer');
+            } catch (e) {
+                log('SINWE effects chain setup failed: ' + e.message, 'error');
+            }
+        }
+
+        // Volume and Level Monitoring
+        function startVolumeMonitoring() {
+            if (!KozmicStudio.analyzer || !KozmicStudio.dataArray) return;
+            
+            function updateVolume() {
+                try {
+                    KozmicStudio.analyzer.getByteFrequencyData(KozmicStudio.dataArray);
+                    const sum = KozmicStudio.dataArray.reduce((a, b) => a + b, 0);
+                    const average = sum / KozmicStudio.dataArray.length;
+                    const volumePercentage = Math.min((average / 128) * 100, 100);
+                    
+                    const volumeBar = safeGetElement('volumeBar');
+                    volumeBar.style.width = volumePercentage + '%';
+                    
+                    // Update guitar status based on signal
+                    const guitarStatus = safeGetElement('guitarStatus');
+                    if (average > 10) {
+                        guitarStatus.textContent = 'SINWE: Signal Active 🎸';
+                        guitarStatus.style.color = '#4ade80';
+                        guitarStatus.style.background = 'rgba(74, 222, 128, 0.2)';
+                    } else {
+                        guitarStatus.textContent = 'SINWE: Standby';
+                        guitarStatus.style.color = '#fcd34d';
+                        guitarStatus.style.background = 'rgba(252, 211, 77, 0.2)';
+                    }
+                    
+                    requestAnimationFrame(updateVolume);
+                } catch (e) {
+                    log('Volume monitoring error: ' + e.message, 'error');
+                }
+            }
+            updateVolume();
+        }
+
+        // SINWE Level Indicators
+        function startLevelIndicators() {
+            function updateLevels() {
+                if (!KozmicStudio.analyzer || !KozmicStudio.dataArray) return;
+                
+                try {
+                    KozmicStudio.analyzer.getByteFrequencyData(KozmicStudio.dataArray);
+                    const micLevels = safeGetElement('micLevels');
+                    const levelBars = micLevels.querySelectorAll('.level-bar');
+                    
+                    const sum = KozmicStudio.dataArray.reduce((a, b) => a + b, 0);
+                    const average = sum / KozmicStudio.dataArray.length;
+                    const levelCount = Math.floor((average / 128) * 10);
+                    
+                    levelBars.forEach((bar, index) => {
+                        bar.className = 'level-bar';
+                        if (index < levelCount) {
+                            if (index < 6) bar.classList.add('active-green');
+                            else if (index < 8) bar.classList.add('active-yellow');
+                            else bar.classList.add('active-red');
+                        }
+                    });
+                    
+                    requestAnimationFrame(updateLevels);
+                } catch (e) {
+                    log('Level indicator error: ' + e.message, 'error');
+                }
+            }
+            updateLevels();
+        }
+
+        // SINWE Recording Mode Management
+        function setSINWEMode(mode) {
+            KozmicStudio.sinwe.mode = mode;
+            
+            // Update UI
+            document.querySelectorAll('[data-mode]').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.mode === mode) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Apply mode-specific settings
+            const modeSettings = {
+                primal: { treble: 50, mid: 50, bass: 50 },
+                studio: { treble: 60, mid: 55, bass: 45 },
+                pro: { treble: 65, mid: 60, bass: 50 },
+                pop: { treble: 70, mid: 65, bass: 40 },
+                mc: { treble: 75, mid: 70, bass: 35 },
+                karaoke: { treble: 60, mid: 70, bass: 60 },
+                lightning: { treble: 80, mid: 50, bass: 30 },
+                change: { treble: 55, mid: 45, bass: 65 }
+            };
+            
+            if (modeSettings[mode]) {
+                const settings = modeSettings[mode];
+                updateEQ('treble', settings.treble);
+                updateEQ('mid', settings.mid);
+                updateEQ('bass', settings.bass);
             }
             
-            updateVisuals();
-            detectBeat();
+            log(`Recording mode: ${mode.toUpperCase()}`, 'mixer');
         }
 
-        // Analysis Functions
-        function performBooleanCheck() {
+        // SINWE Sound Effects Trigger
+        function triggerSINWEEffect(effect) {
+            if (KozmicStudio.sinwe.activeEffects.has(effect)) {
+                KozmicStudio.sinwe.activeEffects.delete(effect);
+                document.querySelector(`[data-effect="${effect}"]`).classList.remove('active');
+                log(`Effect ${effect} OFF`, 'mixer');
+            } else {
+                KozmicStudio.sinwe.activeEffects.add(effect);
+                document.querySelector(`[data-effect="${effect}"]`).classList.add('active');
+                
+                // Simulate effect trigger
+                if (KozmicStudio.audioContext) {
+                    const oscillator = KozmicStudio.audioContext.createOscillator();
+                    const gainNode = KozmicStudio.audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(KozmicStudio.audioContext.destination);
+                    
+                    // Effect-specific frequencies
+                    const effectFreqs = {
+                        cheer: 800, din: 400, gunshot: 100, laughter: 600,
+                        applause: 1000, awesome: 750, pubg: 200
+                    };
+                    
+                    oscillator.frequency.value = effectFreqs[effect] || 500;
+                    gainNode.gain.setValueAtTime(0.1, KozmicStudio.audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, KozmicStudio.audioContext.currentTime + 0.5);
+                    
+                    oscillator.start(KozmicStudio.audioContext.currentTime);
+                    oscillator.stop(KozmicStudio.audioContext.currentTime + 0.5);
+                }
+                
+                log(`Effect ${effect} triggered!`, 'mixer');
+                
+                // Auto-deactivate after 2 seconds
+                setTimeout(() => {
+                    KozmicStudio.sinwe.activeEffects.delete(effect);
+                    document.querySelector(`[data-effect="${effect}"]`).classList.remove('active');
+                }, 2000);
+            }
+            
+            pulseCreature();
+        }
+
+        // EQ Control System
+        function updateEQ(band, value) {
+            KozmicStudio.sinwe.eq[band] = value;
+            
+            // Update slider and display
+            const slider = safeGetElement(band);
+            const display = safeGetElement(band + 'Value');
+            slider.value = value;
+            display.textContent = value + '%';
+            
+            // Apply to audio chain
+            if (KozmicStudio.effectsChain && KozmicStudio.audioContext) {
+                const currentTime = KozmicStudio.audioContext.currentTime;
+                const gainValue = (value - 50) / 50 * 12; // Convert to dB range
+                
+                try {
+                    switch(band) {
+                        case 'treble':
+                            KozmicStudio.effectsChain.trebleFilter.gain.setValueAtTime(gainValue, currentTime);
+                            break;
+                        case 'mid':
+                            KozmicStudio.effectsChain.midFilter.gain.setValueAtTime(gainValue, currentTime);
+                            break;
+                        case 'bass':
+                            KozmicStudio.effectsChain.bassFilter.gain.setValueAtTime(gainValue, currentTime);
+                            break;
+                        case 'echo':
+                            const echoAmount = value / 100 * 0.3;
+                            KozmicStudio.effectsChain.echoGain.gain.setValueAtTime(echoAmount, currentTime);
+                            break;
+                    }
+                } catch (e) {
+                    log(`EQ update error for ${band}: ${e.message}`, 'error');
+                }
+            }
+        }
+
+        // SINWE Function Controls
+        function toggleSINWEFunction(func) {
+            KozmicStudio.sinwe.functions[func] = !KozmicStudio.sinwe.functions[func];
+            const button = safeGetElement(func + 'Btn');
+            
+            if (KozmicStudio.sinwe.functions[func]) {
+                button.classList.add('active');
+                log(`${func} ON`, 'mixer');
+            } else {
+                button.classList.remove('active');
+                log(`${func} OFF`, 'mixer');
+            }
+            
+            // Apply function logic
+            if (KozmicStudio.effectsChain && KozmicStudio.audioContext) {
+                const currentTime = KozmicStudio.audioContext.currentTime;
+                
+                switch(func) {
+                    case 'mute':
+                        const muteGain = KozmicStudio.sinwe.functions[func] ? 0 : 0.75;
+                        KozmicStudio.effectsChain.outputGain.gain.setValueAtTime(muteGain, currentTime);
+                        break;
+                    case 'elimination':
+                        // Implement noise gate or similar
+                        break;
+                    case 'denoise':
+                        // Implement noise reduction
+                        break;
+                    case 'voiceOver':
+                        // Implement voice-over ducking
+                        break;
+                }
+            }
+        }
+
+        // Recording System
+        function toggleRecording(type) {
             try {
-                var checks = {
-                    audio: !!audioStream,
-                    webgl: !!renderer,
-                    recording: isRecording,
-                    tuner: tunerActive,
-                    amplified: isAmplified,
-                    kozmicVibe: !!audioStream && !!renderer
-                };
+                if (!KozmicStudio.isRecording) {
+                    startRecording(type);
+                } else {
+                    stopRecording();
+                }
+            } catch (e) {
+                log(`Recording error: ${e.message}`, 'error');
+            }
+        }
 
-                safeElement('audioBoolean').textContent = checks.audio ? 'TRUE ✅' : 'FALSE ❌';
-                safeElement('webglBoolean').textContent = checks.webgl ? 'TRUE ✅' : 'FALSE ❌';
-
-                debugLog('🔍 BOOLEAN STATUS CHECK INITIATED', 'success');
-                for (var key in checks) {
-                    var value = checks[key];
-                    debugLog(key.toUpperCase() + ': ' + (value ? 'TRUE ✅' : 'FALSE ❌'), value ? 'success' : 'warning');
+        function startRecording(type) {
+            try {
+                if (!KozmicStudio.guitarStream && !KozmicStudio.videoStream) {
+                    log('No input stream available for recording', 'error');
+                    return;
                 }
 
-                debugLog('KOZMIC VIBE: ' + (checks.kozmicVibe ? 'SHREDDING THE COSMOS! 🌌' : 'TUNE UP, SHREDDER! ⚡️'), checks.kozmicVibe ? 'success' : 'warning');
-                debugLog('Boolean check complete! System analysis finished.', 'info');
+                KozmicStudio.recordedChunks = [];
+                let streamToRecord;
+                
+                if (type === 'video' && KozmicStudio.videoStream && KozmicStudio.guitarStream) {
+                    streamToRecord = new MediaStream([
+                        ...KozmicStudio.videoStream.getVideoTracks(),
+                        ...KozmicStudio.guitarStream.getAudioTracks()
+                    ]);
+                } else if (type === 'video' && KozmicStudio.videoStream) {
+                    streamToRecord = KozmicStudio.videoStream;
+                } else if (KozmicStudio.guitarStream) {
+                    streamToRecord = KozmicStudio.guitarStream;
+                } else {
+                    throw new Error('No suitable stream for recording');
+                }
 
-                var console = safeElement('heuristicConsole');
-                console.style.display = 'block';
-                console.scrollTop = console.scrollHeight;
+                KozmicStudio.mediaRecorder = new MediaRecorder(streamToRecord);
+                
+                KozmicStudio.mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        KozmicStudio.recordedChunks.push(event.data);
+                    }
+                };
 
-                return checks;
-            } catch(e) {
-                debugLog('Boolean check error: ' + e.message, 'error');
+                KozmicStudio.mediaRecorder.onstop = () => {
+                    const blob = new Blob(KozmicStudio.recordedChunks, { 
+                        type: type === 'video' ? 'video/webm' : 'audio/webm' 
+                    });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `sinwe_${type}_${Date.now()}.webm`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    log(`${type} recording saved!`);
+                };
+
+                KozmicStudio.mediaRecorder.start();
+                KozmicStudio.isRecording = true;
+                
+                const recordBtn = safeGetElement(type === 'video' ? 'recordVideoBtn' : 'recordAudioBtn');
+                recordBtn.textContent = `Stop ${type} 🛑`;
+                recordBtn.classList.add('active');
+                
+                log(`${type} recording started`);
+                
+            } catch (e) {
+                log(`Recording start error: ${e.message}`, 'error');
             }
         }
 
-        function updateBooleans() {
+        function stopRecording() {
             try {
-                safeElement('audioBoolean').textContent = !!audioStream ? 'TRUE ✅' : 'FALSE ❌';
-                safeElement('webglBoolean').textContent = !!renderer ? 'TRUE ✅' : 'FALSE ❌';
-            } catch(e) {
-                // Silent error
+                if (KozmicStudio.mediaRecorder && KozmicStudio.isRecording) {
+                    KozmicStudio.mediaRecorder.stop();
+                    KozmicStudio.isRecording = false;
+                    
+                    safeGetElement('recordAudioBtn').textContent = 'Record Audio 🎙';
+                    safeGetElement('recordVideoBtn').textContent = 'Record Video 🎥';
+                    safeGetElement('recordAudioBtn').classList.remove('active');
+                    safeGetElement('recordVideoBtn').classList.remove('active');
+                    
+                    log('Recording stopped');
+                }
+            } catch (e) {
+                log(`Recording stop error: ${e.message}`, 'error');
             }
         }
 
-        function performDebugAnalysis() {
-            try {
-                debugLog('🔧 INITIATING DEBUG ANALYSIS...', 'info');
-                debugLog('System Status: Checking all subsystems...', 'info');
-                
-                var audioStatus = audioStream ? 'OPERATIONAL' : 'DISCONNECTED';
-                var webglStatus = renderer ? 'RENDERING' : 'INACTIVE';
-                var effectStatus = particles.length > 0 ? 'PARTICLES ACTIVE' : 'NO PARTICLES';
-                
-                debugLog('Audio System: ' + audioStatus, audioStream ? 'success' : 'warning');
-                debugLog('WebGL Engine: ' + webglStatus, renderer ? 'success' : 'warning');
-                debugLog('Effect System: ' + effectStatus, particles.length > 0 ? 'success' : 'warning');
-                debugLog('Debug analysis complete! 🔧', 'success');
-            } catch(e) {
-                debugLog('Debug analysis error: ' + e.message, 'error');
+        // Rhythm System
+        function toggleMetronome() {
+            if (KozmicStudio.isMetronomeActive) {
+                stopMetronome();
+            } else {
+                startMetronome();
             }
         }
 
-        function enterCrisisMode() {
+        function startMetronome() {
+            if (KozmicStudio.metronomeInterval) return;
+            
             try {
-                debugLog('🚨 CRISIS MODE ACTIVATED! 🚨', 'error');
-                debugLog('Emergency protocols engaged...', 'warning');
-                debugLog('Running system diagnostics...', 'info');
-                
-                setTimeout(function() {
-                    debugLog('All systems nominal. Crisis averted! 😅', 'success');
-                }, 2000);
-            } catch(e) {
-                debugLog('Crisis mode error: ' + e.message, 'error');
+                const interval = 60000 / KozmicStudio.currentBPM;
+                KozmicStudio.metronomeInterval = setInterval(() => {
+                    if (KozmicStudio.audioContext) {
+                        const oscillator = KozmicStudio.audioContext.createOscillator();
+                        const gainNode = KozmicStudio.audioContext.createGain();
+                        
+                        oscillator.connect(gainNode);
+                        gainNode.connect(KozmicStudio.audioContext.destination);
+                        
+                        oscillator.frequency.value = 800;
+                        gainNode.gain.setValueAtTime(0.1, KozmicStudio.audioContext.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, KozmicStudio.audioContext.currentTime + 0.1);
+                        
+                        oscillator.start(KozmicStudio.audioContext.currentTime);
+                        oscillator.stop(KozmicStudio.audioContext.currentTime + 0.1);
+                    }
+                    pulseCreature();
+                }, interval);
+
+                KozmicStudio.isMetronomeActive = true;
+                safeGetElement('metronomeBtn').classList.add('active');
+                safeGetElement('rhythmStatus').innerHTML = `Metronome: ${KozmicStudio.currentBPM} BPM ACTIVE`;
+                log(`Metronome started at ${KozmicStudio.currentBPM} BPM`);
+            } catch (e) {
+                log(`Metronome error: ${e.message}`, 'error');
             }
+        }
+
+        function stopMetronome() {
+            if (KozmicStudio.metronomeInterval) {
+                clearInterval(KozmicStudio.metronomeInterval);
+                KozmicStudio.metronomeInterval = null;
+                KozmicStudio.isMetronomeActive = false;
+                safeGetElement('metronomeBtn').classList.remove('active');
+                safeGetElement('rhythmStatus').innerHTML = 'Metronome: STOPPED';
+                log('Metronome stopped');
+            }
+        }
+
+        function setBPM(value) {
+            KozmicStudio.currentBPM = parseInt(value);
+            safeGetElement('bpmDisplay').textContent = KozmicStudio.currentBPM;
+            
+            // Restart metronome if active
+            if (KozmicStudio.isMetronomeActive) {
+                stopMetronome();
+                startMetronome();
+            }
+        }
+
+        // Drum Pad System
+        function triggerDrumSound(sound) {
+            if (!KozmicStudio.audioContext) return;
+            
+            try {
+                const oscillator = KozmicStudio.audioContext.createOscillator();
+                const gainNode = KozmicStudio.audioContext.createGain();
+                const filter = KozmicStudio.audioContext.createBiquadFilter();
+                
+                oscillator.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(KozmicStudio.audioContext.destination);
+                
+                // Sound-specific parameters
+                const drumSounds = {
+                    kick: { freq: 60, type: 'sawtooth', decay: 0.5 },
+                    snare: { freq: 200, type: 'square', decay: 0.2 },
+                    hat: { freq: 8000, type: 'square', decay: 0.1 },
+                    crash: { freq: 4000, type: 'sawtooth', decay: 1.0 },
+                    ride: { freq: 3000, type: 'triangle', decay: 0.8 },
+                    tom: { freq: 150, type: 'sawtooth', decay: 0.4 },
+                    clap: { freq: 1000, type: 'square', decay: 0.15 },
+                    gallop: { freq: 80, type: 'sawtooth', decay: 0.3 }
+                };
+                
+                const drumParams = drumSounds[sound] || drumSounds.kick;
+                
+                oscillator.type = drumParams.type;
+                oscillator.frequency.setValueAtTime(drumParams.freq, KozmicStudio.audioContext.currentTime);
+                filter.frequency.setValueAtTime(drumParams.freq * 2, KozmicStudio.audioContext.currentTime);
+                gainNode.gain.setValueAtTime(0.3, KozmicStudio.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, KozmicStudio.audioContext.currentTime + drumParams.decay);
+                
+                oscillator.start(KozmicStudio.audioContext.currentTime);
+                oscillator.stop(KozmicStudio.audioContext.currentTime + drumParams.decay);
+                
+                // Visual feedback
+                const drumPad = document.querySelector(`[data-sound="${sound}"]`);
+                if (drumPad) {
+                    drumPad.classList.add('active');
+                    setTimeout(() => drumPad.classList.remove('active'), 100);
+                }
+                
+                log(`Drum sound: ${sound.toUpperCase()}`);
+            } catch (e) {
+                log(`Drum sound error: ${e.message}`, 'error');
+            }
+        }
+
+        // Streaming System
+        function toggleStreaming() {
+            if (KozmicStudio.isStreaming) {
+                stopStreaming();
+            } else {
+                startStreaming();
+            }
+        }
+
+        function startStreaming() {
+            try {
+                if (!KozmicStudio.guitarStream && !KozmicStudio.videoStream) {
+                    log('No input streams for streaming', 'error');
+                    return;
+                }
+
+                const platform = safeGetElement('streamPlatform').value;
+                const quality = safeGetElement('streamQuality').value;
+                
+                KozmicStudio.isStreaming = true;
+                safeGetElement('startStream').textContent = 'Stop Stream ⏹️';
+                safeGetElement('startStream').classList.add('active');
+                safeGetElement('streamStatus').innerHTML = `📡 LIVE on ${platform.toUpperCase()}<br>Quality: ${quality}<br>SINWE Audio Active`;
+                
+                log(`Streaming started: ${platform} (${quality})`);
+                pulseCreature();
+            } catch (e) {
+                log(`Streaming error: ${e.message}`, 'error');
+            }
+        }
+
+        function stopStreaming() {
+            KozmicStudio.isStreaming = false;
+            safeGetElement('startStream').textContent = 'Start Stream 🚀';
+            safeGetElement('startStream').classList.remove('active');
+            safeGetElement('streamStatus').innerHTML = 'Stream stopped<br>Ready to stream again';
+            log('Streaming stopped');
         }
 
         // Session Management
-        function updateSessionTime() {
-            try {
-                var elapsed = Math.floor((Date.now() - sessionStart) / 1000);
-                var minutes = Math.floor(elapsed / 60);
-                var seconds = elapsed % 60;
-                safeElement('sessionTime').textContent = minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
-            } catch(e) {
-                // Silent error
-            }
-        }
-
-        function simulateBattery() {
-            try {
-                var batteryLevel = safeElement('batteryLevel');
-                var batteryText = safeElement('batteryText');
-                var currentLevel = 85;
-                
-                var intervalId = setInterval(function() {
-                    if (isRecording) {
-                        currentLevel = Math.max(0, currentLevel - 0.5);
-                    } else {
-                        currentLevel = Math.min(100, currentLevel + 0.1);
-                    }
-                    
-                    batteryLevel.style.width = currentLevel + '%';
-                    var status = currentLevel > 50 ? 'Recording Ready' : 
-                                currentLevel > 20 ? 'Low Battery' : 'Critical';
-                    batteryText.textContent = Math.round(currentLevel) + '% - ' + status;
-                }, 1000);
-                
-                intervalIds.push(intervalId);
-                return intervalId;
-            } catch(e) {
-                debugLog('Battery simulation error: ' + e.message, 'error');
-            }
-        }
-
         function saveSession() {
             try {
-                var sessionData = {
+                const sessionData = {
                     timestamp: Date.now(),
-                    effect: currentEffect,
-                    amplified: isAmplified,
-                    sessionDuration: Date.now() - sessionStart
+                    sinwe: KozmicStudio.sinwe,
+                    bpm: KozmicStudio.currentBPM,
+                    version: 'SINWE Edition'
                 };
                 
-                localStorage.setItem('kozmicSession', JSON.stringify(sessionData));
-                debugLog('Session saved successfully! 💾', 'success');
-            } catch(e) {
-                debugLog('Save session error: ' + e.message, 'error');
+                const blob = new Blob([JSON.stringify(sessionData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `sinwe_session_${Date.now()}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                log('Session saved successfully');
+                safeGetElement('masterStatus').innerHTML = 'Session saved! 💾';
+            } catch (e) {
+                log(`Save session error: ${e.message}`, 'error');
             }
         }
 
         function loadSession() {
             try {
-                var sessionData = JSON.parse(localStorage.getItem('kozmicSession') || '{}');
-                if (sessionData.effect) {
-                    setEffect(sessionData.effect);
-                    isAmplified = !!sessionData.amplified;
-                    safeElement('amplifyBtn').textContent = sessionData.amplified ? 'AMPLIFIED' : 'AMPLIFY';
-                    debugLog('Session loaded successfully! 📁', 'success');
-                } else {
-                    debugLog('No saved session found', 'warning');
-                }
-            } catch(e) {
-                debugLog('Load session error: ' + e.message, 'error');
-            }
-        }
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
 
-        function exportSession() {
-            try {
-                var sessionData = {
-                    timestamp: Date.now(),
-                    effect: currentEffect,
-                    version: 'Ultimate Portable Edition v3.0'
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const sessionData = JSON.parse(e.target.result);
+                            
+                            // Restore SINWE settings
+                            if (sessionData.sinwe) {
+                                KozmicStudio.sinwe = sessionData.sinwe;
+                                
+                                // Update UI
+                                Object.keys(KozmicStudio.sinwe.eq).forEach(band => {
+                                    updateEQ(band, KozmicStudio.sinwe.eq[band]);
+                                });
+                                
+                                setSINWEMode(KozmicStudio.sinwe.mode);
+                            }
+                            
+                            // Restore BPM
+                            if (sessionData.bpm) {
+                                setBPM(sessionData.bpm);
+                                safeGetElement('bpmSlider').value = sessionData.bpm;
+                            }
+                            
+                            log('Session loaded successfully');
+                            safeGetElement('masterStatus').innerHTML = 'Session loaded! 📂';
+                        } catch (e) {
+                            log(`Load session error: ${e.message}`, 'error');
+                        }
+                    };
+                    reader.readAsText(file);
                 };
                 
-                var blob = new Blob([JSON.stringify(sessionData, null, 2)], { type: 'application/json' });
-                var url = URL.createObjectURL(blob);
-                var a = document.createElement('a');
-                a.href = url;
-                a.download = 'kozmic-session-' + Date.now() + '.json';
-                a.click();
-                URL.revokeObjectURL(url);
-                debugLog('Session exported! 📤', 'success');
-            } catch(e) {
-                debugLog('Export session error: ' + e.message, 'error');
+                input.click();
+            } catch (e) {
+                log(`Load session error: ${e.message}`, 'error');
             }
         }
 
-        function resetSession() {
+        function emergencyStop() {
             try {
-                sessionStart = Date.now();
-                safeElement('heuristicConsole').innerHTML = '';
-                debugLog('Session reset! Starting fresh... 🆕', 'info');
-            } catch(e) {
-                debugLog('Reset session error: ' + e.message, 'error');
-            }
-        }
-
-        // Cosmic Creature Functions
-        function handleCreatureClick() {
-            try {
-                creatureClicks++;
-                var creature = safeElement('cosmicCreature');
-                creature.classList.remove('creature-pulse');
-                setTimeout(function() {
-                    creature.classList.add('creature-pulse');
-                }, 10);
-                
-                debugLog('Cosmic creature activated! (' + creatureClicks + '/5) ✨', 'info');
-                
-                if (creatureClicks >= 5) {
-                    triggerHypernova();
-                    creatureClicks = 0;
+                // Stop all streams
+                if (KozmicStudio.guitarStream) {
+                    KozmicStudio.guitarStream.getTracks().forEach(track => track.stop());
+                    KozmicStudio.guitarStream = null;
+                }
+                if (KozmicStudio.videoStream) {
+                    KozmicStudio.videoStream.getTracks().forEach(track => track.stop());
+                    KozmicStudio.videoStream = null;
                 }
                 
-                setTimeout(function() { 
-                    creature.classList.remove('creature-pulse'); 
-                }, 600);
-            } catch(e) {
-                debugLog('Creature click error: ' + e.message, 'error');
+                // Stop recording and streaming
+                if (KozmicStudio.isRecording) stopRecording();
+                if (KozmicStudio.isStreaming) stopStreaming();
+                if (KozmicStudio.isMetronomeActive) stopMetronome();
+                
+                // Reset SINWE state
+                KozmicStudio.sinwe.activeEffects.clear();
+                Object.keys(KozmicStudio.sinwe.functions).forEach(func => {
+                    KozmicStudio.sinwe.functions[func] = false;
+                    safeGetElement(func + 'Btn').classList.remove('active');
+                });
+                
+                // Reset UI
+                document.querySelectorAll('.btn.active').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.effect-btn.active').forEach(btn => btn.classList.remove('active'));
+                
+                // Update status displays
+                safeGetElement('inputStatus').innerHTML = 'EMERGENCY STOP - All systems halted';
+                safeGetElement('mixerStatus').innerHTML = 'SINWE: System Reset';
+                safeGetElement('streamStatus').innerHTML = 'Streaming stopped';
+                safeGetElement('rhythmStatus').innerHTML = 'Rhythm: Stopped';
+                safeGetElement('masterStatus').innerHTML = 'EMERGENCY STOP COMPLETE';
+                safeGetElement('guitarStatus').textContent = 'SINWE: Disconnected';
+                
+                log('EMERGENCY STOP executed - all systems reset');
+            } catch (e) {
+                log(`Emergency stop error: ${e.message}`, 'error');
             }
         }
 
-        function triggerHypernova() {
+        // Equipment Checklist
+        function resetChecklist() {
             try {
-                debugLog('🌟 HYPERNOVA TRIGGERED! 🌟', 'success');
-                
-                var flash = document.createElement('div');
-                flash.className = 'hypernova-flash';
-                document.body.appendChild(flash);
-                
-                for (var i = 0; i < particles.length; i++) {
-                    particles[i].position.copy(particles[i].userData.originalPos);
-                    particles[i].material.color.setHSL(Math.random(), 1, 0.8);
+                document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                safeGetElement('checklistStatus').innerHTML = 'Checklist reset! Check your SINWE equipment setup.';
+                log('Equipment checklist reset');
+            } catch (e) {
+                log(`Checklist reset error: ${e.message}`, 'error');
+            }
+        }
+
+        function checkAllItems() {
+            try {
+                document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                    checkbox.checked = true;
+                });
+                safeGetElement('checklistStatus').innerHTML = '✅ All SINWE equipment checked! Ready to rock!';
+                log('All equipment items checked');
+                pulseCreature();
+            } catch (e) {
+                log(`Check all items error: ${e.message}`, 'error');
+            }
+        }
+
+        // Cosmic Creature Animation
+        function pulseCreature() {
+            try {
+                const creature = document.querySelector('.cosmic-creature');
+                if (creature) {
+                    creature.classList.add('pulse');
+                    setTimeout(() => creature.classList.remove('pulse'), 500);
                 }
+            } catch (e) {
+                log(`Creature animation error: ${e.message}`, 'error');
+            }
+        }
+
+        // Event Listeners Setup
+        function setupEventListeners() {
+            try {
+                // Input Controls
+                safeGetElement('connectInput').addEventListener('click', connectInput);
+                safeGetElement('recordAudioBtn').addEventListener('click', () => toggleRecording('audio'));
+                safeGetElement('recordVideoBtn').addEventListener('click', () => toggleRecording('video'));
                 
-                setTimeout(function() {
-                    if (flash.parentNode) document.body.removeChild(flash);
-                }, 1000);
-            } catch(e) {
-                debugLog('Hypernova error: ' + e.message, 'error');
+                // SINWE Recording Mode Buttons
+                document.querySelectorAll('[data-mode]').forEach(btn => {
+                    btn.addEventListener('click', () => setSINWEMode(btn.dataset.mode));
+                });
+                
+                // SINWE Sound Effect Buttons
+                document.querySelectorAll('[data-effect]').forEach(btn => {
+                    btn.addEventListener('click', () => triggerSINWEEffect(btn.dataset.effect));
+                });
+                
+                // EQ Controls
+                ['treble', 'mid', 'bass', 'echo'].forEach(band => {
+                    const slider = safeGetElement(band);
+                    slider.addEventListener('input', (e) => updateEQ(band, e.target.value));
+                });
+                
+                // SINWE Function Buttons
+                ['elimination', 'mute', 'denoise', 'voiceOver'].forEach(func => {
+                    safeGetElement(func + 'Btn').addEventListener('click', () => toggleSINWEFunction(func));
+                });
+                
+                // Connectivity Buttons
+                safeGetElement('bluetoothBtn').addEventListener('click', () => {
+                    KozmicStudio.sinwe.connectivity.bluetooth = !KozmicStudio.sinwe.connectivity.bluetooth;
+                    const btn = safeGetElement('bluetoothBtn');
+                    if (KozmicStudio.sinwe.connectivity.bluetooth) {
+                        btn.classList.add('active');
+                        log('Bluetooth connected', 'mixer');
+                    } else {
+                        btn.classList.remove('active');
+                        log('Bluetooth disconnected', 'mixer');
+                    }
+                });
+                
+                safeGetElement('internalPlayBtn').addEventListener('click', () => {
+                    KozmicStudio.sinwe.connectivity.internalPlay = !KozmicStudio.sinwe.connectivity.internalPlay;
+                    const btn = safeGetElement('internalPlayBtn');
+                    if (KozmicStudio.sinwe.connectivity.internalPlay) {
+                        btn.classList.add('active');
+                        log('Internal play ON', 'mixer');
+                    } else {
+                        btn.classList.remove('active');
+                        log('Internal play OFF', 'mixer');
+                    }
+                });
+                
+                // Rhythm Controls
+                safeGetElement('metronomeBtn').addEventListener('click', toggleMetronome);
+                safeGetElement('tunerBtn').addEventListener('click', () => {
+                    // Guitar tuner functionality would go here
+                    log('Guitar tuner activated');
+                });
+                safeGetElement('bpmSlider').addEventListener('input', (e) => setBPM(e.target.value));
+                
+                // Drum Pads
+                document.querySelectorAll('[data-sound]').forEach(pad => {
+                    pad.addEventListener('click', () => triggerDrumSound(pad.dataset.sound));
+                });
+                
+                // Streaming Controls
+                safeGetElement('startStream').addEventListener('click', toggleStreaming);
+                
+                // Master Controls
+                safeGetElement('saveBtn').addEventListener('click', saveSession);
+                safeGetElement('loadBtn').addEventListener('click', loadSession);
+                safeGetElement('exportBtn').addEventListener('click', () => {
+                    log('Export functionality would export processed audio');
+                    safeGetElement('masterStatus').innerHTML = 'Export feature coming soon! 🎧';
+                });
+                safeGetElement('emergencyBtn').addEventListener('click', emergencyStop);
+                safeGetElement('jamBtn').addEventListener('click', () => {
+                    // Start jam session with random SINWE effects
+                    const effects = ['cheer', 'awesome', 'applause'];
+                    effects.forEach((effect, index) => {
+                        setTimeout(() => triggerSINWEEffect(effect), index * 1000);
+                    });
+                    startMetronome();
+                    log('Jam session started with SINWE effects!');
+                });
+                
+                // Master Volume
+                safeGetElement('masterVolume').addEventListener('input', (e) => {
+                    const value = e.target.value;
+                    safeGetElement('masterVolumeValue').textContent = value + '%';
+                    if (KozmicStudio.effectsChain && KozmicStudio.effectsChain.outputGain) {
+                        const gain = value / 100;
+                        KozmicStudio.effectsChain.outputGain.gain.setValueAtTime(gain, KozmicStudio.audioContext.currentTime);
+                    }
+                });
+                
+                // Input Gain
+                safeGetElement('inputGain').addEventListener('input', (e) => {
+                    if (KozmicStudio.effectsChain && KozmicStudio.effectsChain.inputGain) {
+                        const gain = e.target.value / 100;
+                        KozmicStudio.effectsChain.inputGain.gain.setValueAtTime(gain, KozmicStudio.audioContext.currentTime);
+                    }
+                });
+                
+                // Checklist Controls
+                safeGetElement('resetChecklistBtn').addEventListener('click', resetChecklist);
+                safeGetElement('checkAllBtn').addEventListener('click', checkAllItems);
+                
+                // Cosmic Creature
+                document.querySelector('.cosmic-creature').addEventListener('click', pulseCreature);
+                
+                // Keyboard Shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey && e.shiftKey) {
+                        switch(e.key.toLowerCase()) {
+                            case 's': saveSession(); break;
+                            case 'l': loadSession(); break;
+                            case 'e': emergencyStop(); break;
+                        }
+                    } else {
+                        switch(e.key.toLowerCase()) {
+                            case ' ': e.preventDefault(); toggleMetronome(); break;
+                            case 'm': toggleSINWEFunction('mute'); break;
+                            case 'r': toggleRecording('audio'); break;
+                            case 'v': toggleRecording('video'); break;
+                            case 's': toggleStreaming(); break;
+                            // Drum pad shortcuts
+                            case 'q': triggerDrumSound('kick'); break;
+                            case 'w': triggerDrumSound('snare'); break;
+                            case 'e': triggerDrumSound('hat'); break;
+                            case 'r': triggerDrumSound('crash'); break;
+                            case 'a': triggerDrumSound('ride'); break;
+                            case 's': triggerDrumSound('tom'); break;
+                            case 'd': triggerDrumSound('clap'); break;
+                            case 'f': triggerDrumSound('gallop'); break;
+                        }
+                    }
+                });
+                
+                log('Event listeners setup complete');
+                
+            } catch (e) {
+                log(`Event listener setup error: ${e.message}`, 'error');
             }
         }
 
         // Initialization
-        function waitForThreeJS() {
-            if (typeof THREE !== 'undefined') {
-                initializeStudio();
-            } else {
-                setTimeout(waitForThreeJS, 100);
-            }
-        }
-
-        function initializeStudio() {
+        function initializeKozmicStudio() {
             try {
-                if (window.studioInitialized) return;
-                window.studioInitialized = true;
-
-                debugLog('🌌 KOZMIC PRO STUDIO v3.0 INITIALIZING...', 'info');
+                log('🌌 KOZMIC PRO STUDIO - SINWE EDITION INITIALIZING...');
+                
+                // Setup all event listeners
                 setupEventListeners();
-                debugLog('🌌 KOZMIC PRO STUDIO INITIALIZED! 🌌', 'success');
-                debugLog('Bulletproof & Error-Free! ✨', 'info');
-            } catch(e) {
-                debugLog('Studio initialization error: ' + e.message, 'error');
+                
+                // Initialize default SINWE state
+                setSINWEMode('primal');
+                
+                // Update initial EQ display values
+                ['treble', 'mid', 'bass', 'echo'].forEach(band => {
+                    const value = KozmicStudio.sinwe.eq[band];
+                    safeGetElement(band + 'Value').textContent = value + '%';
+                });
+                
+                // Update master volume display
+                safeGetElement('masterVolumeValue').textContent = '75%';
+                
+                // Set initial status messages
+                safeGetElement('mixerStatus').innerHTML = 'SINWE Mixer Ready - 44.1kHz/16-bit';
+                safeGetElement('connectionStatus').innerHTML = 'USB-C Connected<br>Ready for 3-phone streaming';
+                safeGetElement('checklistStatus').innerHTML = 'Check your SINWE equipment setup!';
+                
+                log('🎸 KOZMIC PRO STUDIO - SINWE EDITION READY! 🎸');
+                log('Features: SINWE Mixer Integration, Multi-Platform Streaming, Professional Recording');
+                
+                // Initial creature pulse
+                setTimeout(pulseCreature, 1000);
+                
+            } catch (e) {
+                log(`Initialization error: ${e.message}`, 'error');
             }
         }
 
-        function setupEventListeners() {
-            try {
-                // Check for required elements
-                var requiredIds = [
-                    'connectBtn', 'tunerBtn', 'recordBtn', 'amplifyBtn', 
-                    'debugBtn', 'booleanBtn', 'crisisBtn', 'saveBtn', 
-                    'loadBtn', 'exportBtn', 'resetBtn', 'cosmicCreature'
-                ];
-                
-                for (var i = 0; i < requiredIds.length; i++) {
-                    if (!document.getElementById(requiredIds[i])) {
-                        debugLog('Missing element: ' + requiredIds[i], 'error');
-                        return false;
-                    }
-                }
-
-                // Main buttons
-                document.getElementById('connectBtn').onclick = connectAudio;
-                document.getElementById('tunerBtn').onclick = toggleTuner;
-                document.getElementById('recordBtn').onclick = toggleRecord;
-                document.getElementById('amplifyBtn').onclick = toggleAmplify;
-                document.getElementById('debugBtn').onclick = performDebugAnalysis;
-                document.getElementById('booleanBtn').onclick = performBooleanCheck;
-                document.getElementById('crisisBtn').onclick = enterCrisisMode;
-                document.getElementById('saveBtn').onclick = saveSession;
-                document.getElementById('loadBtn').onclick = loadSession;
-                document.getElementById('exportBtn').onclick = exportSession;
-                document.getElementById('resetBtn').onclick = resetSession;
-                document.getElementById('cosmicCreature').onclick = handleCreatureClick;
-                
-                // Effect buttons
-                var effectBtns = document.querySelectorAll('.effect-btn');
-                for (var i = 0; i < effectBtns.length; i++) {
-                    effectBtns[i].onclick = (function(effect) {
-                        return function() { setEffect(effect); };
-                    })(effectBtns[i].dataset.effect);
-                }
-                
-                debugLog('Event listeners set up successfully!', 'success');
-                
-                // Start timers
-                var sessionTimer = setInterval(updateSessionTime, 1000);
-                intervalIds.push(sessionTimer);
-                simulateBattery();
-                
-                // Keyboard shortcuts
-                document.addEventListener('keydown', function(e) {
-                    try {
-                        if (e.ctrlKey && e.shiftKey) {
-                            switch (e.key.toLowerCase()) {
-                                case 'd': performDebugAnalysis(); break;
-                                case 's': saveSession(); break;
-                                case 'c': enterCrisisMode(); break;
-                                case 'b': performBooleanCheck(); break;
-                            }
-                        } else {
-                            switch (e.key.toLowerCase()) {
-                                case ' ': e.preventDefault(); connectAudio(); break;
-                                case 't': toggleTuner(); break;
-                                case 'r': toggleRecord(); break;
-                                case 'a': toggleAmplify(); break;
-                                case 'e': cycleEffect(); break;
-                                case '1': setEffect('particles'); break;
-                                case '2': setEffect('nebula'); break;
-                                case '3': setEffect('waveform'); break;
-                                case '4': setEffect('cosmic'); break;
-                                case '5': setEffect('spiral'); break;
-                                case '6': setEffect('burst'); break;
-                            }
-                        }
-                    } catch(error) {
-                        debugLog('Keyboard shortcut error: ' + error.message, 'error');
-                    }
-                });
-                
-                // Random cosmic messages
-                var messageTimer = setInterval(function() {
-                    var responses = [
-                        'Cosmic frequencies are looking stellar! 🌟',
-                        'System vibes: Totally kozmic! Keep shredding! 🎸',
-                        'Neural networks are grooving to your beat! 🤖',
-                        'All subsystems report: MAXIMUM KOZMICNESS achieved! ⚡'
-                    ];
-                    debugLog(responses[Math.floor(Math.random() * responses.length)], 'info');
-                }, 30000);
-                intervalIds.push(messageTimer);
-
-                // Cleanup on page unload
-                window.addEventListener('beforeunload', function() {
-                    try {
-                        if (animationFrameId) cancelAnimationFrame(animationFrameId);
-                        if (visualizationFrameId) cancelAnimationFrame(visualizationFrameId);
-                        for (var i = 0; i < intervalIds.length; i++) {
-                            clearInterval(intervalIds[i]);
-                        }
-                        if (audioStream) {
-                            var tracks = audioStream.getTracks();
-                            for (var i = 0; i < tracks.length; i++) {
-                                tracks[i].stop();
-                            }
-                        }
-                    } catch(e) {
-                        // Silent cleanup
-                    }
-                });
-
-                return true;
-            } catch(e) {
-                debugLog('Event listener setup error: ' + e.message, 'error');
-                return false;
-            }
+        // Auto-initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeKozmicStudio);
+        } else {
+            initializeKozmicStudio();
         }
 
-        // Global Functions for SINWE Integration
-        window.triggerMixerEffect = function(effect) {
-            try {
-                var effectMap = {
-                    cheer: 'spiral',
-                    gunshot: 'burst',
-                    laughter: 'waveform'
-                };
-                setEffect(effectMap[effect] || 'particles');
-                safeElement('mixerEffect').textContent = effect.toUpperCase() + ' TRIGGERED';
-                debugLog('SINWE effect: ' + effect.toUpperCase() + ' triggered! 🎉', 'info');
-                setTimeout(function() { 
-                    safeElement('mixerEffect').textContent = 'NONE'; 
-                }, 2000);
-            } catch(e) {
-                debugLog('Mixer effect error: ' + e.message, 'error');
-            }
-        };
+        // Export global functions for console debugging
+        window.KozmicStudio = KozmicStudio;
+        window.log = log;
+        window.triggerSINWEEffect = triggerSINWEEffect;
+        window.setSINWEMode = setSINWEMode;
+        window.emergencyStop = emergencyStop;
 
-        window.toggleDrumLoop = function() {
-            try {
-                debugLog('SINWE drum loop toggled! 🥁', 'info');
-                safeElement('beatStatus').textContent = 'DRUM LOOP ACTIVE';
-                detectBeat();
-            } catch(e) {
-                debugLog('Drum loop error: ' + e.message, 'error');
-            }
-        };
+        // Global error handler
+        window.addEventListener('error', (e) => {
+            log(`Global error: ${e.message}`, 'error');
+        });
 
-        // Export main functions to window
-        window.connectAudio = connectAudio;
-        window.cycleEffect = cycleEffect;
-        window.toggleRecord = toggleRecord;
-        window.performBooleanCheck = performBooleanCheck;
-
-        // Handle window resize
-        window.addEventListener('resize', function() {
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
             try {
-                if (renderer && camera) {
-                    var canvas = safeElement('webgl-canvas');
-                    camera.aspect = canvas.clientWidth / canvas.clientHeight;
-                    camera.updateProjectionMatrix();
-                    renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+                if (KozmicStudio.guitarStream) {
+                    KozmicStudio.guitarStream.getTracks().forEach(track => track.stop());
                 }
-            } catch(e) {
-                // Silent error
+                if (KozmicStudio.videoStream) {
+                    KozmicStudio.videoStream.getTracks().forEach(track => track.stop());
+                }
+                if (KozmicStudio.metronomeInterval) {
+                    clearInterval(KozmicStudio.metronomeInterval);
+                }
+                log('Cleanup completed');
+            } catch (e) {
+                log(`Cleanup error: ${e.message}`, 'error');
             }
         });
 
-        // Touch gestures
-        var touchStartY = 0;
-        document.addEventListener('touchstart', function(e) {
-            touchStartY = e.touches[0].clientY;
-        });
-
-        document.addEventListener('touchend', function(e) {
-            try {
-                var touchEndY = e.changedTouches[0].clientY;
-                var diff = touchStartY - touchEndY;
-                
-                if (Math.abs(diff) > 50) {
-                    if (diff > 0) {
-                        cycleEffect();
-                    } else {
-                        performBooleanCheck();
-                    }
-                }
-            } catch(e) {
-                // Silent error
-            }
-        });
-
-        // Initialize on load
-        window.addEventListener('load', function() {
-            waitForThreeJS();
-        });
-
-        window.addEventListener('DOMContentLoaded', function() {
-            setTimeout(function() {
-                if (!window.studioInitialized) {
-                    waitForThreeJS();
-                }
-            }, 1000);
-        });
     </script>
 </body>
 </html>
