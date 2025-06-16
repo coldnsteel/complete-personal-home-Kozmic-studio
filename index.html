@@ -354,9 +354,37 @@
             gap: 10px;
             margin-top: 15px;
         }
+
+        /* Audio Status Indicator */
+        .audio-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            background: rgba(0,0,0,0.8);
+            border-radius: 10px;
+            border: 2px solid #ff6b9d;
+            z-index: 1001;
+            font-size: 12px;
+        }
+
+        .audio-status.active {
+            border-color: #4ade80;
+            color: #4ade80;
+        }
+
+        .audio-status.error {
+            border-color: #f87171;
+            color: #f87171;
+        }
     </style>
 </head>
 <body>
+    <!-- Audio Status Indicator -->
+    <div class="audio-status" id="audioStatusIndicator">
+        🔇 Audio: Click to Initialize
+    </div>
+
     <div class="container">
         <!-- 1. Input Module -->
         <div class="module">
@@ -599,12 +627,13 @@
     <div class="cosmic-creature"></div>
 
     <script>
-        // ===== KOZMIC PRO STUDIO - SINWE EDITION =====
+        // ===== KOZMIC PRO STUDIO - SINWE EDITION (FIXED AUDIO) =====
         
         // Global Studio State
         const KozmicStudio = {
             // Audio System
             audioContext: null,
+            audioInitialized: false,
             guitarStream: null,
             videoStream: null,
             analyzer: null,
@@ -637,6 +666,261 @@
             sessionActive: false
         };
 
+        // ===== CRITICAL AUDIO FIXES =====
+
+        // Fix 1: Proper Audio Context Initialization with Browser Autoplay Handling
+        async function initializeAudioSystem() {
+            try {
+                // Create audio context if it doesn't exist
+                if (!KozmicStudio.audioContext) {
+                    KozmicStudio.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+
+                // CRITICAL: Resume audio context for browser autoplay policy
+                if (KozmicStudio.audioContext.state === 'suspended') {
+                    await KozmicStudio.audioContext.resume();
+                }
+
+                // Initialize analyzer for audio visualization
+                if (!KozmicStudio.analyzer) {
+                    KozmicStudio.analyzer = KozmicStudio.audioContext.createAnalyser();
+                    KozmicStudio.analyzer.fftSize = 256;
+                    KozmicStudio.dataArray = new Uint8Array(KozmicStudio.analyzer.frequencyBinCount);
+                }
+
+                KozmicStudio.audioInitialized = true;
+                updateAudioStatus('🔊 Audio: Active', 'active');
+                log('✅ Audio system initialized successfully!');
+                return true;
+
+            } catch (error) {
+                updateAudioStatus('❌ Audio: Error', 'error');
+                log(`❌ Audio initialization failed: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        // Fix 2: Enhanced Metronome with Proper Error Handling
+        async function startMetronome() {
+            try {
+                // Ensure audio is initialized
+                if (!KozmicStudio.audioInitialized) {
+                    const success = await initializeAudioSystem();
+                    if (!success) {
+                        log('❌ Cannot start metronome: Audio system failed to initialize', 'error');
+                        return;
+                    }
+                }
+
+                if (KozmicStudio.metronomeInterval) {
+                    log('⚠️ Metronome already running!', 'warning');
+                    return;
+                }
+
+                const interval = 60000 / KozmicStudio.currentBPM;
+                let beatCount = 0;
+
+                KozmicStudio.metronomeInterval = setInterval(() => {
+                    try {
+                        if (KozmicStudio.audioContext && KozmicStudio.audioContext.state === 'running') {
+                            // Create metronome beep
+                            const oscillator = KozmicStudio.audioContext.createOscillator();
+                            const gainNode = KozmicStudio.audioContext.createGain();
+                            
+                            oscillator.connect(gainNode);
+                            gainNode.connect(KozmicStudio.audioContext.destination);
+                            
+                            // Accent every 4th beat
+                            const frequency = (beatCount % 4 === 0) ? 1000 : 800;
+                            oscillator.frequency.setValueAtTime(frequency, KozmicStudio.audioContext.currentTime);
+                            oscillator.type = 'square';
+                            
+                            gainNode.gain.setValueAtTime(0, KozmicStudio.audioContext.currentTime);
+                            gainNode.gain.linearRampToValueAtTime(0.1, KozmicStudio.audioContext.currentTime + 0.01);
+                            gainNode.gain.exponentialRampToValueAtTime(0.001, KozmicStudio.audioContext.currentTime + 0.1);
+                            
+                            oscillator.start(KozmicStudio.audioContext.currentTime);
+                            oscillator.stop(KozmicStudio.audioContext.currentTime + 0.1);
+                            
+                            beatCount++;
+                        }
+                    } catch (e) {
+                        log(`Metronome beat error: ${e.message}`, 'error');
+                    }
+                    
+                    pulseCreature();
+                }, interval);
+
+                KozmicStudio.isMetronomeActive = true;
+                safeGetElement('metronomeBtn').classList.add('active');
+                safeGetElement('metronomeBtn').textContent = 'Stop Metronome ⏹️';
+                safeGetElement('rhythmStatus').innerHTML = `🥁 Metronome: ${KozmicStudio.currentBPM} BPM ACTIVE`;
+                log(`🥁 Metronome started at ${KozmicStudio.currentBPM} BPM`);
+
+            } catch (error) {
+                log(`❌ Metronome start error: ${error.message}`, 'error');
+                safeGetElement('rhythmStatus').innerHTML = `❌ Metronome error: ${error.message}`;
+            }
+        }
+
+        function stopMetronome() {
+            try {
+                if (KozmicStudio.metronomeInterval) {
+                    clearInterval(KozmicStudio.metronomeInterval);
+                    KozmicStudio.metronomeInterval = null;
+                    KozmicStudio.isMetronomeActive = false;
+                    
+                    safeGetElement('metronomeBtn').classList.remove('active');
+                    safeGetElement('metronomeBtn').textContent = 'Metronome ⏱️';
+                    safeGetElement('rhythmStatus').innerHTML = '🥁 Metronome: STOPPED';
+                    log('🥁 Metronome stopped');
+                }
+            } catch (error) {
+                log(`❌ Metronome stop error: ${error.message}`, 'error');
+            }
+        }
+
+        function toggleMetronome() {
+            if (KozmicStudio.isMetronomeActive) {
+                stopMetronome();
+            } else {
+                startMetronome();
+            }
+        }
+
+        // Fix 3: Enhanced Drum Sounds with Proper Audio Context
+        async function triggerDrumSound(sound) {
+            try {
+                // Ensure audio is initialized
+                if (!KozmicStudio.audioInitialized) {
+                    const success = await initializeAudioSystem();
+                    if (!success) return;
+                }
+
+                if (!KozmicStudio.audioContext || KozmicStudio.audioContext.state !== 'running') {
+                    log('❌ Audio context not ready for drum sounds', 'error');
+                    return;
+                }
+
+                const oscillator = KozmicStudio.audioContext.createOscillator();
+                const gainNode = KozmicStudio.audioContext.createGain();
+                const filter = KozmicStudio.audioContext.createBiquadFilter();
+                
+                oscillator.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(KozmicStudio.audioContext.destination);
+                
+                // Enhanced drum sound parameters
+                const drumSounds = {
+                    kick: { freq: 60, type: 'sawtooth', decay: 0.5, filter: 100 },
+                    snare: { freq: 200, type: 'square', decay: 0.2, filter: 2000 },
+                    hat: { freq: 8000, type: 'square', decay: 0.1, filter: 10000 },
+                    crash: { freq: 4000, type: 'sawtooth', decay: 1.0, filter: 8000 },
+                    ride: { freq: 3000, type: 'triangle', decay: 0.8, filter: 6000 },
+                    tom: { freq: 150, type: 'sawtooth', decay: 0.4, filter: 300 },
+                    clap: { freq: 1000, type: 'square', decay: 0.15, filter: 2000 },
+                    gallop: { freq: 80, type: 'sawtooth', decay: 0.3, filter: 200 }
+                };
+                
+                const drumParams = drumSounds[sound] || drumSounds.kick;
+                
+                oscillator.type = drumParams.type;
+                oscillator.frequency.setValueAtTime(drumParams.freq, KozmicStudio.audioContext.currentTime);
+                filter.frequency.setValueAtTime(drumParams.filter, KozmicStudio.audioContext.currentTime);
+                filter.Q.setValueAtTime(2, KozmicStudio.audioContext.currentTime);
+                
+                gainNode.gain.setValueAtTime(0, KozmicStudio.audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.3, KozmicStudio.audioContext.currentTime + 0.01);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, KozmicStudio.audioContext.currentTime + drumParams.decay);
+                
+                oscillator.start(KozmicStudio.audioContext.currentTime);
+                oscillator.stop(KozmicStudio.audioContext.currentTime + drumParams.decay);
+                
+                // Visual feedback
+                const drumPad = document.querySelector(`[data-sound="${sound}"]`);
+                if (drumPad) {
+                    drumPad.classList.add('active');
+                    setTimeout(() => drumPad.classList.remove('active'), 150);
+                }
+                
+                log(`🥁 ${sound.toUpperCase()} played!`);
+
+            } catch (error) {
+                log(`❌ Drum sound error for ${sound}: ${error.message}`, 'error');
+            }
+        }
+
+        // Fix 4: Enhanced SINWE Effects with Audio Context Validation
+        async function triggerSINWEEffect(effect) {
+            try {
+                // Ensure audio is initialized
+                if (!KozmicStudio.audioInitialized) {
+                    const success = await initializeAudioSystem();
+                    if (!success) return;
+                }
+
+                if (KozmicStudio.sinwe.activeEffects.has(effect)) {
+                    KozmicStudio.sinwe.activeEffects.delete(effect);
+                    document.querySelector(`[data-effect="${effect}"]`).classList.remove('active');
+                    log(`🔊 SINWE Effect ${effect} OFF`, 'mixer');
+                } else {
+                    KozmicStudio.sinwe.activeEffects.add(effect);
+                    document.querySelector(`[data-effect="${effect}"]`).classList.add('active');
+                    
+                    // Generate effect sound
+                    if (KozmicStudio.audioContext && KozmicStudio.audioContext.state === 'running') {
+                        const oscillator = KozmicStudio.audioContext.createOscillator();
+                        const gainNode = KozmicStudio.audioContext.createGain();
+                        const filter = KozmicStudio.audioContext.createBiquadFilter();
+                        
+                        oscillator.connect(filter);
+                        filter.connect(gainNode);
+                        gainNode.connect(KozmicStudio.audioContext.destination);
+                        
+                        // Effect-specific sound design
+                        const effectSounds = {
+                            cheer: { freq: 800, type: 'sine', duration: 0.8 },
+                            din: { freq: 400, type: 'square', duration: 0.3 },
+                            gunshot: { freq: 100, type: 'sawtooth', duration: 0.5 },
+                            laughter: { freq: 600, type: 'triangle', duration: 1.0 },
+                            applause: { freq: 1000, type: 'square', duration: 1.5 },
+                            awesome: { freq: 750, type: 'sine', duration: 0.6 },
+                            pubg: { freq: 200, type: 'sawtooth', duration: 0.4 },
+                            kiss: { freq: 1200, type: 'sine', duration: 0.2 },
+                            yell: { freq: 500, type: 'square', duration: 0.7 }
+                        };
+                        
+                        const soundParams = effectSounds[effect] || { freq: 500, type: 'sine', duration: 0.5 };
+                        
+                        oscillator.frequency.setValueAtTime(soundParams.freq, KozmicStudio.audioContext.currentTime);
+                        oscillator.type = soundParams.type;
+                        filter.frequency.setValueAtTime(soundParams.freq * 2, KozmicStudio.audioContext.currentTime);
+                        
+                        gainNode.gain.setValueAtTime(0, KozmicStudio.audioContext.currentTime);
+                        gainNode.gain.linearRampToValueAtTime(0.1, KozmicStudio.audioContext.currentTime + 0.05);
+                        gainNode.gain.exponentialRampToValueAtTime(0.001, KozmicStudio.audioContext.currentTime + soundParams.duration);
+                        
+                        oscillator.start(KozmicStudio.audioContext.currentTime);
+                        oscillator.stop(KozmicStudio.audioContext.currentTime + soundParams.duration);
+                    }
+                    
+                    log(`🔊 SINWE Effect ${effect} triggered!`, 'mixer');
+                    
+                    // Auto-deactivate after effect duration
+                    setTimeout(() => {
+                        KozmicStudio.sinwe.activeEffects.delete(effect);
+                        const btn = document.querySelector(`[data-effect="${effect}"]`);
+                        if (btn) btn.classList.remove('active');
+                    }, 2000);
+                }
+                
+                pulseCreature();
+
+            } catch (error) {
+                log(`❌ SINWE effect error for ${effect}: ${error.message}`, 'error');
+            }
+        }
+
         // Utility Functions
         function safeGetElement(id) {
             const element = document.getElementById(id);
@@ -661,28 +945,28 @@
             // Update relevant status displays
             if (type === 'mixer') {
                 safeGetElement('mixerStatus').innerHTML = `SINWE: ${message}`;
+            } else if (type === 'error') {
+                safeGetElement('inputStatus').innerHTML = `❌ ${message}`;
             }
+        }
+
+        function updateAudioStatus(message, type) {
+            const indicator = safeGetElement('audioStatusIndicator');
+            indicator.textContent = message;
+            indicator.className = `audio-status ${type}`;
         }
 
         // Audio System Initialization
-        function initAudio() {
-            if (!KozmicStudio.audioContext) {
-                try {
-                    KozmicStudio.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    KozmicStudio.analyzer = KozmicStudio.audioContext.createAnalyser();
-                    KozmicStudio.analyzer.fftSize = 256;
-                    KozmicStudio.dataArray = new Uint8Array(KozmicStudio.analyzer.frequencyBinCount);
-                    log('Audio context initialized successfully');
-                } catch (e) {
-                    log('Audio context initialization failed: ' + e.message, 'error');
-                }
-            }
+        async function initAudio() {
+            return await initializeAudioSystem();
         }
 
-        // Input Connection System
+        // Input Connection System (Enhanced)
         async function connectInput() {
             try {
-                initAudio();
+                // Initialize audio first
+                await initializeAudioSystem();
+                
                 const inputType = safeGetElement('inputType').value;
                 const inputStatus = safeGetElement('inputStatus');
                 
@@ -760,7 +1044,7 @@
             }
         }
 
-        // SINWE Effects Chain Setup
+        // SINWE Effects Chain Setup (Enhanced)
         function setupSINWEEffectsChain() {
             if (!KozmicStudio.audioContext || !KozmicStudio.guitarStream) return;
             
@@ -813,7 +1097,7 @@
             }
         }
 
-        // Volume and Level Monitoring
+        // Volume and Level Monitoring (Enhanced)
         function startVolumeMonitoring() {
             if (!KozmicStudio.analyzer || !KozmicStudio.dataArray) return;
             
@@ -847,7 +1131,7 @@
             updateVolume();
         }
 
-        // SINWE Level Indicators
+        // SINWE Level Indicators (Enhanced)
         function startLevelIndicators() {
             function updateLevels() {
                 if (!KozmicStudio.analyzer || !KozmicStudio.dataArray) return;
@@ -912,51 +1196,7 @@
             log(`Recording mode: ${mode.toUpperCase()}`, 'mixer');
         }
 
-        // SINWE Sound Effects Trigger
-        function triggerSINWEEffect(effect) {
-            if (KozmicStudio.sinwe.activeEffects.has(effect)) {
-                KozmicStudio.sinwe.activeEffects.delete(effect);
-                document.querySelector(`[data-effect="${effect}"]`).classList.remove('active');
-                log(`Effect ${effect} OFF`, 'mixer');
-            } else {
-                KozmicStudio.sinwe.activeEffects.add(effect);
-                document.querySelector(`[data-effect="${effect}"]`).classList.add('active');
-                
-                // Simulate effect trigger
-                if (KozmicStudio.audioContext) {
-                    const oscillator = KozmicStudio.audioContext.createOscillator();
-                    const gainNode = KozmicStudio.audioContext.createGain();
-                    
-                    oscillator.connect(gainNode);
-                    gainNode.connect(KozmicStudio.audioContext.destination);
-                    
-                    // Effect-specific frequencies
-                    const effectFreqs = {
-                        cheer: 800, din: 400, gunshot: 100, laughter: 600,
-                        applause: 1000, awesome: 750, pubg: 200
-                    };
-                    
-                    oscillator.frequency.value = effectFreqs[effect] || 500;
-                    gainNode.gain.setValueAtTime(0.1, KozmicStudio.audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, KozmicStudio.audioContext.currentTime + 0.5);
-                    
-                    oscillator.start(KozmicStudio.audioContext.currentTime);
-                    oscillator.stop(KozmicStudio.audioContext.currentTime + 0.5);
-                }
-                
-                log(`Effect ${effect} triggered!`, 'mixer');
-                
-                // Auto-deactivate after 2 seconds
-                setTimeout(() => {
-                    KozmicStudio.sinwe.activeEffects.delete(effect);
-                    document.querySelector(`[data-effect="${effect}"]`).classList.remove('active');
-                }, 2000);
-            }
-            
-            pulseCreature();
-        }
-
-        // EQ Control System
+        // EQ Control System (Enhanced)
         function updateEQ(band, value) {
             KozmicStudio.sinwe.eq[band] = value;
             
@@ -967,24 +1207,32 @@
             display.textContent = value + '%';
             
             // Apply to audio chain
-            if (KozmicStudio.effectsChain && KozmicStudio.audioContext) {
+            if (KozmicStudio.effectsChain && KozmicStudio.audioContext && KozmicStudio.audioContext.state === 'running') {
                 const currentTime = KozmicStudio.audioContext.currentTime;
                 const gainValue = (value - 50) / 50 * 12; // Convert to dB range
                 
                 try {
                     switch(band) {
                         case 'treble':
-                            KozmicStudio.effectsChain.trebleFilter.gain.setValueAtTime(gainValue, currentTime);
+                            if (KozmicStudio.effectsChain.trebleFilter) {
+                                KozmicStudio.effectsChain.trebleFilter.gain.setValueAtTime(gainValue, currentTime);
+                            }
                             break;
                         case 'mid':
-                            KozmicStudio.effectsChain.midFilter.gain.setValueAtTime(gainValue, currentTime);
+                            if (KozmicStudio.effectsChain.midFilter) {
+                                KozmicStudio.effectsChain.midFilter.gain.setValueAtTime(gainValue, currentTime);
+                            }
                             break;
                         case 'bass':
-                            KozmicStudio.effectsChain.bassFilter.gain.setValueAtTime(gainValue, currentTime);
+                            if (KozmicStudio.effectsChain.bassFilter) {
+                                KozmicStudio.effectsChain.bassFilter.gain.setValueAtTime(gainValue, currentTime);
+                            }
                             break;
                         case 'echo':
-                            const echoAmount = value / 100 * 0.3;
-                            KozmicStudio.effectsChain.echoGain.gain.setValueAtTime(echoAmount, currentTime);
+                            if (KozmicStudio.effectsChain.echoGain) {
+                                const echoAmount = value / 100 * 0.3;
+                                KozmicStudio.effectsChain.echoGain.gain.setValueAtTime(echoAmount, currentTime);
+                            }
                             break;
                     }
                 } catch (e) {
@@ -993,7 +1241,7 @@
             }
         }
 
-        // SINWE Function Controls
+        // SINWE Function Controls (Enhanced)
         function toggleSINWEFunction(func) {
             KozmicStudio.sinwe.functions[func] = !KozmicStudio.sinwe.functions[func];
             const button = safeGetElement(func + 'Btn');
@@ -1007,28 +1255,152 @@
             }
             
             // Apply function logic
-            if (KozmicStudio.effectsChain && KozmicStudio.audioContext) {
+            if (KozmicStudio.effectsChain && KozmicStudio.audioContext && KozmicStudio.audioContext.state === 'running') {
                 const currentTime = KozmicStudio.audioContext.currentTime;
                 
-                switch(func) {
-                    case 'mute':
-                        const muteGain = KozmicStudio.sinwe.functions[func] ? 0 : 0.75;
-                        KozmicStudio.effectsChain.outputGain.gain.setValueAtTime(muteGain, currentTime);
-                        break;
-                    case 'elimination':
-                        // Implement noise gate or similar
-                        break;
-                    case 'denoise':
-                        // Implement noise reduction
-                        break;
-                    case 'voiceOver':
-                        // Implement voice-over ducking
-                        break;
+                try {
+                    switch(func) {
+                        case 'mute':
+                            if (KozmicStudio.effectsChain.outputGain) {
+                                const muteGain = KozmicStudio.sinwe.functions[func] ? 0 : 0.75;
+                                KozmicStudio.effectsChain.outputGain.gain.setValueAtTime(muteGain, currentTime);
+                            }
+                            break;
+                        case 'elimination':
+                            // Implement noise gate or similar
+                            break;
+                        case 'denoise':
+                            // Implement noise reduction
+                            break;
+                        case 'voiceOver':
+                            // Implement voice-over ducking
+                            break;
+                    }
+                } catch (e) {
+                    log(`Function ${func} error: ${e.message}`, 'error');
                 }
             }
         }
 
-        // Recording System
+        // BPM Control (Enhanced)
+        function setBPM(value) {
+            KozmicStudio.currentBPM = parseInt(value);
+            safeGetElement('bpmDisplay').textContent = KozmicStudio.currentBPM;
+            
+            // Restart metronome if active
+            if (KozmicStudio.isMetronomeActive) {
+                stopMetronome();
+                setTimeout(() => startMetronome(), 100);
+            }
+        }
+
+        // Cosmic Creature Animation
+        function pulseCreature() {
+            try {
+                const creature = document.querySelector('.cosmic-creature');
+                if (creature) {
+                    creature.classList.add('pulse');
+                    setTimeout(() => creature.classList.remove('pulse'), 500);
+                }
+            } catch (e) {
+                log(`Creature animation error: ${e.message}`, 'error');
+            }
+        }
+
+        // User Interaction Handler for Audio Context Activation
+        function handleFirstUserInteraction() {
+            initializeAudioSystem();
+            document.removeEventListener('click', handleFirstUserInteraction);
+            document.removeEventListener('keydown', handleFirstUserInteraction);
+        }
+
+        // Event Listeners Setup (Enhanced)
+        function setupEventListeners() {
+            try {
+                // Audio Status Indicator Click
+                safeGetElement('audioStatusIndicator').addEventListener('click', initializeAudioSystem);
+
+                // Input Controls
+                safeGetElement('connectInput').addEventListener('click', connectInput);
+                safeGetElement('recordAudioBtn').addEventListener('click', () => toggleRecording('audio'));
+                safeGetElement('recordVideoBtn').addEventListener('click', () => toggleRecording('video'));
+                
+                // SINWE Recording Mode Buttons
+                document.querySelectorAll('[data-mode]').forEach(btn => {
+                    btn.addEventListener('click', () => setSINWEMode(btn.dataset.mode));
+                });
+                
+                // SINWE Sound Effect Buttons
+                document.querySelectorAll('[data-effect]').forEach(btn => {
+                    btn.addEventListener('click', () => triggerSINWEEffect(btn.dataset.effect));
+                });
+                
+                // EQ Controls
+                ['treble', 'mid', 'bass', 'echo'].forEach(band => {
+                    const slider = safeGetElement(band);
+                    slider.addEventListener('input', (e) => updateEQ(band, e.target.value));
+                });
+                
+                // SINWE Function Buttons
+                ['elimination', 'mute', 'denoise', 'voiceOver'].forEach(func => {
+                    safeGetElement(func + 'Btn').addEventListener('click', () => toggleSINWEFunction(func));
+                });
+                
+                // Rhythm Controls
+                safeGetElement('metronomeBtn').addEventListener('click', toggleMetronome);
+                safeGetElement('tunerBtn').addEventListener('click', () => {
+                    log('Guitar tuner activated');
+                });
+                safeGetElement('bpmSlider').addEventListener('input', (e) => setBPM(e.target.value));
+                
+                // Drum Pads
+                document.querySelectorAll('[data-sound]').forEach(pad => {
+                    pad.addEventListener('click', () => triggerDrumSound(pad.dataset.sound));
+                });
+                
+                // Cosmic Creature
+                document.querySelector('.cosmic-creature').addEventListener('click', pulseCreature);
+                
+                // First user interaction handlers for audio activation
+                document.addEventListener('click', handleFirstUserInteraction);
+                document.addEventListener('keydown', handleFirstUserInteraction);
+                
+                // Keyboard Shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey && e.shiftKey) {
+                        switch(e.key.toLowerCase()) {
+                            case 's': saveSession(); break;
+                            case 'l': loadSession(); break;
+                            case 'e': emergencyStop(); break;
+                        }
+                    } else {
+                        switch(e.key.toLowerCase()) {
+                            case ' ': e.preventDefault(); toggleMetronome(); break;
+                            case 'm': toggleSINWEFunction('mute'); break;
+                            case 'r': toggleRecording('audio'); break;
+                            case 'v': toggleRecording('video'); break;
+                            case 's': toggleStreaming(); break;
+                            // Drum pad shortcuts
+                            case 'q': triggerDrumSound('kick'); break;
+                            case 'w': triggerDrumSound('snare'); break;
+                            case 'e': triggerDrumSound('hat'); break;
+                            case 'r': triggerDrumSound('crash'); break;
+                            case 'a': triggerDrumSound('ride'); break;
+                            case 's': triggerDrumSound('tom'); break;
+                            case 'd': triggerDrumSound('clap'); break;
+                            case 'f': triggerDrumSound('gallop'); break;
+                        }
+                    }
+                });
+                
+                log('Event listeners setup complete');
+                
+            } catch (e) {
+                log(`Event listener setup error: ${e.message}`, 'error');
+            }
+        }
+
+        // Recording System (Enhanced with Audio Validation)
         function toggleRecording(type) {
             try {
                 if (!KozmicStudio.isRecording) {
@@ -1117,119 +1489,7 @@
             }
         }
 
-        // Rhythm System
-        function toggleMetronome() {
-            if (KozmicStudio.isMetronomeActive) {
-                stopMetronome();
-            } else {
-                startMetronome();
-            }
-        }
-
-        function startMetronome() {
-            if (KozmicStudio.metronomeInterval) return;
-            
-            try {
-                const interval = 60000 / KozmicStudio.currentBPM;
-                KozmicStudio.metronomeInterval = setInterval(() => {
-                    if (KozmicStudio.audioContext) {
-                        const oscillator = KozmicStudio.audioContext.createOscillator();
-                        const gainNode = KozmicStudio.audioContext.createGain();
-                        
-                        oscillator.connect(gainNode);
-                        gainNode.connect(KozmicStudio.audioContext.destination);
-                        
-                        oscillator.frequency.value = 800;
-                        gainNode.gain.setValueAtTime(0.1, KozmicStudio.audioContext.currentTime);
-                        gainNode.gain.exponentialRampToValueAtTime(0.01, KozmicStudio.audioContext.currentTime + 0.1);
-                        
-                        oscillator.start(KozmicStudio.audioContext.currentTime);
-                        oscillator.stop(KozmicStudio.audioContext.currentTime + 0.1);
-                    }
-                    pulseCreature();
-                }, interval);
-
-                KozmicStudio.isMetronomeActive = true;
-                safeGetElement('metronomeBtn').classList.add('active');
-                safeGetElement('rhythmStatus').innerHTML = `Metronome: ${KozmicStudio.currentBPM} BPM ACTIVE`;
-                log(`Metronome started at ${KozmicStudio.currentBPM} BPM`);
-            } catch (e) {
-                log(`Metronome error: ${e.message}`, 'error');
-            }
-        }
-
-        function stopMetronome() {
-            if (KozmicStudio.metronomeInterval) {
-                clearInterval(KozmicStudio.metronomeInterval);
-                KozmicStudio.metronomeInterval = null;
-                KozmicStudio.isMetronomeActive = false;
-                safeGetElement('metronomeBtn').classList.remove('active');
-                safeGetElement('rhythmStatus').innerHTML = 'Metronome: STOPPED';
-                log('Metronome stopped');
-            }
-        }
-
-        function setBPM(value) {
-            KozmicStudio.currentBPM = parseInt(value);
-            safeGetElement('bpmDisplay').textContent = KozmicStudio.currentBPM;
-            
-            // Restart metronome if active
-            if (KozmicStudio.isMetronomeActive) {
-                stopMetronome();
-                startMetronome();
-            }
-        }
-
-        // Drum Pad System
-        function triggerDrumSound(sound) {
-            if (!KozmicStudio.audioContext) return;
-            
-            try {
-                const oscillator = KozmicStudio.audioContext.createOscillator();
-                const gainNode = KozmicStudio.audioContext.createGain();
-                const filter = KozmicStudio.audioContext.createBiquadFilter();
-                
-                oscillator.connect(filter);
-                filter.connect(gainNode);
-                gainNode.connect(KozmicStudio.audioContext.destination);
-                
-                // Sound-specific parameters
-                const drumSounds = {
-                    kick: { freq: 60, type: 'sawtooth', decay: 0.5 },
-                    snare: { freq: 200, type: 'square', decay: 0.2 },
-                    hat: { freq: 8000, type: 'square', decay: 0.1 },
-                    crash: { freq: 4000, type: 'sawtooth', decay: 1.0 },
-                    ride: { freq: 3000, type: 'triangle', decay: 0.8 },
-                    tom: { freq: 150, type: 'sawtooth', decay: 0.4 },
-                    clap: { freq: 1000, type: 'square', decay: 0.15 },
-                    gallop: { freq: 80, type: 'sawtooth', decay: 0.3 }
-                };
-                
-                const drumParams = drumSounds[sound] || drumSounds.kick;
-                
-                oscillator.type = drumParams.type;
-                oscillator.frequency.setValueAtTime(drumParams.freq, KozmicStudio.audioContext.currentTime);
-                filter.frequency.setValueAtTime(drumParams.freq * 2, KozmicStudio.audioContext.currentTime);
-                gainNode.gain.setValueAtTime(0.3, KozmicStudio.audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, KozmicStudio.audioContext.currentTime + drumParams.decay);
-                
-                oscillator.start(KozmicStudio.audioContext.currentTime);
-                oscillator.stop(KozmicStudio.audioContext.currentTime + drumParams.decay);
-                
-                // Visual feedback
-                const drumPad = document.querySelector(`[data-sound="${sound}"]`);
-                if (drumPad) {
-                    drumPad.classList.add('active');
-                    setTimeout(() => drumPad.classList.remove('active'), 100);
-                }
-                
-                log(`Drum sound: ${sound.toUpperCase()}`);
-            } catch (e) {
-                log(`Drum sound error: ${e.message}`, 'error');
-            }
-        }
-
-        // Streaming System
+        // Streaming System (Enhanced)
         function toggleStreaming() {
             if (KozmicStudio.isStreaming) {
                 stopStreaming();
@@ -1268,14 +1528,15 @@
             log('Streaming stopped');
         }
 
-        // Session Management
+        // Session Management (Enhanced)
         function saveSession() {
             try {
                 const sessionData = {
                     timestamp: Date.now(),
                     sinwe: KozmicStudio.sinwe,
                     bpm: KozmicStudio.currentBPM,
-                    version: 'SINWE Edition'
+                    audioInitialized: KozmicStudio.audioInitialized,
+                    version: 'SINWE Edition FIXED'
                 };
                 
                 const blob = new Blob([JSON.stringify(sessionData, null, 2)], { type: 'application/json' });
@@ -1376,6 +1637,14 @@
                 safeGetElement('rhythmStatus').innerHTML = 'Rhythm: Stopped';
                 safeGetElement('masterStatus').innerHTML = 'EMERGENCY STOP COMPLETE';
                 safeGetElement('guitarStatus').textContent = 'SINWE: Disconnected';
+                updateAudioStatus('🔇 Audio: Reset', 'error');
+                
+                // Reset audio context
+                KozmicStudio.audioInitialized = false;
+                if (KozmicStudio.audioContext) {
+                    KozmicStudio.audioContext.close();
+                    KozmicStudio.audioContext = null;
+                }
                 
                 log('EMERGENCY STOP executed - all systems reset');
             } catch (e) {
@@ -1383,7 +1652,7 @@
             }
         }
 
-        // Equipment Checklist
+        // Equipment Checklist Functions
         function resetChecklist() {
             try {
                 document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
@@ -1409,48 +1678,9 @@
             }
         }
 
-        // Cosmic Creature Animation
-        function pulseCreature() {
+        // Add remaining event listeners for master controls and checklist
+        function setupRemainingEventListeners() {
             try {
-                const creature = document.querySelector('.cosmic-creature');
-                if (creature) {
-                    creature.classList.add('pulse');
-                    setTimeout(() => creature.classList.remove('pulse'), 500);
-                }
-            } catch (e) {
-                log(`Creature animation error: ${e.message}`, 'error');
-            }
-        }
-
-        // Event Listeners Setup
-        function setupEventListeners() {
-            try {
-                // Input Controls
-                safeGetElement('connectInput').addEventListener('click', connectInput);
-                safeGetElement('recordAudioBtn').addEventListener('click', () => toggleRecording('audio'));
-                safeGetElement('recordVideoBtn').addEventListener('click', () => toggleRecording('video'));
-                
-                // SINWE Recording Mode Buttons
-                document.querySelectorAll('[data-mode]').forEach(btn => {
-                    btn.addEventListener('click', () => setSINWEMode(btn.dataset.mode));
-                });
-                
-                // SINWE Sound Effect Buttons
-                document.querySelectorAll('[data-effect]').forEach(btn => {
-                    btn.addEventListener('click', () => triggerSINWEEffect(btn.dataset.effect));
-                });
-                
-                // EQ Controls
-                ['treble', 'mid', 'bass', 'echo'].forEach(band => {
-                    const slider = safeGetElement(band);
-                    slider.addEventListener('input', (e) => updateEQ(band, e.target.value));
-                });
-                
-                // SINWE Function Buttons
-                ['elimination', 'mute', 'denoise', 'voiceOver'].forEach(func => {
-                    safeGetElement(func + 'Btn').addEventListener('click', () => toggleSINWEFunction(func));
-                });
-                
                 // Connectivity Buttons
                 safeGetElement('bluetoothBtn').addEventListener('click', () => {
                     KozmicStudio.sinwe.connectivity.bluetooth = !KozmicStudio.sinwe.connectivity.bluetooth;
@@ -1474,19 +1704,6 @@
                         btn.classList.remove('active');
                         log('Internal play OFF', 'mixer');
                     }
-                });
-                
-                // Rhythm Controls
-                safeGetElement('metronomeBtn').addEventListener('click', toggleMetronome);
-                safeGetElement('tunerBtn').addEventListener('click', () => {
-                    // Guitar tuner functionality would go here
-                    log('Guitar tuner activated');
-                });
-                safeGetElement('bpmSlider').addEventListener('input', (e) => setBPM(e.target.value));
-                
-                // Drum Pads
-                document.querySelectorAll('[data-sound]').forEach(pad => {
-                    pad.addEventListener('click', () => triggerDrumSound(pad.dataset.sound));
                 });
                 
                 // Streaming Controls
@@ -1514,7 +1731,7 @@
                 safeGetElement('masterVolume').addEventListener('input', (e) => {
                     const value = e.target.value;
                     safeGetElement('masterVolumeValue').textContent = value + '%';
-                    if (KozmicStudio.effectsChain && KozmicStudio.effectsChain.outputGain) {
+                    if (KozmicStudio.effectsChain && KozmicStudio.effectsChain.outputGain && KozmicStudio.audioContext) {
                         const gain = value / 100;
                         KozmicStudio.effectsChain.outputGain.gain.setValueAtTime(gain, KozmicStudio.audioContext.currentTime);
                     }
@@ -1522,7 +1739,7 @@
                 
                 // Input Gain
                 safeGetElement('inputGain').addEventListener('input', (e) => {
-                    if (KozmicStudio.effectsChain && KozmicStudio.effectsChain.inputGain) {
+                    if (KozmicStudio.effectsChain && KozmicStudio.effectsChain.inputGain && KozmicStudio.audioContext) {
                         const gain = e.target.value / 100;
                         KozmicStudio.effectsChain.inputGain.gain.setValueAtTime(gain, KozmicStudio.audioContext.currentTime);
                     }
@@ -1532,51 +1749,19 @@
                 safeGetElement('resetChecklistBtn').addEventListener('click', resetChecklist);
                 safeGetElement('checkAllBtn').addEventListener('click', checkAllItems);
                 
-                // Cosmic Creature
-                document.querySelector('.cosmic-creature').addEventListener('click', pulseCreature);
-                
-                // Keyboard Shortcuts
-                document.addEventListener('keydown', (e) => {
-                    if (e.ctrlKey && e.shiftKey) {
-                        switch(e.key.toLowerCase()) {
-                            case 's': saveSession(); break;
-                            case 'l': loadSession(); break;
-                            case 'e': emergencyStop(); break;
-                        }
-                    } else {
-                        switch(e.key.toLowerCase()) {
-                            case ' ': e.preventDefault(); toggleMetronome(); break;
-                            case 'm': toggleSINWEFunction('mute'); break;
-                            case 'r': toggleRecording('audio'); break;
-                            case 'v': toggleRecording('video'); break;
-                            case 's': toggleStreaming(); break;
-                            // Drum pad shortcuts
-                            case 'q': triggerDrumSound('kick'); break;
-                            case 'w': triggerDrumSound('snare'); break;
-                            case 'e': triggerDrumSound('hat'); break;
-                            case 'r': triggerDrumSound('crash'); break;
-                            case 'a': triggerDrumSound('ride'); break;
-                            case 's': triggerDrumSound('tom'); break;
-                            case 'd': triggerDrumSound('clap'); break;
-                            case 'f': triggerDrumSound('gallop'); break;
-                        }
-                    }
-                });
-                
-                log('Event listeners setup complete');
-                
             } catch (e) {
-                log(`Event listener setup error: ${e.message}`, 'error');
+                log(`Remaining event listeners setup error: ${e.message}`, 'error');
             }
         }
 
-        // Initialization
+        // Initialization Function (Enhanced)
         function initializeKozmicStudio() {
             try {
-                log('🌌 KOZMIC PRO STUDIO - SINWE EDITION INITIALIZING...');
+                log('🌌 KOZMIC PRO STUDIO - SINWE EDITION (AUDIO FIXED) INITIALIZING...');
                 
                 // Setup all event listeners
                 setupEventListeners();
+                setupRemainingEventListeners();
                 
                 // Initialize default SINWE state
                 setSINWEMode('primal');
@@ -1594,9 +1779,10 @@
                 safeGetElement('mixerStatus').innerHTML = 'SINWE Mixer Ready - 44.1kHz/16-bit';
                 safeGetElement('connectionStatus').innerHTML = 'USB-C Connected<br>Ready for 3-phone streaming';
                 safeGetElement('checklistStatus').innerHTML = 'Check your SINWE equipment setup!';
+                updateAudioStatus('🔇 Audio: Click to Initialize', '');
                 
-                log('🎸 KOZMIC PRO STUDIO - SINWE EDITION READY! 🎸');
-                log('Features: SINWE Mixer Integration, Multi-Platform Streaming, Professional Recording');
+                log('🎸 KOZMIC PRO STUDIO - SINWE EDITION (AUDIO FIXED) READY! 🎸');
+                log('✅ FIXES: Audio Context, Metronome, Drum Sounds, SINWE Effects');
                 
                 // Initial creature pulse
                 setTimeout(pulseCreature, 1000);
@@ -1619,6 +1805,7 @@
         window.triggerSINWEEffect = triggerSINWEEffect;
         window.setSINWEMode = setSINWEMode;
         window.emergencyStop = emergencyStop;
+        window.initializeAudioSystem = initializeAudioSystem;
 
         // Global error handler
         window.addEventListener('error', (e) => {
@@ -1636,6 +1823,9 @@
                 }
                 if (KozmicStudio.metronomeInterval) {
                     clearInterval(KozmicStudio.metronomeInterval);
+                }
+                if (KozmicStudio.audioContext) {
+                    KozmicStudio.audioContext.close();
                 }
                 log('Cleanup completed');
             } catch (e) {
